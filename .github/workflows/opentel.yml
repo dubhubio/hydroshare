@@ -9,13 +9,16 @@ on:
 jobs:
   container-job:
     runs-on: ubuntu-latest
-    container: docker/compose:latest
+    container: canopyiq/python-dind-builder:latest
     services:
       open-tel:
         image: baseshiftefraim/otelcol:latest
         ports:
           - 4317:4317
     steps:
+      - uses: KengoTODA/actions-setup-docker-compose@v1
+        with:
+          version: '2.14.2'
       - name: Check out repository code
         uses: actions/checkout@v3
       - name: Set Up Docker
