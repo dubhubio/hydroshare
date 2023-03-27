@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+cd /hydroshare
+userdel hydro-service \
+ && groupdel storage-hydro \
+ && echo "storage-hydro:x:1000:" >> /etc/group \
+ && echo "hydro-service:x:1000:1000::/hydroshare:/bin/bash" >> /etc/passwd \
+ && chown -R hydro-service:storage-hydro /hydroshare /hs_tmp /shared_tmp /tmp \
+ && chmod -R 3777 /hs_tmp /shared_tmp /tmp 
+
+celery -A hydroshare beat  -s /hydroshare/celery/celerybeat-schedule &
+celery -A hydroshare worker -E -Q default --concurrency=4 &
+celery -A hydroshare flower --address=0.0.0.0 --broker=amqp://guest:guest@rabbitmq:5672//
+
