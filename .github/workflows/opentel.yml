@@ -18,8 +18,10 @@ jobs:
     steps:
       - name: Set Up Docker
         run: |
+          docker logs
           service docker start
           docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker logs
           echo "c" | ./local-dev-first-start-only.sh
       - name: Run Tests
         run: |

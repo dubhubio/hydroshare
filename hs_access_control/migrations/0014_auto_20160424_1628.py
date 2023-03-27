@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
             preserve_default=False,
         ),
         # END(ID=243)
-        # START(ID=244,NAME=MigrationAddFieldDescriptionGroupAccessTYPE=ALTER,OBJECTS=[GroupAccess])
+        # START(ID=244,NAME=MigrationAddFieldDescriptionGroupAccess,TYPE=ALTER,OBJECTS=[GroupAccess])
         migrations.AddField(
             model_name='groupaccess',
             name='description',
@@ -43,14 +43,18 @@ class Migration(migrations.Migration):
             preserve_default=False,
         ),
         # END(ID=244)
+        # START(ID=245,NAME=MigrationAddFieldPictureGroupAccess,TYPE=ALTER,OBJECTS=[GroupAccess])
         migrations.AddField(
             model_name='groupaccess',
             name='picture',
             field=models.ImageField(null=True, upload_to='group', blank=True),
         ),
+        # END(ID=245)
+        # START(ID=246,NAME=MigrationAddFieldPurposeGroupAccess,TYPE=ALTER,OBJECTS=[GroupAccess])
         migrations.AddField(
             model_name='groupaccess',
             name='purpose',
             field=models.TextField(null=True, blank=True),
         ),
+        # END(ID=246)
     ]

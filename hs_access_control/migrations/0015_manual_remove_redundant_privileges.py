@@ -42,10 +42,18 @@ def remove_extra_privileges(apps, schema_editor):
     GroupResourcePrivilege = apps.get_model("hs_access_control", "GroupResourcePrivilege")
 
     # brute force removal of offending records.
+    # START(ID=247,NAME=MigrationGetAllUsersForForceRemoval,TYPE=SELECT,OBJECTS=[USER])
     for u in User.objects.all():
+    # END(ID=247)
+        # START(ID=248,NAME=MigrationGetAllBaseResourceForForceRemoval,TYPE=SELECT,OBJECTS=[BaseResource])
         for r in BaseResource.objects.all():
+        # END(ID=248)
+            # START(ID=249,NAME=MigrationFilterUserResourcePrivilegeForForceRemoval,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
             records = UserResourcePrivilege.objects.filter(user=u, resource=r)
+            # END(ID=249)
+            # START(ID=250,NAME=MigrationFilterUserResourcePrivilegeForForceRemoval,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
             if records.count() > 1:  # do nothing if there are no duplicates
+            # END(ID=250)
                 # print(str.format("User '{}' (id={}) has {} privilege records" +
                 #                  " over resource '{}'",
                 #                  str(r.user.username).encode('ascii'), str(r.user.id),
@@ -56,18 +64,25 @@ def remove_extra_privileges(apps, schema_editor):
                 #     print(str.format("   {}", str(x)))
 
                 # determine the lowest privilege number
+                # START(ID=251,NAME=MigrationFindMinOfUserResourcePrivilegeForForceRemoval,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
                 min = records.aggregate(models.Min('privilege'))
+                # END(ID=251)
                 min_privilege = min['privilege__min']
                 # print (str.format("   minimum privilege is {}", str(min_privilege)))
 
                 # of records with this number, select the record with maximum timestamp.
                 # This determines the (last) grantor
+                # START(ID=252,NAME=MigrationFindMaxOfUserResourcePrivilegeForForceRemovalWithMinPriviledge,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
                 max = records.filter(privilege=min_privilege).aggregate(models.Max('start'))
+                # END(ID=252)
                 max_start = max['start__max']
                 # print (str.format("   maximum start is {}", str(max_start)))
-
+                # START(ID=253,NAME=MigrationUserResourcePrivilegeToKeepWithMinPriviledge,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
                 to_keep = records.filter(privilege=min_privilege, start=max_start)
+                # END(ID=253)
+                # START(ID=254,NAME=MigrationUserResourcePrivilegeToKeepWithMinPriviledge,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
                 if to_keep.count() == 1:
+                # END(ID=254)
                     # print("   one UNIQUE start record: {}", str(to_keep[0]))
                     to_delete = records.exclude(pk__in=to_keep)
                     to_delete.delete()
