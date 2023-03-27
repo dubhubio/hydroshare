@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
             ],
         ),
         # END(ID=242)
-        # START(ID=243,NAME=MigrationAlterUniqueTogetherUserResourcePrivilege0013,TYPE=ALTER,OBJECTS=[UserResourcePrivilege])
+        # START(ID=243,NAME=MigrationAlterUniqueTogetherUserResourcePrivilege,TYPE=ALTER,OBJECTS=[UserResourcePrivilege])
         migrations.AddField(
             model_name='groupaccess',
             name='date_created',
@@ -35,12 +35,14 @@ class Migration(migrations.Migration):
             preserve_default=False,
         ),
         # END(ID=243)
+        # START(ID=244,NAME=MigrationAddFieldDescriptionGroupAccessTYPE=ALTER,OBJECTS=[GroupAccess])
         migrations.AddField(
             model_name='groupaccess',
             name='description',
             field=models.TextField(default=''),
             preserve_default=False,
         ),
+        # END(ID=244)
         migrations.AddField(
             model_name='groupaccess',
             name='picture',

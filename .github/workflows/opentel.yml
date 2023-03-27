@@ -16,8 +16,6 @@ jobs:
         ports:
           - 4317:4317
     steps:
-      - name: Check out repository code
-        uses: actions/checkout@v3
       - name: Set Up Docker
         run: |
           service docker start
