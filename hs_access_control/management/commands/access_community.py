@@ -122,7 +122,9 @@ class Command(BaseCommand):
         # not specifing a community lists active communities
         if cname is None:
             print("All communities:")
+            # START(ID=107,NAME=GetAllAndLoopThroughCommunity,TYPE=SELECT,OBJECTS=[Community])
             for c in Community.objects.all():
+            # END(ID=107)
                 print("  '{}' (id={})".format(c.name, str(c.id)))
             usage()
             exit(0)
@@ -137,12 +139,16 @@ class Command(BaseCommand):
             print("  description: {}".format(community.description))
             print("  purpose: {}".format(community.purpose))
             print("  owners:")
+            # START(ID=108,NAME=LoopThroughUserCommunityPrivilegeFilterByCommunityAndPrivledge,TYPE=SELECT,OBJECTS=[UserCommunityPrivilege])
             for ucp in UserCommunityPrivilege.objects.filter(community=community,
                                                              privilege=PrivilegeCodes.OWNER):
+            # END(ID=108)
                 print("    {} (grantor {})".format(ucp.user.username, ucp.grantor.username))
 
             print("  member groups:")
+            # START(ID=109,NAME=LoopThroughGroupCommunityPrivilegeFilterByCommunity,TYPE=SELECT,OBJECTS=[GroupCommunityPrivilege])
             for gcp in GroupCommunityPrivilege.objects.filter(community=community):
+            # END(ID=109)
                 if gcp.privilege == PrivilegeCodes.CHANGE:
                     others = "can edit community resources"
                 else:
@@ -151,11 +157,15 @@ class Command(BaseCommand):
                       .format(gcp.group.name, gcp.group.id, gcp.grantor.username))
                 print("         {}.".format(others))
                 print("         '{}' (id={}) owners are:".format(gcp.group.name, str(gcp.group.id)))
+                # START(ID=110,NAME=LoopThroughUserGroupPrivilegeFilterByGroupAndPrivilege,TYPE=SELECT,OBJECTS=[UserGroupPrivilege])
                 for ugp in UserGroupPrivilege.objects.filter(group=gcp.group,
                                                              privilege=PrivilegeCodes.OWNER):
+                # END(ID=110)
                     print("             {}".format(ugp.user.username))
             print("  invitations and requests:")
+            # START(ID=111,NAME=LoopThroughGroupCommunityRequestFilterByCommunityAndRedeemedFalse,TYPE=SELECT,OBJECTS=[GroupCommunityRequest])
             for gcr in GroupCommunityRequest.objects.filter(community=community, redeemed=False):
+            # END(ID=111)
                 if (gcr.group_owner is None):
                     print("     '{}' (id={}) invited (by community owner={}):"
                           .format(gcr.group.name, gcr.group.id, gcr.community_owner.username))
@@ -168,19 +178,19 @@ class Command(BaseCommand):
         if command == 'update' or command == 'create':
             community = community_from_name_or_id(cname)
             if community is not None:
+                # START(ID=112,NAME=GetCommunityByName,TYPE=SELECT,OBJECTS=[Community])
                 community = Community.objects.get(name=cname)
+                # END(ID=112)
                 if options['description'] is not None:
                     community.description = options['description']
                     community.save()
                 if options['purpose'] is not None:
                     community.purpose = options['purpose']
                     community.save()
-
                 UserCommunityPrivilege.update(user=owner,
                                               community=community,
                                               privilege=PrivilegeCodes.OWNER,
                                               grantor=owner)
-
             else:  # if it does not exist, create it
                 if options['description'] is not None:
                     description = options['description']
@@ -224,8 +234,10 @@ class Command(BaseCommand):
             if len(options['command']) < 3:
                 # list owners
                 print("owners of community '{}' (id={})".format(community.name, str(community.id)))
+                # START(ID=113,NAME=LoopUserCommunityPrivilegeByCommunityAndPrivledge,TYPE=SELECT,OBJECTS=[UserCommunityPrivilege])
                 for ucp in UserCommunityPrivilege.objects.filter(community=community,
                                                                  privilege=PrivilegeCodes.OWNER):
+                # END(ID=113)
                     print("    {}".format(ucp.user.username))
                 exit(0)
 
@@ -267,7 +279,9 @@ class Command(BaseCommand):
             # not specifying a group should list groups
             if len(options['command']) < 3:
                 print("Community '{}' groups:")
+                # START(ID=114,NAME=LoopGroupCommunityPrivilegeByCommunity,TYPE=SELECT,OBJECTS=[GroupCommunityPrivilege])
                 for gcp in GroupCommunityPrivilege.objects.filter(community=community):
+                # END(ID=114)
                     if gcp.privilege == PrivilegeCodes.CHANGE:
                         others = "can edit community resources"
                     else:
@@ -296,7 +310,9 @@ class Command(BaseCommand):
                 try:
                     print("Updating group '{}' (id={}) status in community '{}' (id={})."
                           .format(gname, str(group.id), cname, str(community.id)))
+                    # START(ID=115,NAME=GetGroupCommunityPrivilegeByGroupAndCommunityToUpdate,TYPE=SELECT,OBJECTS=[GroupCommunityPrivilege])
                     gcp = GroupCommunityPrivilege.objects.get(group=group, community=community)
+                    # END(ID=115)
                     # pass privilege changes through the privilege system to record provenance.
                     if gcp.privilege != privilege or owner != gcp.grantor:
                         GroupCommunityPrivilege.share(group=group, community=community,
@@ -314,7 +330,9 @@ class Command(BaseCommand):
                                                   privilege=privilege, grantor=owner)
 
                     # update view status if different than default
+                    # START(ID=116,NAME=GetGroupCommunityPrivilegeByGroupAndCommunityToUpdateWhenDifferentThanDefault,TYPE=SELECT,OBJECTS=[GroupCommunityPrivilege])
                     gcp = GroupCommunityPrivilege.objects.get(group=group, community=community)
+                    # END(ID=116)
 
             elif action == 'invite':
                 # resolve privilege of group
@@ -323,7 +341,9 @@ class Command(BaseCommand):
                 try:
                     print("Inviting group '{}' (id={}) to community '{}' (id={})."
                           .format(gname, str(group.id), cname, str(community.id)))
+                    # START(ID=117,NAME=GetGroupCommunityPrivilegeByGroupAndCommunityToUpdateForActionInvite,TYPE=SELECT,OBJECTS=[GroupCommunityPrivilege])
                     gcp = GroupCommunityPrivilege.objects.get(group=group, community=community)
+                    # END(ID=117)
                     # pass privilege changes through the privilege system to record provenance.
                     if gcp.privilege != privilege or owner != gcp.grantor:
                         community_owner = community.first_owner
@@ -345,7 +365,9 @@ class Command(BaseCommand):
 
                 # update gcp for result of situation
                 try:
+                    # START(ID=118,NAME=GetGroupCommunityPrivilegeUpdateForResultOfSituation,TYPE=SELECT,OBJECTS=[GroupCommunityPrivilege])
                     gcp = GroupCommunityPrivilege.objects.get(group=group, community=community)
+                    # END(ID=118)
                 except GroupCommunityPrivilege.DoesNotExist:
                     gcp = None
 
@@ -356,7 +378,9 @@ class Command(BaseCommand):
                 print("Requesting that group '{}' (id={}) join community '{}' (id={})."
                       .format(gname, str(group.id), cname, str(community.id)))
                 try:
+                    # START(ID=119,NAME=GetGroupCommunityPrivilegeByGroupAndCommunityToUpdateForActionRequest,TYPE=SELECT,OBJECTS=[GroupCommunityPrivilege])
                     gcp = GroupCommunityPrivilege.objects.get(group=group, community=community)
+                    # END(ID=119)
                     # pass privilege changes through the privilege system to record provenance.
                     if gcp.privilege != privilege or owner != gcp.grantor:
                         group_owner = group.gaccess.first_owner
@@ -374,14 +398,18 @@ class Command(BaseCommand):
 
                 # update gcp for result of situation
                 try:
+                    # START(ID=120,NAME=GetGroupCommunityUpdateForActionRequestResultOfSituation,TYPE=SELECT,OBJECTS=[GroupCommunityPrivilege])
                     gcp = GroupCommunityPrivilege.objects.get(group=group, community=community)
+                    # END(ID=120)
                 except GroupCommunityPrivilege.DoesNotExist:
                     gcp = None
 
             elif action == 'approve':
 
                 try:
+                    # START(ID=121,NAME=GetGroupCommunityRequestByGroupAndCommunityActionApprove,TYPE=SELECT,OBJECTS=[GroupCommunityRequest])
                     gcr = GroupCommunityRequest.objects.get(community=community, group=group)
+                    # END(ID=121)
                 except GroupCommunityRequest.DoesNotExist:
                     print("GroupCommunityRequest for community '{}' and group '{}' does not exist."
                           .format(cname, gname))
@@ -403,14 +431,18 @@ class Command(BaseCommand):
 
                 # update gcp for result of situation
                 try:
+                    # START(ID=122,NAME=GetGroupCommunityPrivilegeByGroupAndCommunityActionApproveUpdateResult,TYPE=SELECT,OBJECTS=[GroupCommunityPrivilege])
                     gcp = GroupCommunityPrivilege.objects.get(group=group, community=community)
+                    # END(ID=122)
                 except GroupCommunityPrivilege.DoesNotExist:
                     gcp = None
 
             elif action == 'decline':
 
                 try:
+                    # START(ID=123,NAME=GetGroupCommunityRequestByGroupAndCommunityActionDecline,TYPE=SELECT,OBJECTS=[GroupCommunityRequest])
                     gcr = GroupCommunityRequest.objects.get(community=community, group=group)
+                    # END(ID=123)
                 except GroupCommunityRequest.DoesNotExist:
                     print("GroupCommunityRequest for community '{}' and group '{}' does not exist."
                           .format(cname, gname))
@@ -434,7 +466,9 @@ class Command(BaseCommand):
 
                 # update gcp for result of situation
                 try:
+                    # START(ID=124,NAME=GetGroupCommunityPrivilegeByGroupAndCommunityActionDeclineUpdateResult,TYPE=SELECT,OBJECTS=[GroupCommunityPrivilege])
                     gcp = GroupCommunityPrivilege.objects.get(group=group, community=community)
+                    # END(ID=124)
                 except GroupCommunityPrivilege.DoesNotExist:
                     gcp = None
 

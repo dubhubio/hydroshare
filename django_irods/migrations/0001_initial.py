@@ -12,6 +12,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # START(ID=100,NAME=CreateRodsEnvironmentTableMigration,TYPE=CREATE,OBJECTS=[RodsEnvironment])
         migrations.CreateModel(
             name='RodsEnvironment',
             fields=[
@@ -31,4 +32,5 @@ class Migration(migrations.Migration):
             },
             bases=(models.Model,),
         ),
+        # END(ID=100)
     ]

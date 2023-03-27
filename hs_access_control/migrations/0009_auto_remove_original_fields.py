@@ -11,18 +11,24 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # START(ID=197,NAME=MigrationAlterUniqueTogetherSetGroupResourcePrivilege,TYPE=ALTER,OBJECTS=[GroupResourcePrivilege])
         migrations.AlterUniqueTogether(
             name='groupresourceprivilege',
             unique_together=set([]),
         ),
+        # END(ID=197)
+        # START(ID=198,NAME=MigrationRemoveFieldResourceGroupResourcePrivilege,TYPE=ALTER,OBJECTS=[GroupResourcePrivilege])
         migrations.RemoveField(
             model_name='groupresourceprivilege',
             name='resource',
         ),
+        # END(ID=198)
+        # START(ID=199,NAME=MigrationRemoveFieldGroupGroupResourcePrivilege,TYPE=ALTER,OBJECTS=[GroupResourcePrivilege])
         migrations.RemoveField(
             model_name='groupresourceprivilege',
             name='group',
         ),
+        # END(ID=199)
         migrations.RemoveField(
             model_name='groupresourceprivilege',
             name='grantor',

@@ -95,7 +95,9 @@ class Command(BaseCommand):
         # not specifing a group lists active groups
         if gname is None:
             print("All groups:")
+            # START(ID=125,NAME=LoopThroughAllGroups,TYPE=SELECT,OBJECTS=[Group])
             for g in Group.objects.all():
+            # END(ID=125)
                 print("  '{}' (id={})".format(g.name, str(g.id)))
             exit(0)
 
@@ -109,8 +111,10 @@ class Command(BaseCommand):
             print("  description: {}".format(group.gaccess.description))
             print("  purpose: {}".format(group.gaccess.purpose))
             print("  owners:")
+            # START(ID=126,NAME=LoopThroughUserGroupPrivilegeFilterByGroupAndPriviledge,TYPE=SELECT,OBJECTS=[UserGroupPrivilege])
             for ucp in UserGroupPrivilege.objects.filter(group=group,
                                                          privilege=PrivilegeCodes.OWNER):
+            # END(ID=126)
                 print("    {} (grantor {})".format(ucp.user.username, ucp.grantor.username))
 
             exit(0)
@@ -118,7 +122,9 @@ class Command(BaseCommand):
         # These are idempotent actions. Creating a group twice does nothing.
         elif command == 'update' or command == 'create':
             try:
+                # START(ID=127,NAME=GetGroupByName,TYPE=SELECT,OBJECTS=[Group])
                 group = Group.objects.get(name=gname)
+                # END(ID=127)
                 # if it exists, update it
                 if options['description'] is not None:
                     group.description = options['description']
@@ -158,8 +164,10 @@ class Command(BaseCommand):
             if len(options['command']) < 3:
                 # list owners
                 print("owners of group '{}' (id={})".format(group.name, str(group.id)))
+                # START(ID=128,NAME=LoopFilterUserGroupPrivilegeByGroupAndPrivledgeCommandOwner,TYPE=SELECT,OBJECTS=[UserGroupPrivilege])
                 for ucp in UserGroupPrivilege.objects.filter(group=group,
                                                              privilege=PrivilegeCodes.OWNER):
+                # END(ID=128)
                     print("    {}".format(ucp.user.username))
                 exit(0)
 
@@ -200,7 +208,9 @@ class Command(BaseCommand):
 
             if len(options['command']) < 3:
                 print("members of group '{}' (id={})".format(group.name, str(group.id)))
+                # START(ID=129,NAME=LoopFilterUserGroupPrivilegeByGroupAndCommandUSer,TYPE=SELECT,OBJECTS=[UserGroupPrivilege])
                 for ucp in UserGroupPrivilege.objects.filter(group=group):
+                # END(ID=129)
                     print("    {}".format(ucp.user.username))
                 exit(0)
 
@@ -212,8 +222,9 @@ class Command(BaseCommand):
 
             if len(options['command']) < 4 or options['command'][3] == 'list':
                 # list whether the user is a member of the group
+                # START(ID=130,NAME=CheckIfUserGroupPrivilegeExists,TYPE=SELECT,OBJECTS=[UserGroupPrivilege])
                 if UserGroupPrivilege.objects.filter(group=group, user=user).exists():
-
+                # END(ID=130)
                     print("group '{}' (id={}) has member {}"
                           .format(group.name, str(group.id), user.username))
                 else:

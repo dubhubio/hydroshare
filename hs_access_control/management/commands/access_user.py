@@ -72,13 +72,17 @@ class Command(BaseCommand):
         # not specifing a community lists active communities
         if uname is None:
             print("All users:")
+            # START(ID=136,NAME=LoopThroughAllUsers,TYPE=SELECT,OBJECTS=[User])
             for u in User.objects.all():
+            # END(ID=136)
                 print("  '{}'".format(u.username))
             exit(0)
 
         if command is None or command == 'list':
             try:
+                # START(ID=137,NAME=GetUserByUsernameCommandNoneOrList,TYPE=SELECT,OBJECTS=[User])
                 user = User.objects.get(username=uname)
+                # END(ID=137)
             except User.DoesNotExist:
                 print("user '{}' does not exist.".format(uname))
                 usage()
@@ -92,7 +96,9 @@ class Command(BaseCommand):
         # These are idempotent actions. Creating a user twice does nothing.
         elif command == 'update' or command == 'create':
             try:
+                # START(ID=138,NAME=GetUserByUsernameCommandUpdateOrCreate,TYPE=SELECT,OBJECTS=[User])
                 user = User.objects.get(username=uname)
+                # END(ID=138)
                 if 'email' in options:
                     user.email = options['email']
                     user.save()

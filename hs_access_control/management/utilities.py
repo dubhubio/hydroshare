@@ -17,14 +17,18 @@ def group_from_name_or_id(gname):
     if RE_INT.match(gname):
         try:
             gid = int(gname)
+            # START(ID=139,NAME=GetGroupByIdRegex,TYPE=SELECT,OBJECTS=[Group])
             group = Group.objects.get(id=gid)
+            # END(ID=139)
             return group
         except Group.DoesNotExist:
             print("group with id {} does not exist.".format(str(gid)))
             return None
 
     else:  # interpret as name
+        # START(ID=140,NAME=GetGroupInterpretAsName,TYPE=SELECT,OBJECTS=[Group])
         groups = Group.objects.filter(name=gname)
+        # END(ID=140)
         if groups.count() == 0:
             print("group '{}' not found.".format(gname))
             return None
@@ -44,14 +48,18 @@ def community_from_name_or_id(cname):
     if RE_INT.match(cname):
         try:
             cid = int(cname)
+            # START(ID=141,NAME=GetCommunityIdRegex,TYPE=SELECT,OBJECTS=[Community])
             group = Community.objects.get(id=cid)
+            # END(ID=141)
             return group
         except Community.DoesNotExist:
             print("community with id {} does not exist.".format(str(cid)))
             return None
 
     else:  # interpret as name
+        # START(ID=142,NAME=GetCommunityInterpretAsName,TYPE=SELECT,OBJECTS=[Community])
         communities = Community.objects.filter(name=cname)
+        # END(ID=142)
         if communities.count() == 0:
             print("community with name '{}' does not exist.".format(cname))
             return None
@@ -69,7 +77,9 @@ def community_from_name_or_id(cname):
 
 def user_from_name(uname):
     try:
+        # START(ID=143,NAME=GetUserFromName,TYPE=SELECT,OBJECTS=[User])
         return User.objects.get(username=uname)
+        # END(ID=143)
     except User.DoesNotExist:
         print("user with username '{}' does not exist.".format(uname))
         return None
@@ -77,7 +87,9 @@ def user_from_name(uname):
 
 def resource_from_id(id):
     try:
+        # START(ID=144,NAME=GetBaseResourceFromShortId,TYPE=SELECT,OBJECTS=[BaseResource])
         return BaseResource.objects.get(short_id=id)
+        # END(ID=144)
     except BaseResource.DoesNotExist:
         print("resource with id '{} does not exist.".format(id))
         return None

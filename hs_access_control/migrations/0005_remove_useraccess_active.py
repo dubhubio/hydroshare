@@ -11,8 +11,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # START(ID=178,NAME=MigrationRemoveFieldActiveUserResourcePrivilegeTable,TYPE=ALTER,OBJECTS=[UserAccess])
         migrations.RemoveField(
             model_name='useraccess',
             name='active',
         ),
+        # END(ID=178)
     ]

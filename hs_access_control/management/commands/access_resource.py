@@ -72,7 +72,9 @@ class Command(BaseCommand):
         # not specifing a resource lists resources
         if rid is None:
             print("All resources:")
+            # START(ID=131,NAME=LoopThroughAllBaseResource,TYPE=SELECT,OBJECTS=[BaseResource])
             for r in BaseResource.objects.all():
+            # END(ID=131)
                 print("  {} title='{}'".format(r.short_id, r.title))
             exit(0)
 
@@ -85,16 +87,22 @@ class Command(BaseCommand):
 
             print("resource '{}' title='{}'):".format(resource.short_id, resource.title))
             print("  owners:")
+            # START(ID=132,NAME=LoopThroughUserResourcePrivilegeFilterByResourceAndPrivilegeIsOwner,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
             for ugp in UserResourcePrivilege.objects.filter(resource=resource,
                                                             privilege=PrivilegeCodes.OWNER):
+            # END(ID=132)
                 print("    {} (grantor {})".format(ugp.user.username, ugp.grantor.username))
             print("  editors:")
+            # START(ID=133,NAME=LoopThroughUserResourcePrivilegeFilterByResourceAndPrivilegeIsChange,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
             for ugp in UserResourcePrivilege.objects.filter(resource=resource,
                                                             privilege=PrivilegeCodes.CHANGE):
+            # END(ID=133)
                 print("    {} (grantor {})".format(ugp.user.username, ugp.grantor.username))
             print("  viewrs:")
+            # START(ID=134,NAME=LoopThroughUserResourcePrivilegeFilterByResourceAndPrivilegeIsView,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
             for ugp in UserResourcePrivilege.objects.filter(resource=resource,
                                                             privilege=PrivilegeCodes.VIEW):
+            # END(ID=134)
                 print("    {} (grantor {})".format(ugp.user.username, ugp.grantor.username))
             exit(0)
 
@@ -103,8 +111,10 @@ class Command(BaseCommand):
             if len(options['command']) < 3:
                 # list owners
                 print("owners of resource '{}'".format(resource.short_id))
+                # START(ID=135,NAME=LoopThroughUserResourcePrivilegeFilterByResourceAndCommandAndPrivilegeIsOwner,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
                 for ugp in UserResourcePrivilege.objects.filter(resource=resource,
                                                                 privilege=PrivilegeCodes.OWNER):
+                # END(ID=135)
                     print("    {}".format(ugp.user.username))
                 exit(0)
 

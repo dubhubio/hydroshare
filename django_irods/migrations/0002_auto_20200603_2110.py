@@ -12,29 +12,39 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # START(ID=101,NAME=AlterRodsEnvironmentAuthField,TYPE=ALTER,OBJECTS=[RodsEnvironment])
         migrations.AlterField(
             model_name='rodsenvironment',
             name='auth',
             field=models.TextField(verbose_name='Password'),
         ),
+        # END(ID=101)
+        # START(ID=102,NAME=AlterRodsEnvironmentCwdField,TYPE=ALTER,OBJECTS=[RodsEnvironment])
         migrations.AlterField(
             model_name='rodsenvironment',
             name='cwd',
             field=models.TextField(verbose_name='Working directory'),
         ),
+        # END(ID=102)
+        # START(ID=103,NAME=AlterRodsEnvironmentDefRefsField,TYPE=ALTER,OBJECTS=[RodsEnvironment])
         migrations.AlterField(
             model_name='rodsenvironment',
             name='def_res',
             field=models.CharField(max_length=255, verbose_name='Default resource'),
         ),
+        # END(ID=103)
+        # START(ID=104,NAME=AlterRodsEnvironmentHomeCollField,TYPE=ALTER,OBJECTS=[RodsEnvironment])
         migrations.AlterField(
             model_name='rodsenvironment',
             name='home_coll',
             field=models.CharField(max_length=255, verbose_name='Home collection'),
         ),
+        # END(ID=104)
+        # START(ID=105,NAME=AlterRodsEnvironmentHostField,TYPE=ALTER,OBJECTS=[RodsEnvironment])
         migrations.AlterField(
             model_name='rodsenvironment',
             name='host',
             field=models.CharField(max_length=255, verbose_name='Hostname'),
         ),
+        # END(ID=105)
     ]

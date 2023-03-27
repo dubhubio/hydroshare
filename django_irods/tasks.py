@@ -84,7 +84,9 @@ class IRODSTask(Task):
                 irods_default_hash_scheme='MD5'
             )
         elif isinstance(environment, int):
+            # START(ID=106,NAME=GetRodsEnvironmentFromPk,TYPE=SELECT,OBJECTS=[RodsEnvironment])
             environment = m.RodsEnvironment.objects.get(pk=environment)
+            # END(ID=106)
 
         if environment.pk not in self._sessions:
             session = Session("/tmp/django_irods", settings.IRODS_ICOMMANDS_PATH, session_id=uuid4())
