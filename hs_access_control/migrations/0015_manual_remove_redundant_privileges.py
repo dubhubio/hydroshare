@@ -80,17 +80,27 @@ def remove_extra_privileges(apps, schema_editor):
                 # START(ID=253,NAME=MigrationUserResourcePrivilegeToKeepWithMinPriviledge,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
                 to_keep = records.filter(privilege=min_privilege, start=max_start)
                 # END(ID=253)
-                # START(ID=254,NAME=MigrationUserResourcePrivilegeToKeepWithMinPriviledge,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
+                # START(ID=254,NAME=MigrationUserResourcePrivilegeToKeepWithMinPriviledgeIsOne,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
                 if to_keep.count() == 1:
                 # END(ID=254)
                     # print("   one UNIQUE start record: {}", str(to_keep[0]))
+                    # START(ID=255,NAME=MigrationUserResourcePrivilegeToExludeWithMinPriviledge,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
                     to_delete = records.exclude(pk__in=to_keep)
+                    # END(ID=255)
+                    # START(ID=256,NAME=MigrationUserResourcePrivilegeToDelete,TYPE=DELETE,OBJECTS=[UserResourcePrivilege])
                     to_delete.delete()
+                    # END(ID=256)
+                # START(ID=257,NAME=MigrationUserResourcePrivilegeToKeepWithMinPriviledgeGreaterThanOne,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
                 elif to_keep.count() > 1:  # unlikely
+                # END(ID=257)
                     kept = records[0]  # choose first one arbitrarily
                     # print("   choosing arbitrary record: {}", str(kept))
+                    # START(ID=258,NAME=MigrationUserResourcePrivilegeToExludeWithMinPriviledgeGreateThanOne,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
                     to_delete = records.exclude(pk=kept)
+                    # END(ID=258)
+                    # START(ID=259,NAME=MigrationUserResourcePrivilegeToDeleteGreaterThanOne,TYPE=DELETE,OBJECTS=[UserResourcePrivilege])
                     to_delete.delete()
+                    # END(ID=259)
 
     for u in User.objects.all():
         for g in Group.objects.all():
