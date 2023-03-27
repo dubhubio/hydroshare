@@ -1,0 +1,245 @@
+{% load theme_tags %}
+{% get_recaptcha_site_key as sitekey %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/jquery.tagsinput-revisited.min.css' %}" />
+  <style>
+    .tagsinput {
+      border: 1px solid #ccc;
+    }
+
+    .tagsinput div input::-webkit-input-placeholder {
+      color: #777;
+    }
+
+    .tagsinput .tag {
+      background: #DDD;
+      color: #111;
+    }
+  </style>
+{% endblock %}
+
+<form id="form-signup" action="/accounts/signup/" method="post" role="form">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="row">
+        <div class="form-group half">
+          {% include "includes/form_field.html" with field=form.first_name inline_label=True required=False %}
+          {% include "includes/form_field.html" with field=form.last_name inline_label=True required=False %}
+          <small class="text-muted">Names may be omitted if you do not wish to provide them or are creating an Organization user account.</small>
+        </div>
+        <div class="form-group">
+            {% include "includes/form_field.html" with field=form.email inline_label=True required=True %}
+        </div>
+        <div class="form-group">
+            {% include "includes/form_field.html" with field=form.username inline_label=True required=True %}
+        </div>
+        <div class="form-group">
+          <input class="form-control form-required tagsinput" name="organization" {% if profile.organization %}value="{{ profile.organization }}"{% endif %}>
+          <small class="text-muted">The names of the organizations you are associated with.</small>
+        </div>
+        <div class="form-group">
+            {% include "includes/form_field.html" with field=form.password1 inline_label=True required=True %}
+        </div>
+        <div class="form-group">
+            {% include "includes/form_field.html" with field=form.password2 inline_label=True required=True %}
+        </div>
+        <div class="form-group">
+          <fieldset>
+            <small class="text-muted">Specify user type *</small>
+            <select name="user_type" class="form-control form-required" id="selectUserType">
+                <option value=""></option>
+                <option value="University Faculty">University Faculty</option>
+                <option value="University Professional or Research Staff">University Professional or Research Staff</option>
+                <option value="Post-Doctoral Fellow">Post-Doctoral Fellow</option>
+                <option value="University Graduate Student">University Graduate Student</option>
+                <option value="University Undergraduate Student">University Undergraduate Student</option>
+                <option value="Commercial/Professional">Commercial/Professional</option>
+                <option value="Government Official">Government Official</option>
+                <option value="School Student Kindergarten to 12th Grade">School Student Kindergarten to 12th Grade</option>
+                <option value="School Teacher Kindergarten to 12th Grade">School Teacher Kindergarten to 12th Grade</option>
+                <option value="Organization">Organization</option>
+                <option value="Other">Other</option>
+            </select>
+          </fieldset>
+
+          {#        User Type - Other       #}
+          <fieldset id="user-type-other">
+              <small class="text-muted">Specify other user type: *</small>
+              <input name="user_type" class="form-control">
+          </fieldset>
+
+          {#        Country       #}
+          <fieldset>
+              <small class="text-muted">Country *</small>
+              <select id="id_country" name="country" class="form-control form-required input-medium bfh-countries" data-country=""></select>
+          </fieldset>
+
+          {#        State       #}
+          <div class="form-group">
+            <small class="text-muted">State/Region</small>
+            <select id="id_state" class="form-control bfh-states" name="state" data-country="id_country"></select>
+          </div>
+        </div>
+    </div>
+    <div class="row">
+      <script src='https://www.google.com/recaptcha/api.js'></script>
+      <div class="g-recaptcha" data-sitekey={{ sitekey }}></div>
+        <div id="missing-data-div" class="space-bottom"></div>
+        <input class="btn btn-primary space-top" type="button" id="signup" value="Join HydroShare & start collaborating">
+    </div>
+</form>
+
+<script type="text/javascript" src="{% static 'js/jquery.tagsinput-revisited.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/bootstrap-formhelpers.js' %}"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+         $('input[type="button"]').prop('disabled', false);
+         $("#selectUserType").change(function () {
+             var inputOther = $("#user-type-other input");
+             if ($(this).val() == "Other") {
+                 $("#user-type-other").show();
+                 $("#selectUserType").removeAttr("name");
+                 inputOther.attr("name", "user_type");
+                 inputOther.addClass("form-required");
+             }
+             else {
+                 $("#user-type-other").hide();
+                 inputOther.removeAttr("name");
+                 inputOther.removeClass("form-required");
+                 $("#selectUserType").attr("name", "user_type");
+             }
+         });
+         // remove the content of the 'missing-data-div' upon data editing in any of the
+        // form fields
+         var fieldsToCheck = ["#id_first_name", "#id_last_name", "#id_username", "#id_email",
+             "#id_password1", "#id_password2"];
+
+         var i;
+         for (i=0; i< fieldsToCheck.length; i++){
+             $(fieldsToCheck[i]).keyup(function () {
+                 $("#missing-data-div").html(" ");
+             });
+             $(fieldsToCheck[i]).change(function () {
+                 $("#missing-data-div").html(" ");
+             });
+         }
+    });
+
+    // Only letters, numbers, dashes, dot, underscore, or @ are viewed as valid characters
+    // to conform to the same user name validation rules in Django with + removed from set of
+    // valid characters since although + is supported as a valid character in username field,
+    // it is not supported as a valid character in corresponding iRODS username
+    function validateUserName() {
+        var regex = /^[a-zA-Z0-9-_.@]+$/;
+        var username = $("#id_username");
+
+        if (!username.val()) {
+            return false;
+        }
+
+        if (!regex.test(username.val())) {
+            return false;
+        }
+        return true;
+    }
+
+    $(function() {
+        $("#signup").click(function() {
+            var password = $("#id_password1").val();
+            var pwconfirm = $("#id_password2").val();
+            // These are the required form fields
+            var requiredFieldsToCheck = ["#id_username", "#id_email", "#id_password1",
+                "#id_password2",  "[name='organization']", "#id_country"];
+            var fieldNames = [ 'User name', 'Email', 'Password', 'Password (again)', "Organization",
+                "Country", "State/Region"];
+            var empty = false;
+            var missingFields = 'Data missing for:';
+            var missingFieldCount = 0;
+            var j;
+            if($("#selectUserType").val() == 'Other' && $("#user-type-other  input").val().trim() == '') {
+                empty = true;
+                missingFields += " " + 'User type Other';
+                missingFieldCount++;
+            }
+            else if ($("#selectUserType").val() == '') {
+                empty = true;
+                missingFields += " " + 'User type';
+                missingFieldCount++;
+            }
+
+            for(j=0; j< requiredFieldsToCheck.length; j++) {
+                if ($(requiredFieldsToCheck[j]).val().trim() == '') {
+                    empty = true;
+                    if (missingFieldCount == 0){
+                        missingFields += " " + fieldNames[j];
+                    }
+                    else {
+                        missingFields += ", " + fieldNames[j];
+                    }
+                    missingFieldCount++;
+                }
+           }
+
+           // validate username to make sure username not only passes django username validation
+           // but also passed iRODS username validation
+           var username_valid = validateUserName();
+           if(empty || !username_valid) {
+               var warning_str = '';
+               if(empty)
+                   warning_str += missingFields;
+               if(!username_valid) {
+                   if (empty)
+                       warning_str += "<br>";
+                   warning_str += "username is not valid - make sure username only contains " +
+                       "letters, numbers, dashes, dot, underscore, or @";
+               }
+               $("#missing-data-div").html('<p class="alert alert-danger">' + warning_str +'</p>');
+               return;
+           }
+            function onSuccess() {
+                document.location.href = '/verify-account/';
+            }
+            function onFailure(data, stuff) {
+                console.log(data);
+                console.log(stuff);
+                alert('cannot create account');
+            }
+            if (password && pwconfirm) {
+                if (password === pwconfirm) {
+                    $('#form-signup').submit();
+                } else {
+                    $("#id_password1").val('');
+                    $("#id_password2").val('');
+                    $("#missing-data-div").append('<p class="alert alert-danger">Passwords do not match</p>');
+                }
+            }
+        });
+    });
+
+    $('.tagsinput').tagsInput({
+      interactive: true,
+      placeholder: "Organization(s) *",
+      delimiter: [";"],
+      autocomplete: {
+          source: "/hsapi/dictionary/universities/",
+          minLength: 3,
+          delay: 500,
+          classes: {
+              "ui-autocomplete": "minHeight"
+          }
+      }
+    });
+
+    $('.ui-autocomplete-input').on('blur', function(e) {
+      e.preventDefault();
+      $('.ui-autocomplete-input').trigger(jQuery.Event('keypress', { which: 13 }));
+    });
+
+    $('.ui-autocomplete-input').on('keydown', function(e) {
+      if(e.keyCode === 9 && $(this).val() !== '') {
+        e.preventDefault();
+        $(this).trigger(jQuery.Event('keypress', { which: 13 }));
+      }
+    });
+</script>

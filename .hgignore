@@ -1,0 +1,10 @@
+syntax: glob
+*.pyc
+*.pyo
+*.db
+.DS_Store
+.coverage
+hydroshare/local_settings.py
+
+syntax: regexp
+^static/

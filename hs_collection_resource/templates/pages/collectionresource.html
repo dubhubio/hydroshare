@@ -1,0 +1,275 @@
+{% extends "pages/baseresource.html" %}
+{% load pages_tags mezzanine_tags crispy_forms_tags hydroshare_tags %}
+
+{% block extra_css %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/jquery.dataTables.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static "css/collection.css" %}" />
+{% endblock %}
+
+{# override content_block in generice.html#}
+{% block content_block %}
+    <input type="hidden" id="edit-mode" value="{{ edit_mode }}" >
+    <input type="hidden" id="published" value="{{ cm.raccess.published }}" >
+    <input type="hidden" id="discoverable" value="{{ discoverable }}">
+    <input type="hidden" id="collection-res-id" value="{{ collection_res_id }}">
+    <div class="col-sm-12 content-block">
+        {# collection content table #}
+        <div id="collection_content_div">
+            <div id="title_and_add_btn_div">
+                <h3>Collection Contents </h3>
+            </div>
+            <div id="collection-table-div">
+                {% if edit_mode and not cm.raccess.published %}
+                    <form id="collector-new" name="collector-new"
+                          action="/hsapi/_internal/{{ collection_res_id }}/update-collection/" method="POST">
+                {% endif %}
+
+                <table id="collection-table" class="table-hover table-striped resource-custom-table" width="100%">
+                    <thead>
+                    <tr>
+                        <th>Add</th>
+                        <th>Title</th>
+                        <th>Type</th>
+                        <th>Owners</th>
+                        <th>Sharing Status</th>
+                        <th>My Permission</th>
+                        <th>Remove</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% if collection %}
+                        {% for res in collection %}
+                            {% with res.raccess as raccess %}
+                                {% with res|user_permission:request.user.pk as upermission %}
+                                    <tr id="{{ res.short_id }}">
+                                        <td>
+                                            <input class="row-selector" type="checkbox" id="{{ res.short_id }}">
+                                        </td>
+                                        <td>
+                                            {% if upermission|lower == "none" %}
+                                                <strong>{{ res.metadata.title }}</strong>
+                                            {% else %}
+                                                <strong><a href="{{ res.get_absolute_url }}"
+                                                           target="_blank">{{ res.metadata.title }}</a></strong>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if res.resource_type == "CompositeResource" %}
+                                                Resource
+                                            {% elif res.resource_type == "CollectionResource" %}
+                                                Collection
+                                            {% elif res.resource_type == "ToolResource" %}
+                                                App Connector
+                                            {% else %}
+                                                {{ res.resource_type }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% with raccess.owners.all|first as owner %}
+                                                {% if owner.first_name %}
+                                                    <strong><a href='/user/{{ owner.pk }}/'
+                                                               target="_blank">{{ owner.first_name }} {{ owner.last_name }}</a></strong>
+                                                {% else %}
+                                                    <strong><a href='/user/{{ owner.pk }}/'
+                                                               target="_blank">{{ owner.username }}</a></strong>
+                                                {% endif %}
+                                            {% endwith %}
+                                        </td>
+                                        <td>
+                                            {% if raccess.published %}
+                                                Published
+                                            {% elif raccess.public %}
+                                                Public
+                                            {% elif raccess.discoverable %}
+                                                Discoverable
+                                            {% else %}
+                                                Private
+                                            {% endif %}
+
+                                            {% if raccess.shareable %}
+                                                 & Shareable
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if upermission|lower == "none" %}
+                                                <strong class="label-private">{{ upermission }}</strong>
+                                            {% elif upermission|lower == "open access" %}
+                                                <strong class="label-public">{{ upermission }}</strong>
+                                            {% else %}
+                                                {{ upermission }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span data-res-id="{{ res.short_id }}"
+                                                  data-form-id="form-favorite-{{ res.short_id }}"
+                                                  data-form-type="toggle-favorite"
+                                                  class="glyphicon glyphicon-remove btn-inline-favorite btn-remove-collection-item"></span>
+                                        </td>
+                                    </tr>
+                                {% endwith %}
+                            {% endwith %}
+                        {% endfor %}
+                    {% endif %}
+                    </tbody>
+                </table>
+
+                {% if edit_mode and not cm.raccess.published %}
+                    </form>
+                    <div>
+                        <a id="btn-add-collection-resources" type="button" class="btn btn-success">
+                        <span class="glyphicon glyphicon-plus"><span
+                                class="button-label"> Add resources...</span></span>
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+            {% if deleted_resources|length > 0 %}
+                <div id="view_deleted_res_div">
+                    <input type="button" id="view_deleted_res_btn" class="btn btn-default" value="View deleted contents">
+                    <span data-toggle="tooltip" data-placement="auto"
+                          title='Some resources in this collection have been deleted which may result in broken resource links in the bag. {% if page.perms.change %} You need to clear deleted resources to fix that.{% endif %}'
+                          class="glyphicon glyphicon-info-sign text-muted"></span>
+                </div>
+            {% endif %}
+            <hr>
+            {% block download_bag %}
+                <button id="btn-download-all" class="btn btn-default row-selector space-bottom"
+                    {% if cm.raccess.require_download_agreement %}
+                        data-target="#license-agree-dialog-bag" data-toggle="modal"
+                        data-placement="auto"
+                    {% endif %}
+                    data-bag-url="{{ cm.bag_url }}">
+                    <span class="glyphicon glyphicon-download-alt"></span>
+                    <span title='Download All Content as Zipped BagIt Archive' class="button-label">Download All Content as Zipped BagIt Archive</span>
+                </button>
+                <div>
+                    <a target="_blank" href="https://help.hydroshare.org/creating-and-managing-resources/view-and-download-a-resource">Learn more about the BagIt download</a>
+                </div>
+            {% endblock %}
+        </div>
+    </div>
+
+    {#    modal div: warning message  #}
+    <div class="modal fade" id="remove-collection-warning" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="remove-collection-warning-title">Warning</h4>
+                </div>
+                <div class="modal-body" id="remove-collection-warning-body">
+                    You have NO PERMISSION over the resource you are about to remove, which means you CAN NOT add it back later.
+                </div>
+                <div id="remove-collection-btn-warning" class="collection-div-popup-warning">Updating collection...Please wait...</div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" id="remove-collection-btn-cancel">
+                        Cancel
+                    </button>
+                    <button type="button" class="btn btn-danger" id="remove-collection-btn-ok">
+                        Confirm
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {#    modal div: collection candidate table - modal to list all possible resources  that can be added to the collection #}
+    <div id="collectable-resources-modal-container">
+        {# JS code populates the modal html here dynamically at the time of page load  #}
+    </div>
+    {#    modal div: deleted-resources-modal #}
+    <div class="modal fade" id="deleted-resources-modal" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" style="width:65%">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Deleted Resources</h4>
+                </div>
+                <div class="modal-body">
+                    <table id="deleted-resources-table" class="table-hover table-striped" width="100%">
+                        <thead>
+                        <tr>
+                            <th>Resource ID</th>
+                            <th>Title</th>
+                            <th>Owner</th>
+                            <th>Type</th>
+                            <th>Deleted By</th>
+                            <th>Deletion Date</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            {% for res in deleted_resources %}
+                                <tr>
+                                    <td>
+                                        {{ res.resource_id }}
+                                    </td>
+                                    <td>
+                                        {{ res.resource_title }}
+                                    </td>
+                                   <td>
+                                       {% with res.resource_owners.all|first as owner %}
+                                            {% if owner.first_name %}
+                                                <strong><a href='/user/{{ owner.pk }}/'
+                                                           target="_blank">{{ owner.first_name }} {{ owner.last_name }}</a></strong>
+                                            {% else %}
+                                                <strong><a href='/user/{{ owner.pk }}/'
+                                                           target="_blank">{{ owner.username }}</a></strong>
+                                            {% endif %}
+                                      {% endwith %}
+                                    </td>
+                                    <td>
+                                        {% if res.resource_type == "CompositeResource" %}
+                                            Resource
+                                        {% elif res.resource_type == "CollectionResource" %}
+                                            Collection
+                                        {% elif res.resource_type == "ToolResource" %}
+                                            App Connector
+                                        {% else %}
+                                            {{ res.resource_type }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% with res.deleted_by as deleted_by %}
+                                            {% if deleted_by.first_name %}
+                                                <strong><a href='/user/{{ deleted_by.pk }}/' target="_blank">{{deleted_by.first_name}} {{deleted_by.last_name }}</a></strong>
+                                            {% else %}
+                                                <strong><a href='/user/{{ deleted_by.pk }}/' target="_blank">{{ deleted_by.username }}</a></strong>
+                                            {% endif %}
+                                        {% endwith %}
+                                    </td>
+                                    <td>
+                                        {{ res.date_deleted }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <div id="clear-deleted-res-warning" class="collection-div-popup-warning">Clearing deleted resources and updating bag. Please wait...</div>
+                </div>
+                <div class="modal-footer">
+                    {% if page.perms.change %}
+                        <button type="button" data-res-id="{{ cm.short_id }}" class="btn btn-success"
+                                id="clear-deleted-res-btn">
+                            Clear and Update Bag
+                        </button>
+                    {% endif %}
+                    <button type="button" class="btn btn-default" data-dismiss="modal" id="clear-deleted-res-btn-cancel">
+                       Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    <script type="text/javascript" charset="utf8" src="{% static 'js/jquery.dataTables.js' %}"></script>
+
+    {# put resource specific js below #}
+
+    <script type="text/javascript" src="{% static 'js/collection-resource.js' %}"></script>
+
+{% endblock %}

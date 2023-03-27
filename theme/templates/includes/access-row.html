@@ -1,0 +1,89 @@
+{% load hydroshare_tags %}
+
+<tr v-for="(user, index) in this.users" v-bind:key="user.id"
+    :class="{ 'hide-actions': selfAccessLevel !== 'owner' && (user.access === 'owner' && hasOnlyOneOwner || user.user_type === 'user' && user.id === quotaHolder.id), 'loading': user.loading, 'is-group': user.user_type === 'group'}">
+    <td>
+        <table class="user-scope">
+            <tr v-if="user.user_type === 'user'">
+                <td>
+                    <div v-if="user.pictureUrl"
+                         :style="{backgroundImage: 'url(' + user.pictureUrl + ')'}"
+                         class="profile-pic-thumbnail round-image">
+                    </div>
+
+                    <div v-else class="profile-pic-thumbnail round-image user-icon"></div>
+                </td>
+                <td>
+                    <div class="user-name">
+                        <a :href="'/user/' + user.id">${user.best_name}</a>
+                    </div>
+                    <div class="user-username-content">${user.user_name}</div>
+                    <div>
+                        <span v-if="user.id === currentUser" class="badge you-flag">You</span>
+                        <span v-if="user.id === quotaHolder.id" class="badge you-flag">
+                            <i class="fa fa-pie-chart" aria-hidden="true"></i> Quota Holder
+                        </span>
+                    </div>
+                </td>
+            </tr>
+
+            <tr v-else>
+                <td>
+                    <div class="group-image-wrapper extra-small">
+                        <div class="group-image-extra-small group-preview-image-default"
+                             :style="{backgroundImage: 'url(' + (user.pictureUrl || groupImageDefaultUrl) + ')'}">
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div>
+                        <a :href="'/group/' + user.id">${user.best_name}</a>
+                    </div>
+                    <div class="user-username-content">(Group)</div>
+                </td>
+            </tr>
+        </table>
+    </td>
+
+    <td class="user-roles">
+        <span class="dropdown role-dropdown">
+            <span class="dropdown-toggle"
+                  id="roles-menu"
+                  data-toggle="dropdown"
+                  aria-haspopup="true" aria-expanded="true">
+                    ${accessStr[user.access]}
+                <span class="caret"></span>
+            </span>
+
+            <ul class="dropdown-menu" aria-labelledby="roles-menu">
+                <li :class="getUserDropdownItemClass(user, 'view')">
+                    <a @click="onChangeAccess(user, index, 'view')">Can view</a>
+                </li>
+                <li :class="getUserDropdownItemClass(user, 'edit')">
+                    <a @click="onChangeAccess(user, index, 'edit')">Can edit</a>
+                </li>
+                <li v-if="user.user_type === 'user'"
+                    :class="getUserDropdownItemClass(user, 'owner')">
+                    <a @click="onChangeAccess(user, index, 'owner')">Is owner</a>
+                </li>
+            </ul>
+        </span>
+    </td>
+
+    <td class="user-actions">
+        <i @click="undoAccess(user, index)"
+           v-if="user.can_undo && (user.user_type==='group' || (user.user_type === 'user' && quotaHolder.id !== user.id))"
+            {# TODO: manually initialize tooltips of dynamically created items #}
+           class="fa fa-undo" aria-hidden="true" data-toggle="tooltip"
+           title="Undo Share"></i>
+    </td>
+
+    <td class="user-actions">
+        <span @click="user.id === currentUser ? showDeleteSelfDialog(user, index) : removeAccess(user, index)"
+              v-if="!(user.access === 'owner' && hasOnlyOneOwner) && !(user.user_type === 'user' && user.id == quotaHolder.id) && (selfAccessLevel === 'owner' || user.id === currentUser)"
+              :id="'form-remove-' + user.user_type + '-' + user.id"
+              class="glyphicon glyphicon-remove btn-remove-row"
+              data-toggle="tooltip" title="Remove">
+        </span>
+    </td>
+</tr>

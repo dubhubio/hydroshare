@@ -1,0 +1,921 @@
+{% extends "base.html" %}
+{% load mezzanine_tags hydroshare_tags %}
+
+{% block meta_title %}User profile for {{ profile_user|best_name }}{% endblock %}
+
+{% block extra_head %}
+    <link href="{% static 'css/profile.css' %}" rel="stylesheet"/>
+{% endblock %}
+
+{% block main %}
+    <div class="container">
+        {% with profile_user.userprofile as profile %}
+        <input type="hidden" id="url-create-irods-account" value="{% url 'create_irods_account' %}">
+        <input type="hidden" id="url-delete-irods-account" value="{% url 'delete_irods_account' %}">
+        {% if profile_user.id == user.id or user.is_superuser %}
+        <form id="profile-form" action="{% url 'update_profile' profile_user.id %}" class="account-form" method="post"
+              enctype="multipart/form-data" onsubmit="return validateForm()">
+        {% csrf_token %}
+        {% endif %}
+            <div class="row">
+                {% if profile_user.id == user.id or user.is_superuser %}
+                    <div data-page-mode="edit" class="alert alert-info" role="alert">
+                        Information entered here may be publicly visible. Do not enter information that you want to keep
+                        private.
+                    </div>
+                {% endif %}
+
+                <div class="col-sm-12">
+                    <div class="row">
+                        {% if profile_user.id == user.id or user.is_superuser %}
+                            <div class="col-xs-12 col-sm-3 height-fix pull-right">
+                                <span data-page-mode="view" id="btn-edit-profile" data-toggle="tooltip"
+                                      data-placement="left"
+                                      class="glyphicon glyphicon-pencil pull-right icon-button icon-blue"
+                                      title="Edit profile"></span>
+                                <button type="submit" data-page-mode="edit"
+                                        class="btn btn-primary pull-right btn-save-profile">Save changes
+                                </button>
+                                <span data-page-mode="edit"
+                                      class="btn btn-default pull-right btn-cancel-profile-edit">Cancel</span>
+                            </div>
+                        {% endif %}
+
+                        {#        Profile picture       #}
+                        <div class="col-sm-3 height-fix">
+                            <div id="profile-pic-container">
+                            {% if profile.picture and profile.picture.url %}
+                                <div style="background-image: url('{{ profile.picture.url }}')"
+                                     class="profile-pic round-image">
+                                </div>
+                            {% else %}
+                                <div class="profile-pic round-image user-icon"></div>
+                            {% endif %}
+                            </div>
+
+                            {#        Profile picture upload controls       #}
+                            {% if profile_user.id == user.id or user.is_superuser %}
+                                <div data-page-mode="edit" class="text-center" id="photo-control">
+                                {% if profile.picture and profile.picture.url %}
+                                    <div class="btn-file btn-update-picture">
+                                        <span class="glyphicon glyphicon-camera"></span>
+                                        <span>&nbsp;&nbsp;Update profile picture</span>
+                                        <input class="upload-picture" type="file" name="picture"  accept=".png, .jpg, .jpeg, .gif"></div>
+                                    <button id="btn-delete-profile-pic" class="no-style icon-button btn-remove" data-toggle="modal"
+                                            data-target="#delete-picture" title="Delete profile picture"><span
+                                            class="glyphicon glyphicon-trash"></span>
+                                    </button>
+                                {% else %}
+                                    <fieldset>
+                                        <div class="btn-file btn-update-picture upload-picture"><span class="glyphicon glyphicon-camera"></span>
+                                            <span>&nbsp;&nbsp;Add a photo</span>
+                                            <input class="upload-picture" type="file" name="picture" accept=".png, .jpg, .jpeg, .gif"></div>
+                                    </fieldset>
+                                {% endif %}
+                                </div>
+                            {% endif %}
+
+                            {#        Password      #}
+                            {% if profile_user.id == user.id or user.is_superuser %}
+                            <div data-page-mode="edit">
+                                <hr>
+                                <div class="profile-picture-controls text-center">
+                                    <div><a href="/accounts/update">Change HydroShare password</a></div>
+
+                                    {#        Account deactivation       #}
+                                    <div><a data-toggle="modal" data-target="#deactivate-account-dialog">Deactivate HydroShare account</a></div>
+                                    <hr>
+                                    {# Account creation/deletion in iRODS user zone #}
+                                    <div id="irods-account-container">
+                                        {% if profile.create_irods_user_account %}
+                                            {# an iRODS account already exists #}
+                                            <a data-toggle="modal" data-target="#delete-irods-account-dialog">Delete your iRODS user account</a>
+                                        {% else %}
+                                            {# an iRODS account does not exist #}
+                                            <a data-toggle="modal" data-target="#create-irods-account-dialog">Create your iRODS user account</a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-xs-12 col-sm-6">
+                            <div data-page-mode="view">
+                                {#        Name       #}
+                                {% if profile_user.first_name or profile_user.last_name %}
+                                    <h2>{{ profile_user.first_name }} {% if profile.middle_name %}{{ profile.middle_name }}{% endif %} {{ profile_user.last_name }}</h2>
+                                {% else %}
+                                    <h2>{{ profile_user.username }}</h2>
+                                {% endif %}
+
+                                {#        Organization and Title       #}
+                                {% if profile.organization or profile.title %}
+                                    <h4 id="organization" class="text-muted">
+                                        {% if profile.organization %}{{ profile.organization }}{% endif %}
+                                        {% if profile.organization and profile.title %} | {% endif %}
+                                        {% if profile.title %}{{ profile.title }}{% endif %}
+                                    </h4>
+                                {% endif %}
+
+                                {#        Subject areas       #}
+                                {% if profile.subject_areas or profile.profession %}
+                                    <table class="overview">
+                                        <tbody>
+                                        {% if profile.subject_areas %}
+                                            <tr>
+                                                <td><span class="text-muted">Subject Areas: </span></td>
+                                                <td>{{ profile.subject_areas }}</td>
+                                            </tr>
+                                        {% endif %}
+                                        </tbody>
+                                    </table>
+                                {% endif %}
+                            </div>
+                            {% if profile_user.id == user.id or user.is_superuser %}
+                            <div data-page-mode="edit">
+                                <div class="row">
+                                    {# First name #}
+                                    <fieldset class="col-sm-4">
+                                        <label>First name</label>
+                                        <input class="form-control" value="{{ profile_user.first_name }}" name="first_name">
+                                    </fieldset>
+
+                                    {# Middle name #}
+                                    <fieldset class="col-sm-4">
+                                        <label>Middle name</label>
+                                        <input class="form-control" {% if profile.middle_name %}value="{{ profile.middle_name }}"{% endif %} name="middle_name">
+                                    </fieldset>
+
+                                    {# Last name #}
+                                    <fieldset class="col-sm-4">
+                                        <label>Last name</label>
+                                        <input class="form-control" value="{{ profile_user.last_name }}" name="last_name">
+                                    </fieldset>
+                                    <fieldset class="col-sm-12">
+                                        <small class="text-muted">If this user account is for an Organization, First name, Middle name, and Last name may be left blank. Any resources created by an Organization user will list the Organization as the resource author/creator.</small>
+                                    </fieldset>
+                                    <br>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12 col-sm-6">
+                                      <div class="row">
+                                        
+                                        {# Organization #}
+                                        <fieldset class="col-xs-12">
+                                            <label>Organization *</label>
+                                            <input class="form-control form-required tagsinput" {% if profile.organization %}value="{{ profile.organization }}"{% endif %} name="organization">
+                                            <small class="text-muted">The names of the organizations you are associated with.</small><br />
+                                        </fieldset>
+                                        <br>
+
+                                        {#        User Type       #}
+                                        <fieldset class="col-xs-12">
+                                            <label for="selectUserType">User type *</label>
+                                            <select name="user_type" class="form-control form-required" id="selectUserType">
+                                                <option disabled selected value>Select a user type</option>
+                                                <option value="University Faculty">University Faculty</option>
+                                                <option value="University Professional or Research Staff">University Professional or Research Staff</option>
+                                                <option value="Post-Doctoral Fellow">Post-Doctoral Fellow</option>
+                                                <option value="University Graduate Student">University Graduate Student</option>
+                                                <option value="University Undergraduate Student">University Undergraduate Student</option>
+                                                <option value="Commercial/Professional">Commercial/Professional</option>
+                                                <option value="Government Official">Government Official</option>
+                                                <option value="School Student Kindergarten to 12th Grade">School Student Kindergarten to 12th Grade</option>
+                                                <option value="School Teacher Kindergarten to 12th Grade">School Teacher Kindergarten to 12th Grade</option>
+                                                <option value="Organization">Organization</option>
+                                                <option value="Other">Other</option>
+                                            </select>
+                                        </fieldset>
+
+                                        {#        User Type - Other       #}
+                                        <fieldset id="user-type-other" class="col-sm-6">
+                                            <label>Specify: *</label>
+                                            <input name="user_type" class="form-control">
+                                        </fieldset>
+                                      </div>
+                                    </div>
+
+                                    <div class="col-xs-12 col-sm-6">
+                                      <div class="row">
+                                        {#        Country       #}
+                                        <fieldset class="col-xs-12">
+                                            <label>Country *</label>
+                                            <select id="country" name="country" class="form-control form-required input-medium bfh-countries" data-country="{{ profile.country }}"></select>
+                                        </fieldset>
+
+                                        {#        State       #}
+                                        <fieldset class="col-xs-12">
+                                            <label>State/Region</label>
+                                            <select id="state" name="state" class="form-control input-medium bfh-states" data-country="country" data-state="{{ profile.state }}"></select>
+                                        </fieldset>
+                                      </div>
+                                    </div>
+                                </div>
+
+                                {# Subject areas #}
+                                <fieldset>
+                                    <label>Subject areas</label>
+                                    <input class="form-control" {% if profile.subject_areas %}value="{{ profile.subject_areas }}"{% endif %} name="subject_areas">
+                                    <small class="text-muted">A comma-separated list of subject areas you are interested
+                                        in researching. e.g. "Computer Science, Hydrology, Water Management"
+                                    </small>
+                                </fieldset>
+
+                                <br>
+
+                                {# email subscription #}
+                                <fieldset>
+                                    <div class="checkbox">
+                                        <label class="form-check" for="id_email_opt_out">
+                                            <input type="checkbox" name="email_opt_out" id="id_email_opt_out" {% if profile.email_opt_out %} checked {% endif %}>
+                                            Opt out of receiving system announcement emails such as announcements of planned downtime for system upgrades.</label>
+                                    </div>
+                                </fieldset>
+                            </div>
+                            {% endif %}
+
+                            {#        CV       #}
+                            {% if profile_user.id == user.id or user.is_superuser %}
+                                <div data-page-mode="edit">
+                                    <div>
+                                        {% if profile.cv and profile.cv.url %}
+                                            <hr>
+                                            <span><a href="{{ profile.cv.url }}" class="btn btn-default"
+                                                    target="_blank"><span
+                                                    class="glyphicon glyphicon-file"></span>&nbsp;Download CV</a></span>
+                                            <button id="btn-delete-cv" class="no-style icon-button btn-remove"
+                                                        data-toggle="modal"
+                                                        data-target="#delete-cv" title="Delete CV"><span
+                                                        class="glyphicon glyphicon-trash"></span>
+                                            </button>
+                                            <div id="group-cv" class="btn-group text-center" role="group"
+                                                 aria-label="CV">
+                                            <span class="input-group">
+                                            <span id="cv-custom-upload" class="btn btn-primary btn-file" title="Update CV">
+                                                <span class="glyphicon glyphicon-edit"></span>
+                                                <input type="file" name="cv">
+                                            </span>
+                                             <input class='no-style' type="text" readonly>
+                                            </span>
+                                        {% else %}
+                                            <hr>
+                                            <fieldset>
+                                            <label>Add a CV</label>
+                                            <div class="input-group">
+                                                <span class="input-group-btn">
+                                                    <span id="cv-custom-upload" class="btn btn-primary btn-file">
+                                                        Browse&hellip; <input type="file" name="cv">
+                                                    </span>
+                                                </span>
+                                                <input type="text" class="form-control" readonly>
+                                            </div>
+                                            </fieldset>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="full-width-tabs-container" id="user-profile-tabs">
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active">
+                        <a href="#overview" aria-controls="home" role="tab"
+                           data-toggle="tab"><i class="glyphicon glyphicon-list-alt"></i> OVERVIEW</a></li>
+                    <li role="presentation">
+                        <a href="#contributions" aria-controls="profile" role="tab" data-toggle="tab">
+                            <i class="glyphicon glyphicon-file"></i> CONTRIBUTIONS</a>
+                    </li>
+                </ul>
+
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane fade in active" id="overview">
+                        <div class="row">
+                            <div class="col-md-7">
+                                <div data-page-mode="on-edit-blur" class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title"><span class="glyphicon glyphicon-time">&nbsp;</span>Recent Activity</h3>
+                                   </div>
+                                    <div class="panel-body">
+                                        {% if resources %}
+
+                                        {% for res in resources reversed %}
+                                            {# Show only the last five #}
+                                            {% if forloop.counter0 < 5 %}
+                                            <div class="activity-block">
+                                                {% if profile.picture and profile.picture.url %}
+                                                    <div style="background-image: url('{{ profile.picture.url }}');"
+                                                         class="profile-pic-thumbnail round-image pull-left">
+                                                    </div>
+                                                {% else %}
+                                                    <div class="profile-pic-thumbnail round-image user-icon"></div>
+                                                {% endif %}
+                                                {% with metadata=res.metadata %}
+                                                    <div class="metadata-wrapper">
+                                                        <div class="shared-resource-info">
+                                                            <strong>{{ profile_user|contact }}</strong>
+                                                            <span class="text-muted"> shared </span>
+                                                            <span><a href="{{ res.get_absolute_url }}">{{ metadata.title }}</a></span>
+                                                        </div>
+                                                        <h5><span class="text-muted">Type: </span>{{ res|resource_type }}</h5>
+                                                        <h5><span class="text-muted">Date: </span>{{ res.created }}</h5>
+                                                    </div>
+                                                    {% with abstract=metadata.description %}
+                                                        {% if abstract %}
+                                                            <div class="activity-description col-sm-12">
+                                                                <p class="description">
+                                                                    <strong>ABSTRACT: </strong>{{ abstract|linebreaks }}
+                                                                </p>
+                                                            </div>
+                                                            <div class="btn-show-more toggle-abstract btn btn-default btn-xs">Show More</div>
+                                                        {% endif %}
+                                                    {% endwith %}
+                                                    </div>
+                                                {% endwith %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% else %}
+                                            <span class="text-muted">This user has no recent activity.</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-5">
+                                {#        DESCRIPTION       #}
+                                {% if not user.is_anonymous %}
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">
+                                            <span class="glyphicon glyphicon-user">&nbsp;</span>About {{ profile_user.first_name }}
+                                        </h3>
+                                    </div>
+
+                                    <div class="panel-body">
+                                        <div data-page-mode="view">
+                                            {% if profile.details %}
+                                            <div id="profile-description">{{ profile.details }}</div><hr>
+                                            {% endif %}
+
+                                            <table class="overview" data-page-mode="view">
+                                                <tbody>
+                                                {% if profile.user_type and profile.user_type != "Unspecified"%}
+                                                    <tr>
+                                                        <td><span class="text-muted">User type</span></td>
+                                                        <td id="db-user-type">{{ profile.user_type }}</td>
+                                                    </tr>
+                                                {% endif %}
+                                                {% if profile.country and profile.country != "Unspecified" %}
+                                                    <tr>
+                                                        <td><span class="text-muted">Country</span></td>
+                                                        <td>{{ profile.country }}</td>
+                                                    </tr>
+                                                {% endif %}
+                                                {% if profile.state and profile.state != "Unspecified"%}
+                                                    <tr>
+                                                        <td><span class="text-muted">State/Region:</span></td>
+                                                        <td><span id="db-state" class="bfh-states" data-state="{{ profile.state }}" data-country="{{ profile.country }}"></span></td>
+                                                    </tr>
+                                                {% endif %}
+                                                <tr>
+                                                    <td class="text-muted">Username: </td>
+                                                    <td>{{ profile_user.username }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><span class="text-muted">User since: </span></td>
+                                                    <td>{{ profile_user.date_joined|date:"M d, Y" }}</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                            {% if profile.cv and profile.cv.url %}
+                                                <div data-page-mode="view">
+                                                    <hr>
+                                                    <div>
+                                                        <a href="{{ profile.cv.url }}"
+                                                            class="btn btn-default"
+                                                            target="_blank">
+                                                            <span class="glyphicon glyphicon-file"></span>
+                                                            Download CV
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                            {% if profile_user.id == user.id or user.is_superuser %}
+                                                <br>
+                                                {% if profile.create_irods_user_account %}
+                                                    <div class="alert alert-success">You have created an associated iRODS account (username: <strong>{{ profile_user.username }}</strong>) in HydroShare user zone (<strong>users.hydroshare.org</strong>). </div>
+                                                {% else %}
+                                                    <div class="alert alert-warning">You have not created an associated iRODS account in HydroShare user zone (<strong>users.hydroshare.org</strong>). </div>
+                                                {% endif %}
+                                                {% if quota_message %}<div class="alert alert-info">{{ quota_message }}</div>{% endif %}
+                                            {% endif %}
+                                        </div>
+
+                                        {% if profile_user.id == user.id or user.is_superuser %}
+                                        <div data-page-mode="edit">
+                                            {# Title #}
+                                            <fieldset>
+                                                <label>Title</label>
+                                                <input class="form-control" {% if profile.title %}value="{{ profile.title }}"{% endif %} name="title">
+                                                <small class="text-muted">e.g. Assistant Professor, Program Director, Adjunct
+                                                    Professor, Software Developer.
+                                                </small>
+                                            </fieldset>
+                                            {#        Description       #}
+                                            <fieldset>
+                                                <label>Description</label>
+                                                <textarea class="form-control"
+                                                          name="details" rows="4">{% if profile.details %}{{ profile.details }}{% endif %}</textarea>
+                                            </fieldset>
+
+                                            {#        Date Joined       #}
+                                            <fieldset>
+                                                <label>User since</label>
+                                                <input readonly class="form-control" value='{{ profile_user.date_joined }}'>
+                                            </fieldset>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                {#  CONTACT #}
+                                {% if profile.public or user.is_superuser or profile_user.id == user.id and not user.is_anonymous %} {# Show only if profile is public and user is logged in #}
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title"><span
+                                                class="glyphicon glyphicon-phone-alt">&nbsp;</span>Contact</h3>
+                                    </div>
+
+                                    <div class="panel-body">
+                                        <table class="overview" data-page-mode="view">
+                                            <tbody>
+                                            {#        Phone 1       #}
+                                            {% if profile.phone_1 %}
+                                                <tr>
+                                                    <td><span class="text-muted">{% if profile.phone_1_type %}
+                                                        {{ profile.phone_1_type }}{% else %}Phone{% endif %}</span></td>
+                                                    <td>{{ profile.phone_1 }}</td>
+                                                </tr>
+                                            {% endif %}
+
+                                            {#        Phone 2       #}
+                                            {% if profile.phone_2 %}
+                                                <tr>
+                                                    <td><span class="text-muted">{{ profile.phone_2_type }}</span></td>
+                                                    <td>{{ profile.phone_2 }}</td>
+                                                </tr>
+                                            {% endif %}
+
+                                            {#        Email       #}
+                                            {% if profile_user.email %}
+                                                {% if not user.is_anonymous %}
+                                                    <tr>
+                                                        <td><span class="text-muted">Email</span></td>
+                                                        <td>
+                                                            <a href="mailto:{{ profile_user.email }}" target="_blank">send email to
+                                                                {% if profile_user.first_name or profile_user.last_name %}
+                                                                    {{ profile_user.first_name }}
+                                                                    {{ profile_user.last_name }}
+                                                                {% else %}
+                                                                    {{ profile_user.username }}
+                                                                {% endif %}
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                {% else %}
+                                                    <tr>
+                                                        <td><span class="text-muted">Email</span></td>
+                                                        <td>(<a href="/accounts/login/">Log in to send email</a>)</td>
+                                                    </tr>
+                                                {% endif %}
+                                            {% endif %}
+
+                                            {#        Website       #}
+                                            {% if profile.website %}
+                                                    <tr>
+                                                        <td><span class="text-muted">Website</span></td>
+                                                        <td><a href="{{ profile.website }}" target="_blank">{{ profile.website }}</a></td>
+                                                    </tr>
+                                            {% endif %}
+                                            </tbody>
+                                        </table>
+
+                                        {% if profile_user.id == user.id or user.is_superuser %}
+                                        <div class="row" data-page-mode="edit">
+                                            <fieldset>
+                                                <div class="col-sm-12"><label>Phone 1</label></div>
+
+                                                <div class="col-sm-6">
+                                                    <select name="phone_1_type" class="form-control">
+                                                        <option {% if profile.phone_1_type == "Mobile" %}selected{% endif %}
+                                                                value="Mobile">Mobile
+                                                        </option>
+                                                        <option {% if profile.phone_1_type == "Home" %}selected{% endif %} value="Home">
+                                                            Home
+                                                        </option>
+                                                        <option {% if profile.phone_1_type == "Work" %}selected{% endif %} value="Work">
+                                                            Work
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    {# this assumes that the phone will be in the same country as the profile #}
+                                                    <input id="phone1" name="phone_1" class="form-control bfh-phone phone" data-country="country" type="tel" {% if profile.phone_1 %}value="{{ profile.phone_1 }}"{% endif %}>
+                                                </div>
+                                            </fieldset>
+
+                                            <fieldset>
+                                                <div class="col-sm-12"><label>Phone 2</label></div>
+
+                                                <div class="col-sm-6">
+                                                    <select name="phone_2_type" class="form-control">
+                                                        <option {% if profile.phone_2_type == "Mobile" %}selected{% endif %}
+                                                                value="Mobile">Mobile
+                                                        </option>
+                                                        <option {% if profile.phone_2_type == "Home" %}selected{% endif %} value="Home">
+                                                            Home
+                                                        </option>
+                                                        <option {% if profile.phone_2_type == "Work" %}selected{% endif %} value="Work">
+                                                            Work
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    {# this assumes that the phone will be in the same country as the profile #}
+                                                    <input id="phone2" name="phone_2" class="form-control bfh-phone phone" data-country="country" type="tel" {% if profile.phone_2 %}value="{{ profile.phone_2 }}"{% endif %}>
+                                                </div>
+                                            </fieldset>
+                                            <fieldset class="col-sm-12">
+                                                <label>Email address *</label>
+                                                <input class="form-control form-required" id="id_email"
+                                                       value="{{ profile_user.email }}" name="email">
+                                            </fieldset>
+
+                                            <fieldset class="col-sm-12">
+                                                <label>Website</label>
+                                                <input class="form-control"
+                                                       {% if profile.website %}value="{{ profile.website }}"{% endif %} name="website">
+                                            </fieldset>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {# AUTHOR IDENTIFIERS #}
+                                <div class="panel panel-default {% if not profile.identifiers %}hidden{% endif %}"
+                                     data-page-mode="view">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title"><span
+                                                class="fa fa-address-card-o" style="width:32px;">&nbsp;</span>Author
+                                            Identifiers</h3>
+                                    </div>
+
+                                    <div class="panel-body">
+                                        <table class="identifiers">
+                                            {% for name, link in profile.identifiers.items %}
+                                            <tr>
+                                                <td colspan="2"><span class="text-muted">{{ name }}</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    {% if name == "GoogleScholarID" %}
+                                                    <i class="identifier-icon ai ai-google-scholar-square"></i>
+                                                    {% elif name == "ORCID" %}
+                                                    <i class="identifier-icon ai ai-orcid"></i>
+                                                    {% elif name == "ResearchGateID" %}
+                                                    <i class="identifier-icon ai ai-researchgate-square"></i>
+                                                    {% elif name == "ResearcherID" %}
+                                                    <img class="identifier-icon"
+                                                         src="{% static 'img/researcherID.png' %}"
+                                                         alt="ResearcherID icon"/>
+                                                    {% else %}
+                                                    <i class="identifier-icon fa fa-address-card"></i>
+                                                    {% endif %}
+                                                </td>
+                                                <td><a href="{{ link }}" target="_blank"
+                                                       class="identifier-url">{{ link }}</a>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </table>
+                                    </div>
+                                </div>
+
+                                {% if profile_user.id == user.id or user.is_superuser %}
+                                <div class="panel panel-default"  data-page-mode="edit">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title"><span
+                                                class="fa fa-address-card-o" style="width:32px;">&nbsp;</span>Author
+                                            Identifiers</h3>
+                                    </div>
+
+                                    <div class="panel-body">
+                                        {% include "includes/identifiers-form.html" with identifiers=profile.identifiers %}
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div role="tabpanel" class="tab-pane fade" id="contributions">
+                        <div class="row" data-page-mode='on-edit-blur'>
+                            <div class="col-sm-12"><legend>Resources</legend></div>
+                            <div class="col-sm-12 col-md-3">
+                                <table class="table-user-contributions table table-hover">
+                                    <tbody>
+                                        <tr id="badge-all" class="active" data-type="all">
+                                            <td><span>All</span></td>
+                                            <td><span class="badge">0</span></td>
+                                        </tr>
+                                        <tr id="badge-collection" data-type="type-Collection">
+                                            <td><span>Collection</span></td>
+                                            <td><span class="badge">0</span></td>
+                                        </tr>
+                                        <tr id="badge-composite" data-type="type-Resource">
+                                            <td><span>Resource</span></td>
+                                            <td><span class="badge">0</span></td>
+                                        </tr>
+                                        <tr id="badge-web-app" data-type="type-App Connector">
+                                            <td><span>App Connector</span></td>
+                                            <td><span class="badge">0</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-sm-12 col-md-9">
+                                {% if resources %}
+                                {% for res in resources %}
+                                    {% with res|resource_type as resource_type %}
+                                    <div data-type="type-{{ resource_type }}" class="contribution">
+                                        <div class="icon-resource-type-wrapper">
+                                        <span class="icon-resource-type">
+                                            <span><strong>{{ resource_type }}</strong></span>
+                                            {% if res.resource_type == "CompositeResource" %}
+                                                <img src="{% static 'img/resource-icons/composite48x48.png' %}"
+                                                     alt="{{ resource_type }}"
+                                                     title="{{ resource_type }}"/>
+                                            {% elif res.resource_type == "ToolResource" %}
+                                                <img src="{% static 'img/resource-icons/webapp48x48.png' %}"
+                                                     alt="{{ resource_type }}"
+                                                     title="{{ resource_type }}"/>
+                                            {% elif res.resource_type == "CollectionResource" %}
+                                                <img src="{% static 'img/resource-icons/collection48x48.png' %}"
+                                                     alt="{{ resource_type }}"
+                                                     title="{{ resource_type }}"/>
+                                            {% endif %}
+
+                                        </span>
+                                        </div>
+                                        <div class="activity-block row">
+                                            {% with metadata=res.metadata %}
+                                                <div class="activity-info col-sm-12">
+                                                    <span class="title"><a href="{{ res.get_absolute_url }}">{{ metadata.title }}</a></span>
+                                                    <h5><span class="text-muted">Created: </span>{{ res.created }}</h5>
+                                                    <h5><span class="text-muted">Authors: </span>
+                                                        {% for creator in metadata.creators.all %}
+                                                            {% if forloop.counter0 != 0 %}<span> · </span>{% endif %}
+                                                            {% if creator.relative_uri and creator.is_active_user %}
+                                                                <a href="{{ creator.relative_uri }}">{{ creator.name }}</a>
+                                                            {% else %}
+                                                                <span>{{ creator.name }}</span>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </h5>
+                                                </div>
+                                                {%  with abstract=metadata.description %}
+                                                    {% if abstract %}
+                                                        <div class="activity-description col-sm-12">
+                                                            <p>
+                                                                <strong>ABSTRACT: </strong>{{ abstract|linebreaks }}
+                                                            </p>
+                                                        </div>
+                                                        <div class="btn-show-more toggle-abstract btn btn-default btn-xs">Show More</div>
+                                                    {% endif %}
+                                               {% endwith %}
+                                           {% endwith %}
+                                        </div>
+                                    </div>
+                                    {% endwith %}
+                                {% endfor %}
+                                {% else %}
+                                    <span class="text-muted">This user has not shared any resources.</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        {% if profile_user.id == user.id or user.is_superuser %}
+            <div class="col-xs-12 col-sm-3 height-fix pull-right">
+            <button type="submit" class="btn btn-primary pull-right
+                btn-save-profile" data-page-mode="edit">
+                Save changes
+            </button>
+            <span data-page-mode="edit"
+                  class="btn btn-default pull-right btn-cancel-profile-edit">Cancel</span>
+        </div>
+
+            <!-- Deactivate Account Modal -->
+            <div class="modal fade" id="deactivate-account-dialog" tabindex="-1" role="dialog"
+                 aria-labelledby="Deactivate account">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal"
+                                    aria-label="Close"><span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title" id="myModalLabel">Deactivate Account</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-sm-2 col-xs-12 text-center">
+                                    <span id="icon-warning" class="glyphicon glyphicon-warning-sign"></span>
+                                </div>
+                                <div class="col-sm-10 col-xs-12">
+                                    <div><strong>WARNING</strong>: This will <strong><u>permanently</u></strong> disable your account. You cannot undo
+                                        this action. Please note that if you do choose to disable your account, your Resources
+                                        will remain in HydroShare and will be accessible to anyone who currently has access. If
+                                        you wish to remove your resources from HydroShare, you should do so <u>before</u> disabling
+                                        your account.
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                            <a href="{% url 'deactivate_account' %}" class="btn btn-danger">Confirm</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delete picture modal -->
+            <div class="modal fade" id="delete-picture" tabindex="-1" role="dialog"
+                 aria-labelledby="deleteProfilePicture">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal"
+                                    aria-label="Close"><span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title" id="deleteProfilePicture">Delete profile picture</h4>
+                        </div>
+                        <div class="modal-body">
+                            Are you sure you want to delete your profile picture?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">
+                                Close
+                            </button>
+                            <button class="btn btn-primary" id="picture-clear_id" name="picture-clear"
+                                    title="Delete profile picture"
+                                    value="clear">Confirm
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delete CV modal -->
+            <div class="modal fade" id="delete-cv" tabindex="-1" role="dialog"
+                 aria-labelledby="deleteCV">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal"
+                                    aria-label="Close"><span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title" id="deleteCV">Delete CV</h4>
+                        </div>
+                        <div class="modal-body">
+                            Are you sure you want to delete your CV?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">
+                                Close
+                            </button>
+                            <button class="btn btn-primary" id="cv-clear_id" name="cv-clear"
+                                    title="Delete CV"
+                                    value="clear">Confirm
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delete iRODS User Account Modal -->
+            <div class="modal fade" id="delete-irods-account-dialog" tabindex="-1" role="dialog"
+                 aria-labelledby="Create iRODS user account">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal"
+                                    aria-label="Close"><span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title" id="myModalLabel">Delete your iRODS user account</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-sm-2 col-xs-12 text-center">
+                                    <span id="icon-warning" class="glyphicon glyphicon-warning-sign"></span>
+                                </div>
+                                <div class="col-sm-10 col-xs-12">
+                                    <div><strong>WARNING</strong>: This will <strong>delete</strong> your iRODS user account in the
+                                        HydroShare user zone as well as all data you have under that account. You cannot recover
+                                        your data after this action.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                            <button id="btn-delete-irods-account" class="btn btn-danger">Confirm</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Create iRODS User Account Modal -->
+            <div class="modal fade" id="create-irods-account-dialog" tabindex="-1" role="dialog"
+                 aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <form role="form" method="post">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal"
+                                        aria-label="Close"><span aria-hidden="true">&times;</span>
+                                </button>
+                                <h4 class="modal-title" id="myModalLabel">Create your iRODS user account</h4>
+                            </div>
+                            <div class="modal-body">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-sm-10 col-xs-12">
+                                        <div>A corresponding iRODS user account with the same username <strong>{{ profile_user.username }}</strong> will be created
+                                            in the HydroShare user zone when you confirm this action. You will have to input a password below for your
+                                            iRODS user account, which does not have to be the same as your current HydroShare password. <strong>The password
+                                            is required to be composed of at least 8 characters.</strong> Please keep your iRODS user account password in a
+                                            secure place and use it to access your account in the HydroShare user zone using iRODS clients such as icommands or Cyberduck.
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="id_irods_password">Password: </label>
+                                            <input class="form-control" autocomplete="off" id="id_irods_password" name="irods_password" placeholder="Password" type="password">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                <button id="btn-create-irods-account" class="btn btn-primary" disabled>Confirm</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </form>
+        {% endif %}
+        {% endwith %}
+    </div>
+{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/jquery.tagsinput-revisited.min.css' %}" />
+  <style>
+    .tagsinput {
+      border: 1px solid #ccc;
+    }
+
+    .tagsinput div input::-webkit-input-placeholder {
+      color: #777;
+    }
+
+    .tagsinput .tag {
+      background: #DDD;
+      color: #111;
+    }
+  </style>
+{%  endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    <script>
+        var PHONES = {'phone_1': "{{profile_user.userprofile.phone_1}}", 'phone_2': "{{profile_user.userprofile.phone_2}}" };
+        var OLD_STATE = "{{ profile_user.userprofile.state }}";
+        const DATA_UPLOAD_MAX_MEMORY_SIZE = "{{ data_upload_max }}";
+    </script>
+    <script type="text/javascript" src="{% static 'js/bootstrap-formhelpers.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/profile.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery.tagsinput-revisited.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/identifiers-form.js' %}"></script>
+{% endblock %}

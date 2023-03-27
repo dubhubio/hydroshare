@@ -1,0 +1,166 @@
+{% load hydroshare_tags %}
+
+<div class="container">
+    <div class="row">
+        <div id="left-header" class="col-sm-12 col-md-6 res-header">
+            <table class="info-table">
+                <tr>
+                    <th>Authors:</th>
+
+                    <td style="display:flex; align-items: flex-start;">
+                      <div v-if="res_mode === 'View'" class="authors-wrapper">
+                        <template v-if="authors.length">
+                          <a v-for="(author, index) in authors" data-toggle="modal"
+                            @click="selectAuthor(author, index)"
+                            data-target="#view-author-modal">
+                              <template v-if="author.name">${ author.name | nameWithoutCommas }</template>
+                              <template v-else-if="author.organization">${ author.organization }</template>
+                              <template v-else>${ author.email }</template>
+                          </a>
+                        </template>
+                        <template v-else>
+                          This resource does not have an author who is an active HydroShare user.
+                          Contact CUAHSI (<a href="mailto:help@cuahsi.org">help@cuahsi.org</a>)
+                          {% if cm.raccess.public %}
+                              for information on this resource.
+                          {% else %}
+                              to determine if accessing this resource is possible.
+                          {% endif %}
+                        </template>
+                      </div>
+
+                      <div v-if="res_mode === 'Edit'">
+                        {% if not cm.raccess.published_or_review_pending %}
+                        <a :disabled="isUpdatingAuthor" type="button" id="btn-add-new-author"
+                           class="btn btn-success btn-xs space-right-1x" data-toggle="modal"
+                           data-target="#add-author-modal" title="Add Author">
+                            <span class="glyphicon glyphicon-plus"></span>
+                        </a>
+
+                        <span :class="{loading: isUpdatingAuthor}" class="authors-wrapper sortable">
+                            <span v-for="(author, index) in authors" :data-id="author.id">
+                                <a data-toggle="modal" class="author-preview" :title="'Edit ' + author.name"
+                                   @click="selectAuthor(author, index)" data-target="#edit-author-modal">
+                                    <template v-if="author.name">${ author.name | nameWithoutCommas }</template>
+                                    <template v-else-if="author.organization">${ author.organization }</template>
+                                    <template v-else>${ author.email }</template>
+                                </a>
+                            </span>
+                        </span>
+                        
+                        {% else %}
+                          <span class="authors-wrapper">
+                               <a v-for="(author, index) in authors" data-toggle="modal"
+                               @click="selectAuthor(author, index)"
+                               data-target="#view-author-modal">
+                                <template v-if="author.name">${ author.name | nameWithoutCommas }</template>
+                                <template v-else-if="author.organization">${ author.organization }</template>
+                                <template v-else>${ author.email }</template>
+                                </a>
+                          </span>
+                        {% endif %}
+                      </div>
+                      <div style="display:flex; align-items: center;" class="space-left gap-1x">
+                        {% if resource_edit_mode %}
+                            {% if not cm.raccess.published_or_review_pending %}
+                                <span data-toggle="tooltip" data-placement="auto"
+                                    title='Drag and drop Authors to rearrange.'
+                                    class="glyphicon glyphicon-info-sign text-muted">
+                                </span>
+                            {% endif %}
+                            <a data-toggle="tooltip" data-placement="auto"
+                                href="https://www.youtube.com/watch?v=5rYQjvnRXlI" target="_blank"
+                                title='How to: Authorship and Ownership'
+                                class="fa fa-youtube-play icon-red no-decoration icon-guide">
+                            </a>
+                        {% endif %}
+                      </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Owners:</th>
+                    <td v-if="owners.length" class="owners-wrapper">
+                        <template v-for="owner in owners">
+                            <profile-link
+                                :user="owner" :key="owner.id" @load-card="onLoadOwnerCard($event)">
+                            </profile-link>
+                        </template>
+
+                        <profile-card :user="userCardSelected" :position="cardPosition"></profile-card>
+                    </td>
+                    <td v-else class="owners-wrapper">
+                        This resource does not have an owner who is an active HydroShare user.
+                        Contact CUAHSI (<a href="mailto:help@cuahsi.org">help@cuahsi.org</a>)
+                        {% if cm.raccess.public %}
+                            for information on this resource.
+                        {% else %}
+                            to determine if accessing this resource is possible.
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Type:</th>
+                    <td>{{ cm|resource_type }}</td>
+                </tr>
+                <tr>
+                    <th>Storage:</th>
+                    <td>The size of this {{ cm|resource_type|lower }} is {{ cm.size|filesizeformat }}</td>
+                </tr>
+                <tr>
+                    <th>Created:</th>
+                    <td>{{ cm.created|date:"M d, Y" }} at {{ cm.created|time }}</td>
+                </tr>
+                <tr>
+                    <th>Last updated:</th>
+                    <td> {{ cm.last_updated|date:"M d, Y" }} at {{ cm.last_updated|time }}
+                        <profile-link v-if="lastChanagedBy.is_active" v-on:load-card="onLoadOwnerCard($event)" :user="lastChanagedBy"></profile-link>
+                        <profile-card v-if="lastChanagedBy.is_active" :user="lastChanagedBy" :position="cardPosition"></profile-card>
+                    </td>
+                </tr>
+                {% if cm.raccess.published %}
+                <tr>
+                    <th>DOI:</th>
+                    <td>10.4211/hs.{{ cm.short_id }}</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <th>Citation:</th>
+                    <td><a href="#citation">See how to cite this resource</a></td>
+                </tr>
+                {% if cm.resource_type == "CompositeResource" and cm.aggregation_types %}
+                <tr>
+                    <th>Content types:</th>
+                    <td>
+                        {% for ct in cm.aggregation_types %}
+                            <span class="label label-info agg-{{ ct|display_name_to_class }}">{{ ct }}</span>&nbsp;
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endif %}
+            </table>
+
+            <edit-author-modal v-if="res_mode === 'Edit'"
+                               @update-author="updateAuthor"
+                               @delete-author="deleteAuthor"
+                               :_author="selectedAuthor.author"
+                               :is_updating_author="isUpdatingAuthor"
+                               :is_deleting_author="isDeletingAuthor"
+                               :is_person="isPerson"
+                               :edit_author_error="editAuthorError"
+                               :can_remove="authors.length > 1">
+            </edit-author-modal>
+
+            <author-preview-modal v-if="res_mode === 'View'"
+                                  :author="selectedAuthor.author"
+                                  :is_person="isPerson">
+            </author-preview-modal>
+
+            <add-author-modal v-if="res_mode === 'Edit'"></add-author-modal>
+        </div>
+        <div class="col-sm-12 col-md-6 res-header">
+            {% include "resource-landing-page/highlights.html" %}
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="{% static 'js/hs-vue/left-header-app.js' %}"></script>

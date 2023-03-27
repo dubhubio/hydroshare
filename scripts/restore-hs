@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+# restore-hs
+# Author: Michael Stealey <michael.j.stealey@gmail.com>
+
+# set local variables
+### hydrodev VM
+HS_PATH=/home/${USER}/hydroshare
+BACKUP_PATH=/home/${USER}/backup
+
+# set variables for use in script
+CID=$(docker-compose ps | grep hydroshare | cut -d ' ' -f 1)
+MEDIA_FILES=${HS_PATH}/media_files
+
+# clone hydroshare repository if it does not exist
+if [ ! -d "$HS_PATH" ]; then
+    echo "*** clone hydroshare repository to ${HS_PATH} ***"
+    cd /home/${USER}/
+    git clone https://github.com/hydroshare/hydroshare.git
+    cd ${HS_PATH}
+fi
+
+# restore settings.py
+echo "*** restore ${HS_PATH}/settings.py ***"
+yes | cp -rf ${BACKUP_PATH}/settings.py ${HS_PATH}/hydroshare/settings.py
+
+# restore local_settings.py
+echo "*** restore ${HS_PATH}/local_settings.py ***"
+yes | cp -rf ${BACKUP_PATH}/local_settings.py ${HS_PATH}/hydroshare/local_settings.py
+
+# restore Dockerfile
+echo "*** restore ${HS_PATH}/Dockerfile ***"
+yes | cp -rf ${BACKUP_PATH}/Dockerfile ${HS_PATH}/Dockerfile
+
+# restore database file
+echo "*** restore ${HS_PATH}/pg.deploy.sql ***"
+yes | cp -rf ${BACKUP_PATH}/pg.deploy.sql ${HS_PATH}/pg.deploy.sql
+
+# restore docker-compose.yml
+echo "*** restore ${HS_PATH}/docker-compose.yml ***"
+yes | cp -rf ${BACKUP_PATH}/docker-compose.yml ${HS_PATH}/docker-compose.yml
+
+# restore hydroshare-config.yaml
+echo "*** restore ${HS_PATH}/config/hydroshare-config.yaml ***"
+yes | cp -rf ${BACKUP_PATH}/hydroshare-config.yaml ${HS_PATH}/config/hydroshare-config.yaml
+
+# restore media files
+echo "*** restore ${HS_PATH}/media.deploy.tar.gz ***"
+yes | cp -rf ${BACKUP_PATH}/media.deploy.tar.gz ${HS_PATH}/media.deploy.tar.gz
+cd ${HS_PATH}
+tar -xzvf media.deploy.tar.gz
+if [ ! -d "$HS_PATH/hydroshare/static" ]; then
+    echo "*** creating directory ${HS_PATH}/hydroshare/static ***"
+    mkdir ${HS_PATH}/hydroshare/static;
+fi
+cd ${HS_PATH}
+yes | cp -r media_files/media hydroshare/static/
+
+echo "*** FINISHED SCRIPT restore-hs ***"
+exit 0;
