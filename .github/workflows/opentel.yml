@@ -9,7 +9,7 @@ on:
 jobs:
   container-job:
     runs-on: ubuntu-latest
-    container: baseshiftefraim/cypress:latest
+    container: canopyiq/python-dind-builder:latest
     services:
       open-tel:
         image: baseshiftefraim/otelcol:latest

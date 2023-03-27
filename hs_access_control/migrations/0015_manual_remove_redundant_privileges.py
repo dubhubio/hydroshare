@@ -51,7 +51,7 @@ def remove_extra_privileges(apps, schema_editor):
             # START(ID=249,NAME=MigrationFilterUserResourcePrivilegeForForceRemoval,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
             records = UserResourcePrivilege.objects.filter(user=u, resource=r)
             # END(ID=249)
-            # START(ID=250,NAME=MigrationFilterUserResourcePrivilegeForForceRemoval,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
+            # START(ID=250,NAME=MigrationFilterUserResourcePrivilegeForForceRemovalCount,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
             if records.count() > 1:  # do nothing if there are no duplicates
             # END(ID=250)
                 # print(str.format("User '{}' (id={}) has {} privilege records" +
