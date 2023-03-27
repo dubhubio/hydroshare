@@ -15,6 +15,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # START(ID=242,NAME=MigrationCreateTableGroupMembershipRequest,TYPE=CREATE,OBJECTS=[GroupMembershipRequest])
         migrations.CreateModel(
             name='GroupMembershipRequest',
             fields=[
@@ -25,12 +26,15 @@ class Migration(migrations.Migration):
                 ('request_from', models.ForeignKey(related_name='ru2gmrequest', on_delete=models.CASCADE,to=settings.AUTH_USER_MODEL)),
             ],
         ),
+        # END(ID=242)
+        # START(ID=243,NAME=MigrationAlterUniqueTogetherUserResourcePrivilege0013,TYPE=ALTER,OBJECTS=[UserResourcePrivilege])
         migrations.AddField(
             model_name='groupaccess',
             name='date_created',
             field=models.DateTimeField(default=datetime.datetime(2016, 4, 24, 16, 28, 14, 996767), auto_now_add=True),
             preserve_default=False,
         ),
+        # END(ID=243)
         migrations.AddField(
             model_name='groupaccess',
             name='description',

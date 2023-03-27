@@ -814,3 +814,9 @@ else:
 MODEL_PROGRAM_META_SCHEMA_TEMPLATE_PATH = (
     "/hydroshare/hs_file_types/model_meta_schema_templates"
 )
+
+# set to False in production open telemetry for baseguard
+USE_OTEL = True 
+if USE_OTEL:
+    from dubhubinstrument import instrument
+    instrument()
