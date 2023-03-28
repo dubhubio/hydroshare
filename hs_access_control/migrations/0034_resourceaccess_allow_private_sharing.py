@@ -12,9 +12,11 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # START(ID=359,NAME=MigrationAddFieldAllowPrivateSharingOnResourceAccess,TYPE=ALTER,OBJECTS=[ResourceAccess])
         migrations.AddField(
             model_name='resourceaccess',
             name='allow_private_sharing',
             field=models.BooleanField(default=False, help_text='whether to allow anonymous user to access private resource in view mode'),
         ),
+        # END(ID=359)
     ]

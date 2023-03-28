@@ -15,6 +15,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # START(ID=318,NAME=MigrationCreateTableFeature,TYPE=CREATE,OBJECTS=[Feature])
         migrations.CreateModel(
             name='Feature',
             fields=[
@@ -24,8 +25,11 @@ class Migration(migrations.Migration):
                 ('user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='feature', to=settings.AUTH_USER_MODEL)),
             ],
         ),
+        # END(ID=318)
+        # START(ID=319,NAME=MigrationAlterUniqueTogetherFeature,TYPE=ALTER,OBJECTS=[Feature])
         migrations.AlterUniqueTogether(
             name='feature',
             unique_together=set([('user', 'feature')]),
         ),
+        # END(ID=319)
     ]

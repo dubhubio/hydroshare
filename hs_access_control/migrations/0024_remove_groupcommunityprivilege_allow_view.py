@@ -12,8 +12,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # START(ID=317,NAME=MigrationRemoveFiedlAllowViewGroupCommunityPrivilege,TYPE=ALTER,OBJECTS=[GroupCommunityPrivilege])
         migrations.RemoveField(
             model_name='groupcommunityprivilege',
             name='allow_view',
         ),
+        # END(ID=317)
     ]

@@ -12,10 +12,14 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # START(ID=364,NAME=MigrationAddFieldReviewPendingOnResourceAccess,TYPE=ALTER,OBJECTS=[ResourceAccess])
         migrations.AddField(
             model_name='resourceaccess',
             name='review_pending',
             field=models.BooleanField(default=False, help_text='whether resource is under metadata review'),
         ),
+        # END(ID=364)
+        # START(ID=365,NAME=MigrationAlterFieldReviewPendingDetDefaultRawSqlOnResourceAccess,TYPE=ALTER,OBJECTS=[ResourceAccess])
         migrations.RunSQL("ALTER TABLE hs_access_control_resourceaccess ALTER COLUMN review_pending SET DEFAULT FALSE;"),
+        # END(ID=365)
     ]

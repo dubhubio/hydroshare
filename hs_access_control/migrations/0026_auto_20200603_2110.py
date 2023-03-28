@@ -12,9 +12,11 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # START(ID=320,NAME=MigrationAlterFieldFeatureOnFeature,TYPE=ALTER,OBJECTS=[Feature])
         migrations.AlterField(
             model_name='feature',
             name='feature',
             field=models.IntegerField(choices=[(0, 'None'), (1, 'CZO')], default=0),
         ),
+        # END(ID=320)
     ]

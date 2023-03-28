@@ -98,7 +98,6 @@ services:
       - "rabbitmq_data_vol:/var/lib/rabbitmq"
   solr:
     image: solr:6.6
-    platform: linux/x86_64
     container_name: solr
     volumes:
       # hydroshare repository

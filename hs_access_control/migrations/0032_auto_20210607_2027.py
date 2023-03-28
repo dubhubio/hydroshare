@@ -14,38 +14,54 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # START(ID=349,NAME=MigrationRemoveFieldCommunityGroupCommunityInvite,TYPE=ALTER,OBJECTS=[GroupCommunityInvite])
         migrations.RemoveField(
             model_name='groupcommunityinvite',
             name='community',
         ),
+        # END(ID=349)
+        # START(ID=350,NAME=MigrationRemoveFieldCommunityOwnerGroupCommunityInvite,TYPE=ALTER,OBJECTS=[GroupCommunityInvite])
         migrations.RemoveField(
             model_name='groupcommunityinvite',
             name='community_owner',
         ),
+        # END(ID=350)
+        # START(ID=351,NAME=MigrationRemoveFieldGroupGroupCommunityInvite,TYPE=ALTER,OBJECTS=[GroupCommunityInvite])
         migrations.RemoveField(
             model_name='groupcommunityinvite',
             name='group',
         ),
+        # END(ID=351)
+        # START(ID=352,NAME=MigrationRemoveFieldGroupOwnerGroupCommunityInvite,TYPE=ALTER,OBJECTS=[GroupCommunityInvite])
         migrations.RemoveField(
             model_name='groupcommunityinvite',
             name='group_owner',
         ),
+        # END(ID=352)
+        # START(ID=353,NAME=MigrationAlterFieldCommunityOwnerGroupCommunityRequest,TYPE=ALTER,OBJECTS=[GroupCommunityRequest])
         migrations.AlterField(
             model_name='groupcommunityrequest',
             name='community_owner',
             field=models.ForeignKey(editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='invite_gcc', to=settings.AUTH_USER_MODEL),
         ),
+        # END(ID=353)
+        # START(ID=354,NAME=MigrationAlterFieldGroupOwnerGroupCommunityRequest,TYPE=ALTER,OBJECTS=[GroupCommunityRequest])
         migrations.AlterField(
             model_name='groupcommunityrequest',
             name='group_owner',
             field=models.ForeignKey(default=None, editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='invite_gcg', to=settings.AUTH_USER_MODEL),
         ),
+        # END(ID=354)
+        # START(ID=355,NAME=MigrationAlterFieldPrivilegeGroupCommunityRequest,TYPE=ALTER,OBJECTS=[GroupCommunityRequest])
         migrations.AlterField(
             model_name='groupcommunityrequest',
             name='privilege',
             field=models.IntegerField(choices=[(1, 'Owner'), (2, 'Change'), (3, 'View')], editable=False, null=True),
         ),
+        # END(ID=355)
+        # START(ID=356,NAME=MigrationDropTableGroupCommunityInvite,TYPE=DROP,OBJECTS=[GroupCommunityInvite])
         migrations.DeleteModel(
             name='GroupCommunityInvite',
         ),
+        # END(ID=356)
     ]

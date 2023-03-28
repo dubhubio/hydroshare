@@ -12,84 +12,116 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # START(ID=327,NAME=MigrationAddFieldExhibitCommunityResourcePrivilege,TYPE=ALTER,OBJECTS=[CommunityResourcePrivilege])
         migrations.AddField(
             model_name='communityresourceprivilege',
             name='exhibit',
             field=models.BooleanField(default=False, editable=False, help_text='exhibit resource as product'),
         ),
+        # END(ID=327)
+        # START(ID=328,NAME=MigrationAddFieldExhibitCommunitySourceProvenance,TYPE=ALTER,OBJECTS=[CommunitySourceProvenance])
         migrations.AddField(
             model_name='communityresourceprovenance',
             name='exhibit',
             field=models.BooleanField(default=False, editable=False, help_text='exhibit resource as product'),
         ),
+        # END(ID=328)
+        # START(ID=329,NAME=MigrationAddFieldExhibitGroupCommunityPrivilege,TYPE=ALTER,OBJECTS=[GroupCommunityPrivilege])
         migrations.AddField(
             model_name='groupcommunityprivilege',
             name='exhibit',
             field=models.BooleanField(default=False, editable=False, help_text='exhibit resource as product'),
         ),
+        # END(ID=329)
+        # START(ID=330,NAME=MigrationAddFieldExhibitGroupCommunityProvenance,TYPE=ALTER,OBJECTS=[GroupCommunityProvenance])
         migrations.AddField(
             model_name='groupcommunityprovenance',
             name='exhibit',
             field=models.BooleanField(default=False),
         ),
+        # END(ID=330)
+        # START(ID=331,NAME=MigrationAddFieldExhibitGroupResourcePrivilege,TYPE=ALTER,OBJECTS=[GroupResourcePrivilege])
         migrations.AddField(
             model_name='groupresourceprivilege',
             name='exhibit',
             field=models.BooleanField(default=False, editable=False, help_text='exhibit resource as product'),
         ),
+        # END(ID=331)
+        # START(ID=332,NAME=MigrationAddFieldExhibitGroupResourceProvenance,TYPE=ALTER,OBJECTS=[GroupResourceProvenance])
         migrations.AddField(
             model_name='groupresourceprovenance',
             name='exhibit',
             field=models.BooleanField(default=False, editable=False, help_text='exhibit resource as product'),
         ),
+        # END(ID=332)
+        # START(ID=333,NAME=MigrationAddFieldExhibitUserCommunityProvenance,TYPE=ALTER,OBJECTS=[UserCommunityProvenance])
         migrations.AddField(
             model_name='usercommunityprovenance',
             name='exhibit',
             field=models.BooleanField(default=False),
         ),
+        # END(ID=333)
+        # START(ID=334,NAME=MigrationAddFieldExhibitUserGroupProvenance,TYPE=ALTER,OBJECTS=[UserGroupProvenance])
         migrations.AddField(
             model_name='usergroupprovenance',
             name='exhibit',
             field=models.BooleanField(default=False),
         ),
+        # END(ID=334)
+        # START(ID=335,NAME=MigrationAddFieldExhibitUserResourcePrivilege,TYPE=ALTER,OBJECTS=[UserResourcePrivilege])
         migrations.AddField(
             model_name='userresourceprivilege',
             name='exhibit',
             field=models.BooleanField(default=False, editable=False, help_text='exhibit resource as product'),
         ),
+        # END(ID=335)
+        # START(ID=336,NAME=MigrationAddFieldExhibitUserResourceProvenance,TYPE=ALTER,OBJECTS=[UserResourceProvenance])
         migrations.AddField(
             model_name='userresourceprovenance',
             name='exhibit',
             field=models.BooleanField(default=False, editable=False, help_text='exhibit resource as product'),
         ),
+        # END(ID=336)
+        # START(ID=337,NAME=MigrationAlterFieldUndoneBooleanCommunityResourceProvenance,TYPE=ALTER,OBJECTS=[CommunityResourceProvenance])
         migrations.AlterField(
             model_name='communityresourceprovenance',
             name='undone',
             field=models.BooleanField(default=False, editable=False, help_text='already undone by undo'),
         ),
+        # END(ID=337)
+        # START(ID=338,NAME=MigrationAlterFieldUndoneBooleanGroupCommunityProvenance,TYPE=ALTER,OBJECTS=[GroupCommunityProvenance])
         migrations.AlterField(
             model_name='groupcommunityprovenance',
             name='undone',
             field=models.BooleanField(default=False, editable=False, help_text='already undone by undo'),
         ),
+        # END(ID=338)
+        # START(ID=339,NAME=MigrationAlterFieldUndoneBooleanGroupResourceProvenance,TYPE=ALTER,OBJECTS=[GroupResourceProvenance])
         migrations.AlterField(
             model_name='groupresourceprovenance',
             name='undone',
             field=models.BooleanField(default=False, editable=False, help_text='already undone by undo'),
         ),
+        # END(ID=339)
+        # START(ID=340,NAME=MigrationAlterFieldUndoneBooleanUserCommunityProvenance,TYPE=ALTER,OBJECTS=[UserCommunityProvenance])
         migrations.AlterField(
             model_name='usercommunityprovenance',
             name='undone',
             field=models.BooleanField(default=False, editable=False, help_text='already undone by undo'),
         ),
+        # END(ID=340)
+        # START(ID=341,NAME=MigrationAlterFieldUndoneBooleanUserGroupProvenance,TYPE=ALTER,OBJECTS=[UserGroupProvenance])
         migrations.AlterField(
             model_name='usergroupprovenance',
             name='undone',
             field=models.BooleanField(default=False, editable=False, help_text='already undone by undo'),
         ),
+        # END(ID=341)
+        # START(ID=342,NAME=MigrationAlterFieldUndoneBooleanUserResourceProvenance,TYPE=ALTER,OBJECTS=[UserResourceProvenance])
         migrations.AlterField(
             model_name='userresourceprovenance',
             name='undone',
             field=models.BooleanField(default=False, editable=False, help_text='already undone by undo'),
         ),
+        # END(ID=342)
     ]

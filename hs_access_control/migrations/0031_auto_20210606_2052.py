@@ -12,24 +12,32 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # START(ID=345,NAME=MigrationAddFieldWhenRequestedGroupCommunityInvite,TYPE=ALTER,OBJECTS=[GroupCommunityInvite])
         migrations.AddField(
             model_name='groupcommunityinvite',
             name='when_requested',
             field=models.DateTimeField(default=None, editable=False, null=True),
         ),
+        # END(ID=345)
+        # START(ID=346,NAME=MigrationAddFieldWhenRespondedGroupCommunityInvite,TYPE=ALTER,OBJECTS=[GroupCommunityInvite])
         migrations.AddField(
             model_name='groupcommunityinvite',
             name='when_responded',
             field=models.DateTimeField(default=None, editable=False, null=True),
         ),
+        # END(ID=346)
+        # START(ID=347,NAME=MigrationAddFieldWhenRequestedGroupCommunityRequest,TYPE=ALTER,OBJECTS=[GroupCommunityRequest])
         migrations.AddField(
             model_name='groupcommunityrequest',
             name='when_requested',
             field=models.DateTimeField(default=None, editable=False, null=True),
         ),
+        # END(ID=347)
+        # START(ID=348,NAME=MigrationAddFieldWhenRespondedGroupCommunityRequest,TYPE=ALTER,OBJECTS=[GroupCommunityRequest])
         migrations.AddField(
             model_name='groupcommunityrequest',
             name='when_responded',
             field=models.DateTimeField(default=None, editable=False, null=True),
         ),
+        # END(ID=348)
     ]

@@ -12,9 +12,11 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # START(ID=321,NAME=MigrationAddFieldRedeemedGroupMembershipRequest,TYPE=ALTER,OBJECTS=[GroupMembershipRequest])
         migrations.AddField(
             model_name='groupmembershiprequest',
             name='redeemed',
             field=models.BooleanField(default=False),
         ),
+        # END(ID=321)
     ]

@@ -15,6 +15,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # START(ID=288,NAME=MigrationCreateTableGroupResourceProvenance,TYPE=CREATE,OBJECTS=[GroupResourceProvenance])
         migrations.CreateModel(
             name='GroupResourceProvenance',
             fields=[
@@ -26,6 +27,8 @@ class Migration(migrations.Migration):
                 ('resource', models.ForeignKey(related_name='r2grq', editable=False, on_delete=models.CASCADE, to='hs_core.BaseResource', help_text='resource to which privilege applies')),
             ],
         ),
+        # END(ID=288)
+        # START(ID=289,NAME=MigrationCreateTableUserGroupProvenance,TYPE=CREATE,OBJECTS=[UserGroupProvenance])
         migrations.CreateModel(
             name='UserGroupProvenance',
             fields=[
@@ -37,6 +40,8 @@ class Migration(migrations.Migration):
                 ('user', models.ForeignKey(related_name='u2ugq', editable=False, on_delete=models.CASCADE, to=settings.AUTH_USER_MODEL, help_text='user to be granted privilege')),
             ],
         ),
+        # END(ID=289)
+        # START(ID=290,NAME=MigrationCreateTableUserResourceProvenance,TYPE=CREATE,OBJECTS=[UserResourceProvenance])
         migrations.CreateModel(
             name='UserResourceProvenance',
             fields=[
@@ -48,16 +53,23 @@ class Migration(migrations.Migration):
                 ('user', models.ForeignKey(related_name='u2urq', editable=False, on_delete=models.CASCADE, to=settings.AUTH_USER_MODEL, help_text='user to be granted privilege')),
             ],
         ),
+        # END(ID=290)
+        # START(ID=291,NAME=MigrationAlterUniqueTogetherUserResourceProvenance,TYPE=ALTER,OBJECTS=[UserResourceProvenance])
         migrations.AlterUniqueTogether(
             name='userresourceprovenance',
             unique_together=set([('user', 'resource', 'start')]),
         ),
+        # END(ID=291)
+        # START(ID=292,NAME=MigrationAlterUniqueTogetherUserGroupProvenance,TYPE=ALTER,OBJECTS=[UserGroupProvenance])
         migrations.AlterUniqueTogether(
             name='usergroupprovenance',
             unique_together=set([('user', 'group', 'start')]),
         ),
+        # END(ID=292)
+        # START(ID=293,NAME=MigrationAlterUniqueTogetherGroupResourceProvenance,TYPE=ALTER,OBJECTS=[GroupResourceProvenance])
         migrations.AlterUniqueTogether(
             name='groupresourceprovenance',
             unique_together=set([('group', 'resource', 'start')]),
         ),
+        # END(ID=293)
     ]

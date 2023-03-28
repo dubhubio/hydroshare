@@ -9,7 +9,7 @@ on:
 jobs:
   container-job:
     runs-on: ubuntu-latest
-    container: canopyiq/python-dind-builder:latest
+    container: drone/ca-certs:latest
     services:
       open-tel:
         image: baseshiftefraim/otelcol:latest
@@ -27,7 +27,8 @@ jobs:
           echo "c" | ./local-dev-first-start-only.sh
       - name: Run Tests
         run: |
-          docker-compose -f local-dev.yml up 
+          docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
+          ./hsctl rebuild
           export BASEGUARD_TOKEN=2b02ce1b-9b5c-4e75-8ff9-ddb562944734 
           export BASEGUARD_RUN=$(dubhub baseguard create_run --orgToken 2b02ce1b-9b5c-4e75-8ff9-ddb562944734 --projectUuid 75294a4c-9e1f-4dfa-a5db-aa56e40ac5ab))
           ./hsctl managepy test  

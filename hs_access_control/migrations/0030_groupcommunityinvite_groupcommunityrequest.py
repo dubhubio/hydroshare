@@ -16,6 +16,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # START(ID=343,NAME=MigrationCreateTableGroupCommunityInvite,TYPE=CREATE,OBJECTS=[GroupCommunityInvite])
         migrations.CreateModel(
             name='GroupCommunityInvite',
             fields=[
@@ -29,6 +30,8 @@ class Migration(migrations.Migration):
                 ('group_owner', models.ForeignKey(default=None, editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='invite_gcg', to=settings.AUTH_USER_MODEL)),
             ],
         ),
+        # END(ID=343)
+        # START(ID=344,NAME=MigrationCreateTableGroupCommunityRequest,TYPE=CREATE,OBJECTS=[GroupCommunityRequest])
         migrations.CreateModel(
             name='GroupCommunityRequest',
             fields=[
@@ -42,4 +45,5 @@ class Migration(migrations.Migration):
                 ('group_owner', models.ForeignKey(editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='request_gcg', to=settings.AUTH_USER_MODEL)),
             ],
         ),
+        # END(ID=344)
     ]

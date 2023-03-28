@@ -11,9 +11,11 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # START(ID=294,NAME=MigrationAddFieldBooleanAutoApproveGroupAccess,TYPE=ALTER,OBJECTS=[GroupAccess])
         migrations.AddField(
             model_name='groupaccess',
             name='auto_approve',
             field=models.BooleanField(default=False, help_text='whether group can be auto approved', editable=False),
         ),
+        # END(ID=294)
     ]

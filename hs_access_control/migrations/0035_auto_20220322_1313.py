@@ -12,14 +12,18 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # START(ID=360,NAME=MigrationAddFieldRequiresExplanationOnGroupAccess,TYPE=ALTER,OBJECTS=[GroupAccess])
         migrations.AddField(
             model_name='groupaccess',
             name='requires_explanation',
             field=models.BooleanField(default=False, editable=False, help_text='whether membership requests include explanation'),
         ),
+        # END(ID=360)
+        # START(ID=361,NAME=MigrationAddFieldExplanationOnGroupMembershipRequest,TYPE=ALTER,OBJECTS=[GroupMembershipRequest])
         migrations.AddField(
             model_name='groupmembershiprequest',
             name='explanation',
             field=models.TextField(blank=True, max_length=300, null=True),
         ),
+        # END(ID=361)
     ]

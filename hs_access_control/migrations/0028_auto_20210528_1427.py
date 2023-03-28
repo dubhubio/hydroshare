@@ -16,6 +16,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # START(ID=322,NAME=MigrationCreateTableCommunityResourcePrivilege,TYPE=CREATE,OBJECTS=[CommunityResourcePrivilege])
         migrations.CreateModel(
             name='CommunityResourcePrivilege',
             fields=[
@@ -27,6 +28,8 @@ class Migration(migrations.Migration):
                 ('resource', models.ForeignKey(editable=False, help_text='resource providing privilege', on_delete=django.db.models.deletion.CASCADE, related_name='r2crp', to='hs_core.BaseResource')),
             ],
         ),
+        # END(ID=322)
+        # START(ID=323,NAME=MigrationCreateTableCommunityResourceProvenance,TYPE=CREATE,OBJECTS=[CommunityResourceProvenance])
         migrations.CreateModel(
             name='CommunityResourceProvenance',
             fields=[
@@ -39,17 +42,24 @@ class Migration(migrations.Migration):
                 ('resource', models.ForeignKey(editable=False, help_text='community to be granted privilege', on_delete=django.db.models.deletion.CASCADE, related_name='r2crq', to='hs_core.BaseResource')),
             ],
         ),
+        # END(ID=323)
+        # START(ID=324,NAME=MigrationAlterFieldGrantorFkGroupCommunityPrivilege,TYPE=ALTER,OBJECTS=[GroupCommunityPrivilege])
         migrations.AlterField(
             model_name='groupcommunityprivilege',
             name='grantor',
             field=models.ForeignKey(editable=False, help_text='grantor of privilege', on_delete=django.db.models.deletion.CASCADE, related_name='x2gcp', to=settings.AUTH_USER_MODEL),
         ),
+        # END(ID=324)
+        # START(ID=325,NAME=MigrationAlterUniqueTogetherCommunityResourceProvenance,TYPE=ALTER,OBJECTS=[CommunityResourceProvenance])
         migrations.AlterUniqueTogether(
             name='communityresourceprovenance',
             unique_together=set([('resource', 'community', 'start')]),
         ),
+        # END(ID=325)
+        # START(ID=326,NAME=MigrationAlterUniqueTogetherCommunityResourcePrivilege,TYPE=ALTER,OBJECTS=[CommunityResourcePrivilege])
         migrations.AlterUniqueTogether(
             name='communityresourceprivilege',
             unique_together=set([('community', 'resource')]),
         ),
+        # END(ID=326)
     ]

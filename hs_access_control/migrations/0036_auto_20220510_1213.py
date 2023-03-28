@@ -14,14 +14,18 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # START(ID=362,NAME=MigrationAlterFieldPictureOnCommunity0036,TYPE=ALTER,OBJECTS=[Community])
         migrations.AlterField(
             model_name='community',
             name='picture',
             field=sorl.thumbnail.fields.ImageField(blank=True, null=True, upload_to=theme.utils.get_upload_path_community),
         ),
+        # END(ID=362)
+        # START(ID=363,NAME=MigrationAlterFieldPictureOnGroupAccess0036,TYPE=ALTER,OBJECTS=[GroupAccess])
         migrations.AlterField(
             model_name='groupaccess',
             name='picture',
             field=sorl.thumbnail.fields.ImageField(blank=True, null=True, upload_to=theme.utils.get_upload_path_group),
         ),
+        # END(ID=363)
     ]

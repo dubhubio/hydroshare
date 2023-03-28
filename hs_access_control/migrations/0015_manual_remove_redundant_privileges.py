@@ -102,11 +102,18 @@ def remove_extra_privileges(apps, schema_editor):
                     to_delete.delete()
                     # END(ID=259)
 
+    # START(ID=260,NAME=MigrationGetAllUsersUserGroupPrivilegeForRemoval,TYPE=SELECT,OBJECTS=[USER])
     for u in User.objects.all():
+    # END(ID=260)
+        # START(ID=261,NAME=MigrationGetAllGroupsUserGroupPrivilegeForRemoval,TYPE=SELECT,OBJECTS=[Group])
         for g in Group.objects.all():
-
+        # END(ID=261)
+            # START(ID=262,NAME=MigrationFilterUserAndGroupForUserGroupPrivilegeForRemoval,TYPE=SELECT,OBJECTS=[UserGroupPrivilege])
             records = UserGroupPrivilege.objects.filter(user=u, group=g)
+            # END(ID=262)
+            # START(ID=263,NAME=MigrationCountUserGroupPrivilegeForRemoval,TYPE=SELECT,OBJECTS=[UserGroupPrivilege])
             if records.count() > 1:  # do nothing if there are no duplicates
+            # END(ID=263)
                 # print(str.format("User '{}' (id={}) has {} privilege records" +
                 #                  " over group '{}' ({})",
                 #                  str(r.user.username), str(r.user.id),
@@ -114,32 +121,55 @@ def remove_extra_privileges(apps, schema_editor):
                 #                  str(r.group.name), str(r.group.id)))
 
                 # determine the lowest privilege number
+                # START(ID=263,NAME=MigrationMinOfUserGroupPrivilegeForRemoval,TYPE=SELECT,OBJECTS=[UserGroupPrivilege])
                 min = records.aggregate(models.Min('privilege'))
+                # END(ID=263)
                 min_privilege = min['privilege__min']
                 # print (str.format("   minimum privilege is {}", str(min_privilege)))
 
                 # of records with this number, select the record with maximum timestamp.
                 # This determines the (last) grantor
+                # START(ID=264,NAME=MigrationPrivilegeMinAgregStartOfUserGroupPrivilegeForRemoval,TYPE=SELECT,OBJECTS=[UserGroupPrivilege])
                 max = records.filter(privilege=min_privilege).aggregate(models.Max('start'))
+                # END(ID=264)
                 max_start = max['start__max']
                 # print (str.format("   maximum start is {}", str(max_start)))
-
+                # START(ID=265,NAME=MigrationPrivilegeMinToKeepStartOfUserGroupPrivilegeForRemoval,TYPE=SELECT,OBJECTS=[UserGroupPrivilege])
                 to_keep = records.filter(privilege=min_privilege, start=max_start)
+                # END(ID=265)
+                # START(ID=266,NAME=MigrationPrivilegeMinToKeepCountOfUserGroupPrivilegeForRemoval,TYPE=SELECT,OBJECTS=[UserGroupPrivilege])
                 if to_keep.count() == 1:
+                # END(ID=266)
                     # print("   one UNIQUE start record: {}", str(to_keep[0]))
+                    # START(ID=267,NAME=MigrationPrivilegeMinToKeepExcludeOfUserGroupPrivilegeForRemoval,TYPE=SELECT,OBJECTS=[UserGroupPrivilege])
                     to_delete = records.exclude(pk__in=to_keep)
+                    # END(ID=267)
+                    # START(ID=268,NAME=MigrationPrivilegeOfUserGroupPrivilegeDeleteCountIsOne,TYPE=DELETE,OBJECTS=[UserGroupPrivilege])
                     to_delete.delete()
-
+                    # END(ID=268)
+                # START(ID=269,NAME=MigrationPrivilegeMinToKeepCountOverOneOfUserGroupPrivilegeForRemoval,TYPE=SELECT,OBJECTS=[UserGroupPrivilege])
                 elif to_keep.count() > 1:  # unlikely
+                # END(ID=269)
                     kept = records[0]  # choose first one arbitrarily
                     # print("   choosing arbitrary record: {}", str(kept))
+                    # START(ID=270,NAME=MigrationPrivilegeMinExcludeToKeepOverOneOfUserGroupPrivilegeForRemoval,TYPE=SELECT,OBJECTS=[UserGroupPrivilege])
                     to_delete = records.exclude(pk=kept)
+                    # END(ID=270)
+                    # START(ID=271,NAME=MigrationPrivilegeOfUserGroupPrivilegeDeleteCountIsOne,TYPE=DELETE,OBJECTS=[UserGroupPrivilege])
                     to_delete.delete()
-
+                    # END(ID=271)
+    # START(ID=272,NAME=MigrationGetAllGroupsGroupResourcePrivilegeForRemoval,TYPE=SELECT,OBJECTS=[Group])
     for g in Group.objects.all():
+    # END(ID=272)
+        # START(ID=273,NAME=MigrationGetAllBaseResourceGroupResourcePrivilegeForRemoval,TYPE=SELECT,OBJECTS=[BaseResource])
         for r in BaseResource.objects.all():
+        # END(ID=273)
+            # START(ID=274,NAME=MigrationGetAllGroupResourcePrivilegeFilterGroupResourceForRemoval,TYPE=SELECT,OBJECTS=[GroupResourcePrivilege])
             records = GroupResourcePrivilege.objects.filter(group=g, resource=r)
+            # END(ID=274)
+            # START(ID=275,NAME=MigrationGetAllGroupResourcePrivilegeFilterGroupResourceCountForRemoval,TYPE=SELECT,OBJECTS=[GroupResourcePrivilege])
             if records.count() > 1:  # do nothing if there are no duplicates
+            # END(ID=275)
                 # print(str.format("Group '{}' (id={}) has {} privilege records" +
                 #                  " over resource '{}'",
                 #                  str(r.group.name).encode('ascii'), str(r.group.id),
@@ -147,27 +177,43 @@ def remove_extra_privileges(apps, schema_editor):
                 #                  str(r.short_id)).encode('ascii'))
 
                 # determine the lowest privilege number
+                # START(ID=276,NAME=MigrationGetAllGroupResourcePrivilegeFilterGroupResourceCountAgregatePrivForRemoval,TYPE=SELECT,OBJECTS=[GroupResourcePrivilege])
                 min = records.aggregate(models.Min('privilege'))
+                # END(ID=276)
                 min_privilege = min['privilege__min']
                 # print (str.format("   minimum privilege is {}", str(min_privilege)))
 
                 # of records with this number, select the record with maximum timestamp.
                 # This determines the (last) grantor
+                # START(ID=277,NAME=MigrationGetAllGroupResourcePrivilegeAgregateStartMaxForRemoval,TYPE=SELECT,OBJECTS=[GroupResourcePrivilege])
                 max = records.filter(privilege=min_privilege).aggregate(models.Max('start'))
+                # END(ID=277)
                 max_start = max['start__max']
                 # print (str.format("   maximum start is {}", str(max_start)))
-
+                # START(ID=278,NAME=MigrationGetAllGroupResourcePrivilegeToKeepCountGreaterThanOneAgregateStartMaxForRemoval,TYPE=SELECT,OBJECTS=[GroupResourcePrivilege])
                 to_keep = records.filter(privilege=min_privilege, start=max_start)
+                # END(ID=278)
+                # START(ID=279,NAME=MigrationGetAllGroupResourcePrivilegeToKeepCountIsOneAgregateStartMaxForRemoval,TYPE=SELECT,OBJECTS=[GroupResourcePrivilege])
                 if to_keep.count() == 1:
+                # END(ID=279)
                     # print("   one UNIQUE start record: {}", str(to_keep[0]))
+                    # START(ID=280,NAME=MigrationGetAllGroupResourcePrivilegeToKeepCountIsOneExcludeForRemoval,TYPE=SELECT,OBJECTS=[GroupResourcePrivilege])
                     to_delete = records.exclude(pk__in=to_keep)
+                    # END(ID=280)
+                    # START(ID=281,NAME=MigrationGetAllGroupResourcePrivilegeToKeepCountIsOneDelete,TYPE=DELETE,OBJECTS=[GroupResourcePrivilege])
                     to_delete.delete()
-
+                    # END(ID=281)
+                # START(ID=282,NAME=MigrationGetAllGroupResourcePrivilegeToKeepCountGreaterThanOneUnlikely,TYPE=SELECT,OBJECTS=[GroupResourcePrivilege])
                 elif to_keep.count() > 1:  # unlikely
+                # END(ID=282)
                     kept = records[0]  # choose first one arbitrarily
                     # print("   choosing arbitrary record: {}", str(kept))
+                     # START(ID=283,NAME=MigrationGetAllGroupResourcePrivilegeToKeepCountGreaterThanOneUnlikelyExclude,TYPE=SELECT,OBJECTS=[GroupResourcePrivilege])
                     to_delete = records.exclude(pk=kept)
+                    # END(ID=283)
+                    # START(ID=284,NAME=MigrationGetAllGroupResourcePrivilegeToKeepCountGreaterThanOneUnlikelyDelete,TYPE=DELETE,OBJECTS=[GroupResourcePrivilege])
                     to_delete.delete()
+                    # END(ID=284)
 
 
 class Migration(migrations.Migration):

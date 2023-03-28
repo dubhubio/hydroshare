@@ -13,14 +13,18 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # START(ID=357,NAME=MigrationAlterFieldPictureOnCommunity,TYPE=ALTER,OBJECTS=[Community])
         migrations.AlterField(
             model_name='community',
             name='picture',
             field=models.ImageField(blank=True, null=True, upload_to=theme.utils.get_upload_path_community),
         ),
+        # END(ID=357)
+        # START(ID=358,NAME=MigrationAlterFieldPictureOnGroupAccess,TYPE=ALTER,OBJECTS=[GroupAccess])
         migrations.AlterField(
             model_name='groupaccess',
             name='picture',
             field=models.ImageField(blank=True, null=True, upload_to=theme.utils.get_upload_path_group),
         ),
+        # END(ID=358)
     ]

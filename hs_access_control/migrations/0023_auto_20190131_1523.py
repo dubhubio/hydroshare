@@ -16,6 +16,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # START(ID=308,NAME=MigrationCreateTableCommunity,TYPE=CREATE,OBJECTS=[Community])
         migrations.CreateModel(
             name='Community',
             fields=[
@@ -28,6 +29,8 @@ class Migration(migrations.Migration):
                 ('picture', models.ImageField(blank=True, null=True, upload_to='community')),
             ],
         ),
+        # END(ID=308)
+        # START(ID=309,NAME=MigrationCreateTableGroupCommunityPrivilege,TYPE=CREATE,OBJECTS=[GroupCommunityPrivilege])
         migrations.CreateModel(
             name='GroupCommunityPrivilege',
             fields=[
@@ -40,6 +43,8 @@ class Migration(migrations.Migration):
                 ('group', models.ForeignKey(editable=False, help_text='group providing privilege', on_delete=django.db.models.deletion.CASCADE, related_name='g2gcp', to='auth.Group')),
             ],
         ),
+        # END(ID=309)
+        # START(ID=310,NAME=MigrationCreateTableGroupCommunityProvenance,TYPE=CREATE,OBJECTS=[GroupCommunityProvenance])
         migrations.CreateModel(
             name='GroupCommunityProvenance',
             fields=[
@@ -52,6 +57,8 @@ class Migration(migrations.Migration):
                 ('group', models.ForeignKey(editable=False, help_text='group to which privilege applies', on_delete=django.db.models.deletion.CASCADE, related_name='g2gcq', to='auth.Group')),
             ],
         ),
+        # END(ID=310)
+        # START(ID=311,NAME=MigrationCreateTableUserCommunityPrivilege,TYPE=CREATE,OBJECTS=[UserCommunityPrivilege])
         migrations.CreateModel(
             name='UserCommunityPrivilege',
             fields=[
@@ -63,6 +70,8 @@ class Migration(migrations.Migration):
                 ('user', models.ForeignKey(editable=False, help_text='group providing privilege', on_delete=django.db.models.deletion.CASCADE, related_name='u2ucp', to=settings.AUTH_USER_MODEL)),
             ],
         ),
+        # END(ID=311)
+        # START(ID=312,NAME=MigrationCreateTableUserCommunityProvenance,TYPE=CREATE,OBJECTS=[UserCommunityProvenance])
         migrations.CreateModel(
             name='UserCommunityProvenance',
             fields=[
@@ -75,20 +84,29 @@ class Migration(migrations.Migration):
                 ('user', models.ForeignKey(editable=False, help_text='user to which privilege applies', on_delete=django.db.models.deletion.CASCADE, related_name='u2ucq', to=settings.AUTH_USER_MODEL)),
             ],
         ),
+        # END(ID=312)
+        # START(ID=313,NAME=MigrationAlterUniqueTogetherUserCommunityProvenance,TYPE=ALTER,OBJECTS=[UserCommunityProvenance])
         migrations.AlterUniqueTogether(
             name='usercommunityprovenance',
             unique_together=set([('community', 'user', 'start')]),
         ),
+        # END(ID=313)
+        # START(ID=314,NAME=MigrationAlterUniqueTogetherUserCommunityPrivilege,TYPE=ALTER,OBJECTS=[UserCommunityPrivilege])
         migrations.AlterUniqueTogether(
             name='usercommunityprivilege',
             unique_together=set([('community', 'user')]),
         ),
+        # END(ID=314)
+        # START(ID=315,NAME=MigrationAlterUniqueTogetherGroupCommunityProvenance,TYPE=ALTER,OBJECTS=[GroupCommunityProvenance])
         migrations.AlterUniqueTogether(
             name='groupcommunityprovenance',
             unique_together=set([('community', 'group', 'start')]),
         ),
+        # END(ID=315)
+        # START(ID=316,NAME=MigrationAlterUniqueTogetherGroupCommunityPrivilege,TYPE=ALTER,OBJECTS=[GroupCommunityPrivilege])
         migrations.AlterUniqueTogether(
             name='groupcommunityprivilege',
             unique_together=set([('community', 'group')]),
         ),
+        # END(ID=316)
     ]
