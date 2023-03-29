@@ -21,6 +21,14 @@ jobs:
           version: '2.14.2'
       - name: Check out repository code
         uses: actions/checkout@v3
+      - name: Create BuildKit Configuration
+        run: |
+          cat <<EOF > buildkitd.toml   
+          [registry."docker-registry.actions-runner-system.svc:5000"]
+            http = false
+            insecure = false
+            ca=["/etc/ssl/certs/ca-certificates.crt"]
+          EOF
       - name: Setup Docker Buildx
         id: setup_docker_buildx
         uses: docker/setup-buildx-action@v1
