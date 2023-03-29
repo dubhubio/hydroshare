@@ -15,15 +15,25 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-    container: debian:stable
-    services:
-      open-tel:
-        image: baseshiftefraim/otelcol:latest
-        ports:
-          - 4317:4317
-      - uses: KengoTODA/actions-setup-docker-compose@v1
+      - name: Set up container and services
+        uses: docker/compose-cli-action@v0.7.1
         with:
-          version: '2.14.2'
+          compose-version: 2.0.0
+          container: debian:stable
+          services: |
+            open-tel:
+              image: baseshiftefraim/otelcol:latest
+              ports:
+                - 4317:4317
+    # container: debian:stable
+    # services:
+    #   open-tel:
+    #     image: baseshiftefraim/otelcol:latest
+    #     ports:
+    #       - 4317:4317
+    #   - uses: KengoTODA/actions-setup-docker-compose@v1
+    #     with:
+    #       version: '2.14.2'
       - name: Check out repository code
         uses: actions/checkout@v3
       - name: Set Up Docker Containers first start
