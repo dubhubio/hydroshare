@@ -72,7 +72,9 @@ class GroupCommunityRequest(models.Model):
         '''
         if not self.id:  # when created
             self.when_requested = timezone.now()
+        # START(ID=417,NAME=InviteGroupCommunityRequestUpdateWhenRequested,TYPE=UPDATE,OBJECTS=[GroupCommunityRequest])
         return super(GroupCommunityRequest, self).save(*args, **kwargs)
+        # END(ID=417)
 
     @classmethod
     def create_or_update(cls, **kwargs):
@@ -146,9 +148,11 @@ class GroupCommunityRequest(models.Model):
 
             # Get the transaction record, if any
             with transaction.atomic():
+                # START(ID=400,NAME=ModelGroupCommunityRequestCreateOrUpdateRequesterOwnsBoth,TYPE=MERGE,OBJECTS=[GroupCommunityRequest])
                 request, created = cls.objects.get_or_create(
                     defaults={'community_owner': community_owner, 'privilege': privilege},
                     group=group, community=community)
+                # END(ID=400)
 
             request.community_owner = community_owner
             request.group_owner = group_owner
@@ -156,7 +160,9 @@ class GroupCommunityRequest(models.Model):
             request.approved = True
             request.privilege = privilege
             request.when_responded = timezone.now()
+            # START(ID=418,NAME=InviteGroupCommunityRequestUpdateRequesterOwnsBoth,TYPE=UPDATE,OBJECTS=[GroupCommunityRequest])
             request.save()
+            # END(ID=418)
             approved = True
             community_owner.uaccess.share_community_with_group(
                 request.community, request.group, request.privilege)
@@ -183,10 +189,11 @@ class GroupCommunityRequest(models.Model):
                 .format(group.name, community.name)
 
             with transaction.atomic():
+                # START(ID=401,NAME=ModelGroupCommunityRequestCreateOrUpdate,TYPE=MERGE,OBJECTS=[GroupCommunityRequest])
                 request, created = cls.objects.get_or_create(
                     defaults={'community_owner': community_owner, 'privilege': privilege},
                     group=group, community=community)
-
+                # END(ID=401)
             # auto-approve if there's already a request(!)
             if request.group_owner is not None and request.redeemed is False:
                 request.community_owner = community_owner
@@ -194,7 +201,9 @@ class GroupCommunityRequest(models.Model):
                 request.redeemed = True
                 request.approved = True
                 request.when_responded = timezone.now()
+                # START(ID=419,NAME=InviteGroupCommunityRequestUpdateAutoApprove,TYPE=UPDATE,OBJECTS=[GroupCommunityRequest])
                 request.save()
+                # END(ID=419)
                 approved = True
                 community_owner.uaccess.share_community_with_group(
                     request.community, request.group, request.privilege)
@@ -210,7 +219,9 @@ class GroupCommunityRequest(models.Model):
                 request.approved = False
                 request.when_requested = timezone.now()
                 request.when_responded = None
+                # START(ID=420,NAME=InviteGroupCommunityRequestUpdateRefreshRequest,TYPE=UPDATE,OBJECTS=[GroupCommunityRequest])
                 request.save()
+                # END(ID=420)
                 message = "Request updated: connect group '{}' to community '{}'."\
                     .format(group.name, community.name)
 
@@ -225,8 +236,10 @@ class GroupCommunityRequest(models.Model):
                 .format(group.name, community.name)
 
             with transaction.atomic():
+                # START(ID=402,NAME=ModelGroupCommunityRequestCreateOrUpdateOwnsGroup,TYPE=MERGE,OBJECTS=[GroupCommunityRequest])
                 request, created = cls.objects.get_or_create(
                     defaults={'group_owner': group_owner}, community=community, group=group)
+                # END(ID=402)
 
             # auto-approve if there's already an invite(!)
             if request.community_owner is not None and request.privilege is not None:
@@ -234,7 +247,9 @@ class GroupCommunityRequest(models.Model):
                 request.redeemed = True
                 request.approved = True
                 request.when_responded = timezone.now()
+                # START(ID=421,NAME=InviteGroupCommunityRequestUpdateCommunityOwnerNotNone,TYPE=UPDATE,OBJECTS=[GroupCommunityRequest])
                 request.save()
+                # END(ID=421)
                 approved = True
                 request.community_owner.uaccess.share_community_with_group(
                     request.community, request.group, request.privilege)
@@ -250,7 +265,9 @@ class GroupCommunityRequest(models.Model):
                 request.redeemed = True
                 request.approved = True
                 request.when_responded = timezone.now()
+                # START(ID=422,NAME=InviteGroupCommunityRequestUpdateCommunityAutoApprove,TYPE=UPDATE,OBJECTS=[GroupCommunityRequest])
                 request.save()
+                # END(ID=422)
                 approved = True
                 request.community_owner.uaccess.share_community_with_group(
                     request.community, request.group, request.privilege)
@@ -264,7 +281,9 @@ class GroupCommunityRequest(models.Model):
                 request.approved = False
                 request.when_requested = timezone.now()
                 request.when_responded = None
+                # START(ID=423,NAME=InviteGroupCommunityRequestUpdateNotCreated,TYPE=UPDATE,OBJECTS=[GroupCommunityRequest])
                 request.save()
+                # END(ID=423)
                 message = "Request updated: connect group '{}' to community '{}'."\
                     .format(group.name, community.name)
 
@@ -310,7 +329,9 @@ class GroupCommunityRequest(models.Model):
         Return a list of active requests as class objects. These can be further filtered
         to determine whether the current user has any requests he/she can approve.
         '''
+        # START(ID=403,NAME=ModelGroupCommunityRequestClassMethodPending,TYPE=SELECT,OBJECTS=[GroupCommunityRequest])
         requests = cls.objects.filter(redeemed=False)
+        # END(ID=403)
         if responder is not None:
             assert (isinstance(responder, User))
             requests = requests.filter(Q(group_owner__isnull=True,
@@ -327,7 +348,9 @@ class GroupCommunityRequest(models.Model):
         Return a list of active requests as class objects. These can be further filtered
         to determine whether the current user has any requests he/she can cancel.
         '''
+        # START(ID=404,NAME=ModelGroupCommunityRequestClassMethodQueued,TYPE=SELECT,OBJECTS=[GroupCommunityRequest])
         requests = cls.objects.filter(redeemed=False)
+        # END(ID=404)
         if requester is not None:
             assert (isinstance(requester, User))
             requests = requests.filter(Q(group__g2ugp__user=requester,
@@ -355,7 +378,9 @@ class GroupCommunityRequest(models.Model):
         community = kwargs['community']
 
         try:
+            # START(ID=405,NAME=ModelGroupCommunityRequestClassMethodGetRequestTry,TYPE=SELECT,OBJECTS=[GroupCommunityRequest])
             return GroupCommunityRequest.objects.get(group=group, community=community)
+            # END(ID=405)
         except GroupCommunityRequest.DoesNotExist:
             return None
 
@@ -372,7 +397,9 @@ class GroupCommunityRequest(models.Model):
                 self.redeemed = True
                 self.approved = True
                 self.when_responded = timezone.now()
+                # START(ID=424,NAME=InviteGroupCommunityUacessOwnsCommunity,TYPE=UPDATE,OBJECTS=[GroupCommunityRequest])
                 self.save()
+                # END(ID=424)
                 self.community_owner.uaccess.share_community_with_group(
                     self.community, self.group, self.privilege)
                 message = "Request to connect group '{}' to community '{}' approved."\
@@ -387,7 +414,9 @@ class GroupCommunityRequest(models.Model):
                 self.redeemed = True
                 self.approved = True
                 self.when_responded = timezone.now()
+                # START(ID=425,NAME=InviteGroupCommunityUacessOwnsGroup,TYPE=UPDATE,OBJECTS=[GroupCommunityRequest])
                 self.save()
+                # END(ID=425)
                 message = "Request to connect group '{}' to community '{}' approved."\
                     .format(self.group.name, self.community.name)
                 self.community_owner.uaccess.share_community_with_group(
@@ -410,7 +439,9 @@ class GroupCommunityRequest(models.Model):
                 self.redeemed = True
                 self.approved = False
                 self.when_responded = timezone.now()
+                # START(ID=426,NAME=InviteGroupCommunityUacessOwnsCommunity,TYPE=UPDATE,OBJECTS=[GroupCommunityRequest])
                 self.save()
+                # END(ID=426)
                 message = "Request to connect group '{}' to community '{}' declined."\
                     .format(self.group.name, self.community.name)
                 return message, True
@@ -423,7 +454,9 @@ class GroupCommunityRequest(models.Model):
                 self.redeemed = True
                 self.approved = False
                 self.when_responded = timezone.now()
+                # START(ID=427,NAME=InviteGroupCommunityUacessOwnsGroupGroupOwnerNone,TYPE=UPDATE,OBJECTS=[GroupCommunityRequest])
                 self.save()
+                # END(ID=427)
                 message = "Request to connect group '{}' to community '{}' declined."\
                     .format(self.group.name, self.community.name)
                 return message, True

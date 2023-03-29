@@ -183,10 +183,14 @@ class Command(BaseCommand):
                 # END(ID=112)
                 if options['description'] is not None:
                     community.description = options['description']
+                    # START(ID=406,NAME=AccessCommunityCommunityUpdateDescription,TYPE=UPDATE,OBJECTS=[Community])
                     community.save()
+                    # END(ID=406)
                 if options['purpose'] is not None:
                     community.purpose = options['purpose']
+                    # START(ID=407,NAME=AccessCommunityCommunityUpdatePurpose,TYPE=UPDATE,OBJECTS=[Community])
                     community.save()
+                    # END(ID=407)
                 UserCommunityPrivilege.update(user=owner,
                                               community=community,
                                               privilege=PrivilegeCodes.OWNER,
@@ -222,7 +226,9 @@ class Command(BaseCommand):
             nname = options['command'][2]
             print("renaming community '{}' (id={}) to '{}'".format(community.name, community.id, nname))
             community.name = nname
+            # START(ID=408,NAME=AccessCommunityCommunityUpdateName,TYPE=UPDATE,OBJECTS=[Community])
             community.save()
+            # END(ID=408)
 
         elif command == 'owner':
             # at this point, community must exist
@@ -492,7 +498,9 @@ class Command(BaseCommand):
             if len(options['command']) > 2:
                 pname = options['command'][2]
                 nname = os.path.basename(pname)
+                # START(ID=409,NAME=AccessCommunityCommunityUpdatePicture,TYPE=UPDATE,OBJECTS=[Community])
                 community.picture.save(nname, File(open(pname, 'rb')))
+                # END(ID=409)
             else:
                 print("no file name given for banner image")
                 usage()

@@ -128,10 +128,14 @@ class Command(BaseCommand):
                 # if it exists, update it
                 if options['description'] is not None:
                     group.description = options['description']
+                    # START(ID=410,NAME=AccessGroupGroupUpdateDescription,TYPE=UPDATE,OBJECTS=[Group])
                     group.save()
+                    # END(ID=410)
                 if options['purpose'] is not None:
                     group.purpose = options['purpose']
+                    # START(ID=411,NAME=AccessGroupGroupUpdatePurpose,TYPE=UPDATE,OBJECTS=[Group])
                     group.save()
+                    # END(ID=411)
                 UserGroupPrivilege.update(user=owner,
                                           group=group,
                                           privilege=PrivilegeCodes.OWNER,

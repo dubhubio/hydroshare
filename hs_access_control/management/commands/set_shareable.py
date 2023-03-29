@@ -21,11 +21,15 @@ def check_shareable(rid, options):
     elif options['on']:
         print("{}: changing sharable bit to True".format(rid))
         resource.raccess.shareable = True
+        # START(ID=415,NAME=SetShareableResourceAccessOptionsOn,TYPE=UPDATE,OBJECTS=[BaseResource, ResourceAccess])
         resource.raccess.save()
+        # END(ID=415)
     elif options['off']:
         print("{}: changing sharable bit to False".format(rid))
         resource.raccess.shareable = False
+        # START(ID=416,NAME=SetShareableResourceAccessOptionsOff,TYPE=UPDATE,OBJECTS=[BaseResource, ResourceAccess])
         resource.raccess.save()
+        # END(ID=416)
 
 
 class Command(BaseCommand):

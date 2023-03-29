@@ -98,10 +98,11 @@ class GroupAccess(models.Model):
 
         Users can only own groups via direct links. Community-based ownership is not possible.
         """
-
+        # START(ID=380,NAME=ModelGroupAccessOwners,TYPE=SELECT,OBJECTS=[User, UserProfile])
         return User.objects.filter(is_active=True,
                                    u2ugp__group=self.group,
                                    u2ugp__privilege=PrivilegeCodes.OWNER).select_related('userprofile')
+        # END(ID=380)
 
     @property
     def __edit_users_of_group(self):
@@ -121,8 +122,9 @@ class GroupAccess(models.Model):
 
         This eliminates duplicates due to multiple invitations.
         """
-
+        # START(ID=381,NAME=ModelGroupAccessEditUsers,TYPE=SELECT,OBJECTS=[User])
         return User.objects.filter(self.__edit_users_of_group)
+        # END(ID=381)
 
     @property
     def __view_users_of_group(self):
@@ -143,8 +145,9 @@ class GroupAccess(models.Model):
         This eliminates duplicates due to multiple memberships,
         unlike members, which just lists explicit group members.
         """
-
+        # START(ID=382,NAME=ModelGroupAccessViewUsers,TYPE=SELECT,OBJECTS=[User])
         return User.objects.filter(self.__view_users_of_group)
+        # END(ID=382)
 
     @property
     def members(self):
@@ -155,17 +158,21 @@ class GroupAccess(models.Model):
 
         This eliminates duplicates due to multiple invitations.
         """
+        # START(ID=383,NAME=ModelGroupAccessMembers,TYPE=SELECT,OBJECTS=[User])
         return User.objects.filter(is_active=True,
                                    u2ugp__group=self.group,
                                    u2ugp__privilege__lte=PrivilegeCodes.VIEW).select_related('userprofile')
+        # END(ID=383)
 
     @property
     def viewers(self):
         """ viewers are group members """
+        # START(ID=384,NAME=ModelGroupAccessViewers,TYPE=SELECT,OBJECTS=[User])
         return User.objects.filter(
             Q(is_active=True)
             & (Q(u2ugp__group__gaccess__active=True,
                  u2ugp__group=self.group))).distinct()
+        # END(ID=384)
 
     def communities(self):
         """
@@ -174,7 +181,9 @@ class GroupAccess(models.Model):
         :return: list of communities
 
         """
+        # START(ID=385,NAME=ModelGroupAccessCommunities,TYPE=SELECT,OBJECTS=[Community])
         return Community.objects.filter(c2gcp__group=self.group)
+        # END(ID=385)
 
     @property
     def __view_resources_of_group(self):
@@ -215,7 +224,9 @@ class GroupAccess(models.Model):
         :return: QuerySet of resource objects held by group.
 
         """
+        # START(ID=386,NAME=ModelGroupAccessViewResources,TYPE=SELECT,OBJECTS=[BaseResource, ResourceAccess])
         return BaseResource.objects.filter(self.__view_resources_of_group).select_related('raccess')
+        # END(ID=386)
 
     @property
     def edit_resources(self):
@@ -227,7 +238,9 @@ class GroupAccess(models.Model):
         These include resources that are directly editable, as well as those editable
         via membership in a group.
         """
+        # START(ID=387,NAME=ModelGroupAccessEditResources,TYPE=SELECT,OBJECTS=[BaseResource, ResourceAccess])
         return BaseResource.objects.filter(self.__edit_resources_of_group).select_related('raccess')
+        # END(ID=387)
 
     @property
     def owned_resources(self):
@@ -239,7 +252,9 @@ class GroupAccess(models.Model):
         This is independent of whether the resource is editable by the group.
 
         """
+        # START(ID=388,NAME=ModelGroupAccessOwnedResources,TYPE=SELECT,OBJECTS=[BaseResource, ResourceAccess])
         return BaseResource.objects.filter(self.__owned_resources_of_group).select_related('raccess')
+        # END(ID=388)
 
     @property
     def group_membership_requests(self):
@@ -247,10 +262,11 @@ class GroupAccess(models.Model):
         get a list of pending group membership requests for this group (self)
         :return: QuerySet
         """
-
+        # START(ID=389,NAME=ModelGroupAccessGroupMembershipRequest,TYPE=SELECT,OBJECTS=[GroupMembershipRequest])
         return GroupMembershipRequest.objects.filter(group_to_join=self.group,
                                                      group_to_join__gaccess__active=True,
                                                      redeemed=False)
+        # END(ID=389)
 
     def get_resources_with_explicit_access(self, this_privilege):
         """
@@ -276,18 +292,22 @@ class GroupAccess(models.Model):
 
         elif this_privilege == PrivilegeCodes.CHANGE:
             # CHANGE does not include immutable resources
+            # START(ID=390,NAME=ModelGroupAccessGetResourcesWithExplicitAccessPrivilegeChange,TYPE=SELECT,OBJECTS=[BaseResource])
             return BaseResource.objects.filter(raccess__immutable=False,
                                                r2grp__privilege=this_privilege,
                                                r2grp__group=self.group)
+            # END(ID=390)
             # there are no excluded resources; maximum privilege is CHANGE
 
         else:  # this_privilege == PrivilegeCodes.VIEW
             # VIEW includes CHANGE & immutable as well as explicit VIEW
+            # START(ID=391,NAME=ModelGroupAccessGetResourcesWithExplicitAccess,TYPE=SELECT,OBJECTS=[BaseResource])
             return BaseResource.objects.filter(Q(r2grp__privilege=PrivilegeCodes.VIEW,
                                                  r2grp__group=self.group)
                                                | Q(raccess__immutable=True,
                                                    r2grp__privilege=PrivilegeCodes.CHANGE,
                                                    r2grp__group=self.group)).distinct()
+            # END(ID=391)
 
     def get_users_with_explicit_access(self, this_privilege):
         """
@@ -305,13 +325,17 @@ class GroupAccess(models.Model):
         if this_privilege == PrivilegeCodes.OWNER:
             return self.owners
         elif this_privilege == PrivilegeCodes.CHANGE:
+            # START(ID=392,NAME=ModelGroupAccessGetUsersWithExplicitAccessPrivilegeChange,TYPE=SELECT,OBJECTS=[User])
             return User.objects.filter(is_active=True,
                                        u2ugp__group=self.group,
                                        u2ugp__privilege=PrivilegeCodes.CHANGE)
+            # END(ID=392)
         else:  # this_privilege == PrivilegeCodes.VIEW
+            # START(ID=393,NAME=ModelGroupAccessGetUsersWithExplicitAccess,TYPE=SELECT,OBJECTS=[User])
             return User.objects.filter(is_active=True,
                                        u2ugp__group=self.group,
                                        u2ugp__privilege=PrivilegeCodes.VIEW)
+            # END(ID=393)
 
     def get_effective_privilege(self, this_user):
         """
@@ -326,8 +350,10 @@ class GroupAccess(models.Model):
         if not this_user.is_active:
             return PrivilegeCodes.NONE
         try:
+            # START(ID=394,NAME=ModelGroupAccessGetEffectivePrivilege,TYPE=SELECT,OBJECTS=[UserGroupPrivilege])
             p = UserGroupPrivilege.objects.get(group=self.group,
                                                user=this_user)
+            # END(ID=394)
             return p.privilege
         except UserGroupPrivilege.DoesNotExist:
             return PrivilegeCodes.NONE
@@ -348,6 +374,7 @@ class GroupAccess(models.Model):
            However, that annotation is really efficient, and is implemented as a postgres
            subquery. This is a Django 1.11 extension.
         """
+        # START(ID=395,NAME=ModelGroupAccessGroupsWithPublicResources,TYPE=SELECT,OBJECTS=[Group, BaseResource])
         return Group.objects\
             .annotate(
                 has_public_resources=Exists(
@@ -358,6 +385,7 @@ class GroupAccess(models.Model):
                         r2urp__privilege=PrivilegeCodes.OWNER)))\
             .filter(has_public_resources=True)\
             .order_by('name')
+        # END(ID=395)
 
     @property
     def public_resources(self):
@@ -366,6 +394,7 @@ class GroupAccess(models.Model):
 
         Based upon hs_access_control/models/community.py:Community:public_resources
         """
+        # START(ID=396,NAME=ModelGroupAccessPropertyPublicResources,TYPE=SELECT,OBJECTS=[BaseResource])
         res = BaseResource.objects.filter(r2grp__group__gaccess=self,
                                           r2grp__group__gaccess__active=True)\
             .filter(Q(raccess__public=True)
@@ -380,6 +409,7 @@ class GroupAccess(models.Model):
                       discoverable=F("raccess__discoverable"))
 
         res = res.only('title', 'resource_type', 'created', 'updated')
+        # END(ID=396)
 
         # # Can't do the following because the content model is polymorphic.
         # # This is documented as only working for monomorphic content_type
@@ -397,13 +427,17 @@ class GroupAccess(models.Model):
             generics.setdefault(item.content_type.id, set()).add(item.object_id)
 
         # fetch all content types in one query
+        # START(ID=397,NAME=ModelGroupAccessPropertyPublicResourcesContentType,TYPE=SELECT,OBJECTS=[ContentType])
         content_types = ContentType.objects.in_bulk(list(generics.keys()))
+        # END(ID=397)
 
         # build a map between content types and the objects that use them.
         relations = {}
         for ct, fk_list in list(generics.items()):
             ct_model = content_types[ct].model_class()
+            # START(ID=398,NAME=ModelGroupAccessPropertyPublicResourcesContentTypeModelClass,TYPE=SELECT,OBJECTS=[ContentType])
             relations[ct] = ct_model.objects.in_bulk(list(fk_list))
+            # END(ID=398)
 
         # force-populate the cache of content type objects.
         for item in res:
@@ -420,8 +454,10 @@ class GroupAccess(models.Model):
 
     @property
     def first_owner(self):
+        # START(ID=399,NAME=ModelGroupAccessPropertyFirstOwner,TYPE=SELECT,OBJECTS=[UserGroupPrivilege])
         opriv = UserGroupPrivilege.objects.filter(group=self.group, privilege=PrivilegeCodes.OWNER)\
             .order_by('start')
+        # END(ID=399)
         opriv = list(opriv)
         if opriv:
             return opriv[0].user

@@ -88,7 +88,9 @@ class PrivilegeBase(models.Model):
         **This is a system routine** and not recommended for use in application code.
         """
         try:
+            # START(ID=419,NAME=PrivilegeBaseGetPrivilege,TYPE=SELECT,OBJECTS=[PrivilegeBase])
             return cls.objects.get(**kwargs).privilege
+            # END(ID=419)
         except cls.DoesNotExist:
             return PrivilegeCodes.NONE
 
@@ -118,19 +120,25 @@ class PrivilegeBase(models.Model):
                 del kwargs['privilege']
             del kwargs['grantor']
             with transaction.atomic():
+                # START(ID=420,NAME=PrivilegeBaseGetOrCreate,TYPE=MERGE,OBJECTS=[PrivilegeBase])
                 record, create = cls.objects.get_or_create(defaults={'privilege': privilege,
                                                                      'grantor': grantor},
                                                            **kwargs)
+                # END(ID=420)
                 if not create:
                     record.privilege = privilege
                     record.grantor = grantor
+                    # START(ID=422,NAME=PrivilegeBaseUpdate,TYPE=UPDATE,OBJECTS=[PrivilegeBase])
                     record.save()
+                    # END(ID=422)
         else:
             if 'privilege' in kwargs:
                 del kwargs['privilege']
             del kwargs['grantor']
+            # START(ID=421,NAME=PrivilegeBaseDelete,TYPE=DELETE,OBJECTS=[PrivilegeBase])
             cls.objects.filter(**kwargs) \
                .delete()
+            # END(ID=421)
 
     @classmethod
     def share(cls, **kwargs):

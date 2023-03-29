@@ -50,9 +50,11 @@ class ProvenanceBase(models.Model):
             UserGroupProvenance.__get_current_start(group={X}, user={Y})
             GroupResourceProvenance.__get_current_start(resource={X}, group={Y})
         """
+        # START(ID=423,NAME=ProvenanceProvenanceBaseGetCurrentStart,TYPE=SELECT,OBJECTS=[ProvenanceBase])
         result = cls.objects\
             .filter(**kwargs)\
             .aggregate(Max('start'))
+        # END(ID=423)
         # This can be None if there is no start pair
         return result['start__max']
 
@@ -78,8 +80,10 @@ class ProvenanceBase(models.Model):
         start = cls.__get_current_start(**kwargs)
         # Then, fetch that unique record.
         if start is not None:
+            # START(ID=424,NAME=ProvenanceProvenanceBaseGetCurrentRecord,TYPE=SELECT,OBJECTS=[ProvenanceBase])
             return cls.objects\
                 .get(start=start, **kwargs)
+            # END(ID=424)
         else:
             return None
 
@@ -122,7 +126,9 @@ class ProvenanceBase(models.Model):
             UserCommunityProvenance.update(user={X}, community={Y}, privilege={Z}, ...)
             GroupCommunityProvenance.update(group={X}, community={Y}, privilege={Z}, ...)
         """
+        # START(ID=425,NAME=ProvenanceProvenanceBaseInsert,TYPE=INSERT,OBJECTS=[ProvenanceBase])
         cls.objects.create(**kwargs)
+        # END(ID=425)
 
     @classmethod
     def __get_prev_start(cls, **kwargs):
@@ -144,10 +150,12 @@ class ProvenanceBase(models.Model):
             assert len(kwargs) == 2
         last = cls.__get_current_start(**kwargs)
         if last is not None:
+            # START(ID=426,NAME=ProvenanceProvenanceBaseGetPrevStart,TYPE=SELECT,OBJECTS=[ProvenanceBase])
             result = cls.objects\
                 .filter(start__lt=last,
                         **kwargs) \
                 .aggregate(Max('start'))
+            # END(ID=426)
             return result['start__max']
         else:
             return None
@@ -174,7 +182,9 @@ class ProvenanceBase(models.Model):
 
         # Then, fetch that (hopefully) unique record(s). There is a small chance of non-uniqueness.
         if start is not None:
+            # START(ID=427,NAME=ProvenanceProvenanceBaseGetPrevRecord,TYPE=SELECT,OBJECTS=[ProvenanceBase])
             return cls.objects.get(start=start, **kwargs)
+            # END(ID=427)
         else:
             return None
 
@@ -378,13 +388,17 @@ class UserGroupProvenance(ProvenanceBase):
         # users are those last granted a privilege over the entity by the grantor
         # This syntax is curious due to undesirable semantics of .exclude.
         # All conditions on the filter must be specified in the same filter statement.
+        # START(ID=428,NAME=ProvenanceUserSelectedAnnotated,TYPE=SELECT,OBJECTS=[User])
         selected = User.objects.filter(u2ugq__group=group)\
                                .annotate(start=Max('u2ugq__start'))\
                                .filter(u2ugq__start=F('start'),
                                        u2ugq__grantor=grantor,
                                        u2ugq__undone=False)
+        # END(ID=428)
         # launder out annotations used to select users
+        # START(ID=429,NAME=ProvenanceUserExluded,TYPE=SELECT,OBJECTS=[User])
         return User.objects.filter(pk__in=selected).exclude(pk=grantor.pk)
+        # END(ID=429)
 
     @classmethod
     def update(cls, group, user, privilege, grantor, undone=False):
@@ -479,13 +493,17 @@ class UserResourceProvenance(ProvenanceBase):
         # users are those last granted a privilege over the resource by the grantor
         # This syntax is curious due to undesirable semantics of .exclude.
         # All conditions on the filter must be specified in the same filter statement.
+        # START(ID=430,NAME=ProvenanceUserGetUndoUsers,TYPE=SELECT,OBJECTS=[User])
         selected = User.objects.filter(u2urq__resource=resource)\
                                .annotate(start=Max('u2urq__start'))\
                                .filter(u2urq__start=F('start'),
                                        u2urq__grantor=grantor,
                                        u2urq__undone=False)
+        # END(ID=430)
         # launder out annotations used to select users
+        # START(ID=431,NAME=ProvenanceUserGetUndoUsersExclude,TYPE=SELECT,OBJECTS=[User])
         return User.objects.filter(pk__in=selected).exclude(pk=grantor.pk)
+        # END(ID=431)
 
     @classmethod
     def update(cls, resource, user, privilege, grantor, undone=False, exhibit=False):
@@ -590,14 +608,17 @@ class GroupResourceProvenance(ProvenanceBase):
         # All conditions on the filter must be specified in the same filter statement.
         # We wish to avoid the state INITIAL, which cannot be undone.
         # This is accomplished by setting a NULL grantor for INITIAL.
+        # START(ID=432,NAME=ProvenanceGroupGetUndoGroups,TYPE=SELECT,OBJECTS=[Group])
         selected = Group.objects.filter(g2grq__resource=resource)\
             .annotate(start=Max('g2grq__start'))\
             .filter(g2grq__start=F('start'),
                     g2grq__grantor=grantor,
                     g2grq__undone=False)
-
+        # END(ID=432)
         # launder out annotations used to select users
+        # START(ID=433,NAME=ProvenanceGroupGetUndoGroupsLaunderOut,TYPE=SELECT,OBJECTS=[Group])
         return Group.objects.filter(pk__in=selected)
+        # END(ID=433)
 
     @classmethod
     def update(cls, resource, group, privilege, grantor, undone=False, exhibit=False):
@@ -699,11 +720,13 @@ class UserCommunityProvenance(ProvenanceBase):
         # users are those last granted a privilege over the entity by the grantor
         # This syntax is curious due to undesirable semantics of .exclude.
         # All conditions on the filter must be specified in the same filter statement.
+        # START(ID=434,NAME=ProvenanceUserGetUndoUser,TYPE=SELECT,OBJECTS=[Group])
         selected = User.objects.filter(u2ucq__community=community)\
                                .annotate(start=Max('u2ucq__start'))\
                                .filter(u2ucq__start=F('start'),
                                        u2ucq__grantor=grantor,
                                        u2ucq__undone=False)
+        # END(ID=434)
         return selected
 
     @classmethod
@@ -810,11 +833,13 @@ class GroupCommunityProvenance(ProvenanceBase):
         # users are those last granted a privilege over the entity by the grantor
         # This syntax is curious due to undesirable semantics of .exclude.
         # All conditions on the filter must be specified in the same filter statement.
+        # START(ID=435,NAME=ProvenanceUserGetUndoGroups,TYPE=SELECT,OBJECTS=[Group])
         selected = Group.objects.filter(g2gcq__community=community)\
             .annotate(start=Max('g2gcq__start'))\
             .filter(g2gcq__start=F('start'),
                     g2gcq__grantor=grantor,
                     g2gcq__undone=False)
+        # END(ID=435)
         return selected
 
     @classmethod
@@ -926,11 +951,13 @@ class CommunityResourceProvenance(ProvenanceBase):
         # users are those last granted a privilege over the entity by the grantor
         # This syntax is curious due to undesirable semantics of .exclude.
         # All conditions on the filter must be specified in the same filter statement.
+        # START(ID=436,NAME=ProvenanceBaseResourceGetUndoResources,TYPE=SELECT,OBJECTS=[BaseResource])
         selected = BaseResource.objects.filter(r2crq__community=community)\
                                        .annotate(start=Max('r2crq__start'))\
                                        .filter(r2crq__start=F('start'),
                                                r2crq__grantor=grantor,
                                                r2crq__undone=False)
+        # END(ID=436)
         return selected
 
     @classmethod

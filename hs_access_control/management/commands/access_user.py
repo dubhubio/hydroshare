@@ -101,13 +101,19 @@ class Command(BaseCommand):
                 # END(ID=138)
                 if 'email' in options:
                     user.email = options['email']
+                    # START(ID=412,NAME=AccessUsersUserUpdateEmail,TYPE=UPDATE,OBJECTS=[User])
                     user.save()
+                    # END(ID=412)
                 if 'first' in options:
                     user.first_name = options['first']
+                    # START(ID=413,NAME=AccessUsersUserUpdateFirstName,TYPE=UPDATE,OBJECTS=[User])
                     user.save()
+                    # END(ID=413)
                 if 'last' in options:
                     user.last_name = options['last']
+                    # START(ID=414,NAME=AccessUsersUserUpdateLastName,TYPE=UPDATE,OBJECTS=[User])
                     user.save()
+                    # END(ID=414)
 
             except User.DoesNotExist:  # create it
 
