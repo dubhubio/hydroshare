@@ -11,8 +11,6 @@ ENV LC_ALL en_US.UTF-8
 USER root
 WORKDIR /hydroshare
 
-RUN pip install --upgrade pip setuptools      && \
-    pip install wheel                         && \
-    pip install dubhub-instrument-psycopg2
+RUN pip install dubhub-instrument-psycopg2
 
 CMD ["/bin/bash"]
