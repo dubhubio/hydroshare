@@ -20,9 +20,9 @@ jobs:
         uses: actions/checkout@v3
       - name: Run Tests
         run: |
-          python3 -m venv .venv
-          source .venv/bin/activate
-          pip install --upgrade pip setuptools wheel
+          python -m venv .venv
+          /usr/bin/env sh
+          python -m pip install --upgrade pip wheel setuptools
           pip install dubhub
           dubhub baseguard create_run --orgToken 2b02ce1b-9b5c-4e75-8ff9-ddb562944734 --projectUuid 75294a4c-9e1f-4dfa-a5db-aa56e40ac5ab))
           dubhub baseguard upload_schema --orgToken 2b02ce1b-9b5c-4e75-8ff9-ddb562944734 
