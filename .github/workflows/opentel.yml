@@ -21,6 +21,12 @@ jobs:
           version: '2.14.2'
       - name: Check out repository code
         uses: actions/checkout@v3
+      - name: Setup docker context for buildx
+        id: buildx-context
+        run: docker context create builders || docker context use builders
+      - name: Copy ca cert
+        run: |
+          sudo cp /etc/docker/certs.d/docker-registry.actions-runner-system.svc\:5000/ca.crt /etc/ssl/certs/ca-certificates.crt
       - name: Create BuildKit Configuration
         run: |
           cat <<EOF > buildkitd.toml   
