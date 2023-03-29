@@ -16,9 +16,9 @@ jobs:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Set up container and services
-        uses: docker/compose-cli-action@v0.7.1
+        uses: KengoTODA/actions-setup-docker-compose@v1
         with:
-          compose-version: 2.0.0
+          version: '2.14.2'
           container: debian:stable
           services: |
             open-tel:
