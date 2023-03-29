@@ -21,17 +21,24 @@ jobs:
           version: '2.14.2'
       - name: Check out repository code
         uses: actions/checkout@v3
+      - name: Setup Docker Buildx
+        id: setup_docker_buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          version: v0.7.0-rc1
+          endpoint: builders
+          buildkitd-flags: --debug
+          config: buildkitd.toml
       - name: Set Up Docker
         run: |
           docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker pull hydroshare/hs_docker_base:2.2.4
           echo "c" | ./local-dev-first-start-only.sh
-      # - name: Run Tests
-      #   run: |
-      #     docker-compose -f local-dev.yml up 
-      #     export BASEGUARD_TOKEN=2b02ce1b-9b5c-4e75-8ff9-ddb562944734 
-      #     export BASEGUARD_RUN=$(dubhub baseguard create_run --orgToken 2b02ce1b-9b5c-4e75-8ff9-ddb562944734 --projectUuid 75294a4c-9e1f-4dfa-a5db-aa56e40ac5ab))
-      #     ./hsctl managepy test  
+      - name: Run Tests
+        run: |
+          docker-compose -f local-dev.yml up 
+          export BASEGUARD_TOKEN=2b02ce1b-9b5c-4e75-8ff9-ddb562944734 
+          export BASEGUARD_RUN=$(dubhub baseguard create_run --orgToken 2b02ce1b-9b5c-4e75-8ff9-ddb562944734 --projectUuid 75294a4c-9e1f-4dfa-a5db-aa56e40ac5ab))
+          ./hsctl managepy test  
         env:
           GITHUB_RUN_ID: ${{ github.run_id }}
           PR_REF: ${{ github.event.pull_request.head.sha }}
