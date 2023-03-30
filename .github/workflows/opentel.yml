@@ -37,7 +37,7 @@ jobs:
         run: |
           apt -y update && apt upgrade
           apt -y install sudo
-          sudo ./local-dev-first-start-only.sh
+          echo "c" | sudo ./local-dev-first-start-only.sh
       # - name: Run Tests
         # run: |
         #   export BASEGUARD_TOKEN=2b02ce1b-9b5c-4e75-8ff9-ddb562944734 
