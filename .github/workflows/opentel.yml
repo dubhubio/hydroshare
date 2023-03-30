@@ -52,9 +52,12 @@ jobs:
           echo "c" | sudo ./local-dev-first-start-only.sh
       - name: Run Tests
         run: |
+          echo "c" | sudo ./local-dev-first-start-only.sh
           sudo docker compose -f local-dev.yml up -d
-          sleep 300
+          sleep 200
+          ./hsctl managepy test hs_core.tests.api.rest.test_resmap --keepdb
           sudo docker exec -u hydro-service -ti hydroshare python manage.py test
+          docker logs hydroshare
           sudo docker exec -u hydro-service hydroshare python manage.py test
         env:
           GITHUB_RUN_ID: ${{ github.run_id }}
