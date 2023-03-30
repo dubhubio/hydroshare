@@ -54,7 +54,7 @@ jobs:
         run: |
           sudo docker compose -f local-dev.yml up -d
           sleep 150
-          docker ps
+          ./hsctl managepy test
           sudo docker exec -u hydro-service -ti hydroshare python manage.py test
         env:
           GITHUB_RUN_ID: ${{ github.run_id }}
