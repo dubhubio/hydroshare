@@ -16,43 +16,34 @@ jobs:
         ports:
           - 4317:4317
     steps:
-      - uses: KengoTODA/actions-setup-docker-compose@v1
-        with:
-          version: '2.14.2'
       - name: Check out repository code
         uses: actions/checkout@v3
-      - name: Setup docker context for buildx
-        id: buildx-context
-        run: docker context create builders || docker context use builders
-      - name: Copy ca cert
-        run: |
-          cp /etc/docker/certs.d/docker-registry.actions-runner-system.svc\:5000/ca.crt /etc/ssl/certs/ca-certificates.crt
-      - name: Create BuildKit Configuration
-        run: |
-          cat <<EOF > buildkitd.toml   
-          [registry."docker-registry.actions-runner-system.svc:5000"]
-            http = false
-            insecure = false
-            ca=["/etc/ssl/certs/ca-certificates.crt"]
-          EOF
-      - name: Setup Docker Buildx
-        id: setup_docker_buildx
-        uses: docker/setup-buildx-action@v1
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
         with:
-          version: v0.7.0-rc1
-          endpoint: builders
-          buildkitd-flags: --debug
-          config: buildkitd.toml
-      - name: Set Up Docker
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - uses: KengoTODA/actions-setup-docker-compose@v1
+        with:
+          version: '2.14.2'   
+      - name: Install Dependencies
         run: |
-          docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
-          echo "c" | ./local-dev-first-start-only.sh
-      - name: Run Tests
+          python -m venv .venv
+          /usr/bin/env sh
+          python -m pip install --upgrade pip wheel setuptools
+          pip install dubhub
+          pip install dubhub-instrument-psycopg2
+      - name: Run docker image
         run: |
-          docker-compose -f local-dev.yml up 
-          export BASEGUARD_TOKEN=2b02ce1b-9b5c-4e75-8ff9-ddb562944734 
-          export BASEGUARD_RUN=$(dubhub baseguard create_run --orgToken 2b02ce1b-9b5c-4e75-8ff9-ddb562944734 --projectUuid 75294a4c-9e1f-4dfa-a5db-aa56e40ac5ab))
-          ./hsctl managepy test  
+          sudo ./local-dev-first-start-only.sh
+      # - name: Run Tests
+        # run: |
+        #   export BASEGUARD_TOKEN=2b02ce1b-9b5c-4e75-8ff9-ddb562944734 
+        #   export BASEGUARD_RUN=$(dubhub baseguard create_run --orgToken 2b02ce1b-9b5c-4e75-8ff9-ddb562944734 --projectUuid 75294a4c-9e1f-4dfa-a5db-aa56e40ac5ab)
         env:
           GITHUB_RUN_ID: ${{ github.run_id }}
           PR_REF: ${{ github.event.pull_request.head.sha }}
+
+
+# dubhub baseguard upload_schema --orgToken 2b02ce1b-9b5c-4e75-8ff9-ddb562944734 
+# dubhub baseguard analyse --orgToken 2b02ce1b-9b5c-4e75-8ff9-ddb562944734

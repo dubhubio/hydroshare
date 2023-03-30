@@ -283,7 +283,7 @@ echo " Starting system"
 echo '########################################################################################################################'
 echo
 
-docker-compose -f local-dev.yml up -d $REBUILD_IMAGE
+sudo docker-compose -f local-dev.yml up -d $REBUILD_IMAGE
 
 echo
 echo '########################################################################################################################'
@@ -451,7 +451,7 @@ echo '  - docker exec -u hydro-service hydroshare curl "solr:8983/solr/admin/cor
 echo
 docker $DOCKER_PARAM exec -u hydro-service hydroshare curl "solr:8983/solr/admin/cores?action=RELOAD&core=collection1"
 
-docker-compose -f local-dev.yml down
+sudo docker-compose -f local-dev.yml down
 
 echo
 echo '########################################################################################################################'
