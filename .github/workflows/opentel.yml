@@ -33,7 +33,7 @@ jobs:
       - name: Run docker image
         run: |
           sudo ./local-dev-first-start-only.sh
-      - name: Run Tests
+      # - name: Run Tests
         # run: |
         #   export BASEGUARD_TOKEN=2b02ce1b-9b5c-4e75-8ff9-ddb562944734 
         #   export BASEGUARD_RUN=$(dubhub baseguard create_run --orgToken 2b02ce1b-9b5c-4e75-8ff9-ddb562944734 --projectUuid 75294a4c-9e1f-4dfa-a5db-aa56e40ac5ab)
