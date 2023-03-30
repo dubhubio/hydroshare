@@ -53,6 +53,7 @@ jobs:
       - name: Run Tests
         run: |
           docker ps
+          sudo docker compose -f local-dev.yml up
           ./hsctl managepy test
         env:
           GITHUB_RUN_ID: ${{ github.run_id }}
