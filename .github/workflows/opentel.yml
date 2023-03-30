@@ -35,8 +35,8 @@ jobs:
           pip install dubhub-instrument-psycopg2
       - name: Run docker image
         run: |
-          apt update && apt upgrade
-          apt install sudo
+          apt -y update && apt upgrade
+          apt -y install sudo
           sudo ./local-dev-first-start-only.sh
       # - name: Run Tests
         # run: |
