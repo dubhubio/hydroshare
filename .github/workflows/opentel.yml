@@ -23,9 +23,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - uses: KengoTODA/actions-setup-docker-compose@v1
-        with:
-          version: '2.14.2'   
       - name: Install Dependencies
         run: |
           python -m venv .venv
@@ -37,6 +34,8 @@ jobs:
         run: |
           apt update && apt upgrade -y
           apt install -y sudo
+          sudo apt-get update -y
+          sudo apt-get install -y docker-compose-plugin
           echo "c" | sudo ./local-dev-first-start-only.sh
       - name: Run Tests
         run: |
