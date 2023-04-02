@@ -3,8 +3,8 @@
 cd /hydroshare
 userdel hydro-service \
  && groupdel storage-hydro \
- && echo "storage-hydro:x:0:" >> /etc/group \
- && echo "hydro-service:x:0:0::/hydroshare:/bin/bash" >> /etc/passwd \
+ && echo "storage-hydro:x:1000:" >> /etc/group \
+ && echo "hydro-service:x:1000:1000::/hydroshare:/bin/bash" >> /etc/passwd \
  && chown -R hydro-service:storage-hydro /hydroshare /hs_tmp /shared_tmp /tmp \
  && chmod -R 3777 /hs_tmp /shared_tmp /tmp 
 
