@@ -54,7 +54,7 @@ jobs:
         run: |
           export BASEGUARD_TOKEN=6a1642cd-e177-4647-8882-ec2d095e7c08  
           export BASEGUARD_RUN=$(dubhub baseguard create_run --orgToken 6a1642cd-e177-4647-8882-ec2d095e7c08  --projectUuid e14c9c96-c3fd-4ec3-bbbc-d3b8e18cf9d5)
-          sudo docker compose -f local-dev.yml up -d -e BASEGUARD_TOKEN=$BASEGUARD_TOKEN,BASEGUARD_RUN=$BASEGUARD_RUN,GITHUB_RUN_ID=$GITHUB_RUN_ID,PR_REF=$PR_REF
+          sudo docker compose -f local-dev.yml up -d
           sleep 600
           ./hsctl managepy test 
           dubhub baseguard analyse --orgToken 6a1642cd-e177-4647-8882-ec2d095e7c08
