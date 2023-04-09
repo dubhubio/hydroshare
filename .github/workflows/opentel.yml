@@ -30,30 +30,34 @@ jobs:
           python -m pip install --upgrade pip wheel setuptools
           pip install dubhub
           pip install dubhub-instrument-psycopg2
-      # - name: Run docker image
-      #   run: |
-      #     apt update && apt upgrade -y
-      #     apt install -y sudo
-      #     sudo apt-get update
-      #     sudo apt-get install -y \
-      #         ca-certificates \
-      #         curl \
-      #         gnupg
-      #     sudo mkdir -m 0755 -p /etc/apt/keyrings
-      #     curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-      #     echo \
-      #     "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
-      #     "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
-      #     sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-      #     sudo apt-get update
-      #     sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-      #     sudo apt-get update
-      #     sudo apt-get install -y docker-compose-plugin
-      #     echo "c" | sudo ./local-dev-first-start-only.sh
+      - name: Run docker image
+        run: |
+          apt update && apt upgrade -y
+          apt install -y sudo
+          sudo apt-get update
+          sudo apt-get install -y \
+              ca-certificates \
+              curl \
+              gnupg
+          sudo mkdir -m 0755 -p /etc/apt/keyrings
+          curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+          echo \
+          "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
+          "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+          sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+          sudo apt-get update
+          sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+          sudo apt-get update
+          sudo apt-get install -y docker-compose-plugin
+          echo "c" | sudo ./local-dev-first-start-only.sh
       - name: Run Tests
         run: |
-          BASEGUARD_RUN=$(dubhub baseguard create_run --orgToken 6a1642cd-e177-4647-8882-ec2d095e7c08  --projectUuid e14c9c96-c3fd-4ec3-bbbc-d3b8e18cf9d5)
-          dubhub baseguard upload_schema --orgToken 6a1642cd-e177-4647-8882-ec2d095e7c08
+          export BASEGUARD_TOKEN=6a1642cd-e177-4647-8882-ec2d095e7c08  
+          export BASEGUARD_RUN=$(dubhub baseguard create_run --orgToken 6a1642cd-e177-4647-8882-ec2d095e7c08  --projectUuid e14c9c96-c3fd-4ec3-bbbc-d3b8e18cf9d5)
+          sudo docker compose -f local-dev.yml up -d -e BASEGUARD_TOKEN=$BASEGUARD_TOKEN,BASEGUARD_RUN=$BASEGUARD_RUN,GITHUB_RUN_ID=$GITHUB_RUN_ID,PR_REF=$PR_REF
+          sleep 600
+          ./hsctl managepy test 
+          dubhub baseguard analyse --orgToken 6a1642cd-e177-4647-8882-ec2d095e7c08
         env:
           GITHUB_RUN_ID: ${{ github.run_id }}
           PR_REF: ${{ github.event.pull_request.head.sha }}
