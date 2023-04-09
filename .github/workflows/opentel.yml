@@ -52,12 +52,7 @@ jobs:
       #     echo "c" | sudo ./local-dev-first-start-only.sh
       - name: Run Tests
         run: |
-          echo GITHUB_RUN_ID
-          echo ${{ github.run_id }}
-          echo GITHUB_RUN_ID
-          ${{ github.event.pull_request.head.sha }}
           BASEGUARD_RUN=$(dubhub baseguard create_run --orgToken 6a1642cd-e177-4647-8882-ec2d095e7c08  --projectUuid e14c9c96-c3fd-4ec3-bbbc-d3b8e18cf9d5)
-          echo $BASEGUARD_RUN
           dubhub baseguard upload_schema --orgToken 6a1642cd-e177-4647-8882-ec2d095e7c08
         env:
           GITHUB_RUN_ID: ${{ github.run_id }}
