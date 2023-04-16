@@ -136,10 +136,12 @@ class Command(BaseCommand):
                     # START(ID=411,NAME=AccessGroupGroupUpdatePurpose,TYPE=UPDATE,OBJECTS=[Group])
                     group.save()
                     # END(ID=411)
+                # START(ID=438,NAME=AccessGroupUpdateUserGroupPrivilege,TYPE=UPDATE,OBJECTS=[UserGroupPrivilege])
                 UserGroupPrivilege.update(user=owner,
                                           group=group,
                                           privilege=PrivilegeCodes.OWNER,
                                           grantor=owner)
+                # END(ID=438)
 
             except Group.DoesNotExist:  # create it
 
@@ -261,7 +263,9 @@ class Command(BaseCommand):
                 exit(1)
 
             print("removing group '{}' (id={}).".format(group.name, group.id))
+            # START(ID=483,NAME=AccessGroupGroupDelete,TYPE=DELETE,OBJECTS=[Group])
             group.delete()
+            # END(ID=483)
 
         else:
             print("unknown command '{}'.".format(command))

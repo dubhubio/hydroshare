@@ -313,7 +313,9 @@ class GroupCommunityRequest(models.Model):
             return message, False
         if (self.group_owner is not None and requester == self.group_owner) or \
            (self.community_owner is not None and requester == self.community_owner):
+            # START(ID=484,NAME=InviteGroupCommunityRequestDelete,TYPE=DELETE,OBJECTS=[GroupCommunityRequest])
             self.delete()
+            # END(ID=484)
             message = "Connection request between community '{}' and group '{}' cancelled."\
                       .format(self.community.name, self.group.name)
             return message, True
@@ -502,7 +504,9 @@ class GroupCommunityRequest(models.Model):
         # delete request from provenance chain
         try:
             request = GroupCommunityRequest.get_request(community=community, group=group)
+            # START(ID=485,NAME=InviteGroupCommunityRequestSecondDelete,TYPE=DELETE,OBJECTS=[GroupCommunityRequest])
             request.delete()
+            # END(ID=485)
         except cls.DoesNotExist:
             pass
 

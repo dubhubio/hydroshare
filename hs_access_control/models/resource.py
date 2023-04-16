@@ -89,9 +89,10 @@ class ResourceAccess(models.Model):
         For VIEW, effective privilege = declared privilege, in the sense that all editors have
         VIEW, even if the resource is immutable.
         """
-
+        # START(ID=486,NAME=ResourceViewUsersFilterUserObjectsUser,TYPE=SELECT,OBJECTS=[User])
         return User.objects.filter(self.__view_users_from_individual
                                    | self.__view_users_from_group).distinct()
+        # END(ID=486)
 
     @property
     def __edit_users_from_individual(self):
@@ -132,9 +133,11 @@ class ResourceAccess(models.Model):
         This now accounts for group and community privileges
 
         """
+        # START(ID=487,NAME=ResourceEditUsersFilterUserObjectsUser,TYPE=SELECT,OBJECTS=[User])
         return User.objects\
                    .filter(self.__edit_users_from_individual
                            | self.__edit_users_from_group).distinct()
+        # END(ID=487)
 
     @property
     def __view_groups_from_group(self):
@@ -156,7 +159,9 @@ class ResourceAccess(models.Model):
 
         This is a property so that it is a workalike for a prior explicit list
         """
+        # START(ID=488,NAME=ResourceViewGroupsFilterGroupObjectsGroup,TYPE=SELECT,OBJECTS=[Group])
         return Group.objects.filter(self.__view_groups_from_group).distinct()
+        # END(ID=488)
 
     @property
     def __edit_groups_from_group(self):
@@ -188,7 +193,9 @@ class ResourceAccess(models.Model):
         if self.immutable:
             return Group.objects.none()
         else:
+            # START(ID=489,NAME=ResourceEditGroupsFilterGroupObjectsGroup,TYPE=SELECT,OBJECTS=[Group])
             return Group.objects.filter(self.__edit_groups_from_group).distinct()
+            # END(ID=489)
 
     @property
     def owners(self):
@@ -201,9 +208,11 @@ class ResourceAccess(models.Model):
 
         For immutable resources, owners are not modified, but do not have CHANGE privilege.
         """
+        # START(ID=490,NAME=ResourceOwnsersFilterUser,TYPE=SELECT,OBJECTS=[User])
         return User.objects.filter(is_active=True,
                                    u2urp__privilege=PC.OWNER,
                                    u2urp__resource=self.resource)
+        # END(ID=490)
 
     def get_users_with_explicit_access(self, this_privilege,
                                        include_user_granted_access=True,
@@ -269,12 +278,18 @@ class ResourceAccess(models.Model):
                     # A subquery speeds up the execution of __in by eliminating
                     # a postgresql invocation, but requires the values operator.
                     # See Subquery documentation for why this is necessary.
+                    # START(ID=491,NAME=ResourceGetUserUserWithSpecificAccessPkValues,TYPE=SELECT,OBJECTS=[User])
                     excluded = User.objects.filter(excl).values('pk')
+                    # END(ID=491)
+                    # START(ID=492,NAME=ResourceGetUserUserWithSpecificAccessExcludePk,TYPE=SELECT,OBJECTS=[User])
                     return User.objects.filter(incl)\
                                        .exclude(pk__in=Subquery(excluded))\
                                        .distinct()
+                    # END(ID=492)
                 else:
+                    # START(ID=493,NAME=ResourceGetUserUserWithSpecificAccessInclude,TYPE=SELECT,OBJECTS=[User])
                     return User.objects.filter(incl)
+                    # END(ID=493)
 
             else:
                 return User.objects.none()
@@ -302,13 +317,19 @@ class ResourceAccess(models.Model):
                     # A subquery speeds up the execution of __in by eliminating
                     # a postgresql invocation, but requires the values operator.
                     # See Subquery documentation for why this is necessary.
+                    # START(ID=494,NAME=ResourceGetUserUserWithSpecificAccessIncExcNotNonePkValues,TYPE=SELECT,OBJECTS=[User])
                     excluded = User.objects.filter(excl).values('pk')
+                    # END(ID=494)
+                    # START(ID=495,NAME=ResourceGetUserUserWithSpecificAccessIncExcNotNoneExclude,TYPE=SELECT,OBJECTS=[User])
                     return User.objects\
                         .filter(incl)\
                         .exclude(pk__in=Subquery(excluded))\
                         .distinct()
+                    # END(ID=495)
                 else:
+                    # START(ID=496,NAME=ResourceGetUserUserWithSpecificAccessIncExcNotNoneElse,TYPE=SELECT,OBJECTS=[User])
                     return User.objects.filter(incl)
+                    # END(ID=496)
             else:
                 return User.objects.none()
 
@@ -336,8 +357,10 @@ class ResourceAccess(models.Model):
 
         # compute simple user privilege over resource
         try:
+            # START(ID=497,NAME=ResourceGetRawUserPriviledgeUserResourcePrivilegeGet,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
             p = UserResourcePrivilege.objects.get(resource=self.resource,
                                                   user=this_user)
+            # END(ID=497)
             response1 = p.privilege
         except UserResourcePrivilege.DoesNotExist:
             response1 = PC.NONE
@@ -360,11 +383,13 @@ class ResourceAccess(models.Model):
             raise PermissionDenied("Grantee user is not active")
 
         # Group privileges must be aggregated
+        # START(ID=498,NAME=ResourceGetRawGroupPriviledgeGroupResourcePrivilegeGet,TYPE=SELECT,OBJECTS=[GroupResourcePrivilege])
         group_priv = GroupResourcePrivilege.objects\
             .filter(resource=self.resource,
                     group__gaccess__active=True,
                     group__g2ugp__user=this_user)\
             .aggregate(models.Min('privilege'))
+        # END(ID=498)
 
         response2 = group_priv['privilege__min']
         if response2 is None:
@@ -381,12 +406,14 @@ class ResourceAccess(models.Model):
         This does not account for resource flags.
         """
         # Community privileges are either direct or via community.
+        # START(ID=499,NAME=ResourceGetRawCommunityPriviledgeGroupResourcePrivilegeGet,TYPE=SELECT,OBJECTS=[GroupResourcePrivilege])
         community_priv = GroupResourcePrivilege.objects \
             .filter(Q(resource=self.resource,
                       group__gaccess__active=True,
                       group__g2gcp__community__c2gcp__group__g2ugp__user=this_user))\
             .aggregate(models.Min('privilege'),
                        models.Min('group__g2gcp__community__c2gcp__privilege'))
+        # END(ID=499)
 
         if community_priv['privilege__min'] is None or \
            community_priv['group__g2gcp__community__c2gcp__privilege__min'] is None:
@@ -485,8 +512,10 @@ class ResourceAccess(models.Model):
 
     @property
     def first_owner(self):
+        # START(ID=500,NAME=ResourceGetEffectivePriviledgeUserResourcePrivilege,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
         opriv = UserResourcePrivilege.objects.filter(community=self, privilege=PC.OWNER)\
             .order_by('start')
+        # END(ID=500)
         opriv = list(opriv)
         if opriv:
             return opriv[0].user

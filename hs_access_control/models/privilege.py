@@ -161,7 +161,9 @@ class PrivilegeBase(models.Model):
         Only use this routine if you wish to completely bypass access control.
         Note also that using this routine directly breaks provenance and disables undo.
         """
+        # START(ID=439,NAME=PriveledgeShareUpdateClsPrivilegeBase,TYPE=UPDATE,OBJECTS=[PrivilegeBase])
         cls.update(cls, **kwargs)
+        # END(ID=439)
 
     @classmethod
     def unshare(cls, **kwargs):
@@ -186,7 +188,9 @@ class PrivilegeBase(models.Model):
 
         An unshare operation is just an update with privilege NONE.
         """
+        # START(ID=440,NAME=PriveledgeUnShareUpdateClsPrivilegeBase,TYPE=UPDATE,OBJECTS=[PrivilegeBase])
         cls.update(cls, privilege=PrivilegeCodes.NONE, **kwargs)
+        # END(ID=440)
 
 
 class UserGroupPrivilege(PrivilegeBase):
@@ -266,8 +270,12 @@ class UserGroupPrivilege(PrivilegeBase):
                 kwargs['privilege'] >= PrivilegeCodes.OWNER and \
                 kwargs['privilege'] <= PrivilegeCodes.NONE
             assert len(kwargs) == 4
+        # START(ID=441,NAME=PriveledgeShareUpdateClsUserGroupPrivilege,TYPE=UPDATE,OBJECTS=[UserGroupPrivilege])
         cls.update(**kwargs)
+        # END(ID=441)
+        # START(ID=442,NAME=PriveledgeShareUpdateClsUserGroupProvenance,TYPE=UPDATE,OBJECTS=[UserGroupProvenance])
         UserGroupProvenance.update(**kwargs)
+        # END(ID=442)
 
     @classmethod
     def unshare(cls, **kwargs):
@@ -299,8 +307,12 @@ class UserGroupPrivilege(PrivilegeBase):
             assert 'grantor' in kwargs
             assert isinstance(kwargs['grantor'], User)
             assert len(kwargs) == 3
+        # START(ID=443,NAME=PriveledgeUnhareUpdateClsUserGroupPrivilege,TYPE=UPDATE,OBJECTS=[UserGroupPrivilege])
         cls.update(privilege=PrivilegeCodes.NONE, **kwargs)
+        # END(ID=443)
+        # START(ID=444,NAME=PriveledgeUnhareUpdateClsUserGroupProvenance,TYPE=UPDATE,OBJECTS=[UserGroupProvenance])
         UserGroupProvenance.update(privilege=PrivilegeCodes.NONE, **kwargs)
+        # END(ID=444)
 
     @classmethod
     def undo_share(cls, **kwargs):
@@ -345,7 +357,9 @@ class UserGroupPrivilege(PrivilegeBase):
         UserGroupProvenance.undo_share(grantor=grantor, **kwargs)
         # read that record and post to privilege table.
         r = UserGroupProvenance.get_current_record(**kwargs)
+        # START(ID=445,NAME=PriveledgeUndoUnhareUpdateClsUserGroupPrivilege,TYPE=UPDATE,OBJECTS=[UserGroupPrivilege])
         cls.update(user=r.user, group=r.group, privilege=r.privilege, grantor=r.grantor)
+        # END(ID=445)
 
     @classmethod
     def get_undo_users(cls, **kwargs):
@@ -440,8 +454,12 @@ class UserResourcePrivilege(PrivilegeBase):
         """
         # prevent import loops
         from hs_access_control.models.provenance import UserResourceProvenance
+        # START(ID=446,NAME=PriveledgeShareUpdateClsUserResourcePrivilege,TYPE=UPDATE,OBJECTS=[UserResourcePrivilege])
         cls.update(**kwargs)
+        # END(ID=446)
+        # START(ID=447,NAME=PriveledgeShareUpdateClsUserResourceProvenance,TYPE=UPDATE,OBJECTS=[UserResourceProvenance])
         UserResourceProvenance.update(**kwargs)
+        # END(ID=447)
 
     @classmethod
     def unshare(cls, **kwargs):
@@ -467,8 +485,12 @@ class UserResourcePrivilege(PrivilegeBase):
         """
         # prevent import loops
         from hs_access_control.models.provenance import UserResourceProvenance
+        # START(ID=448,NAME=PriveledgeUnShareUpdateClsUserResourcePrivilege,TYPE=UPDATE,OBJECTS=[UserResourcePrivilege])
         cls.update(privilege=PrivilegeCodes.NONE, **kwargs)
+        # END(ID=448)
+        # START(ID=449,NAME=PriveledgeUnShareUpdateClsUserResourceProvenance,TYPE=UPDATE,OBJECTS=[UserResourceProvenance])
         UserResourceProvenance.update(privilege=PrivilegeCodes.NONE, **kwargs)
+        # END(ID=449)
 
     @classmethod
     def undo_share(cls, **kwargs):
@@ -514,7 +536,9 @@ class UserResourcePrivilege(PrivilegeBase):
         del kwargs['grantor']
         r = UserResourceProvenance.get_current_record(**kwargs)
         # post to privilege table.
+        # START(ID=450,NAME=PriveledgeUndoShareUpdateClsUserResourcePrivilege,TYPE=UPDATE,OBJECTS=[UserResourcePrivilege])
         cls.update(user=r.user, resource=r.resource, privilege=r.privilege, grantor=r.grantor, exhibit=r.exhibit)
+        # END(ID=450)
 
     @classmethod
     def get_undo_users(cls, **kwargs):
@@ -611,8 +635,12 @@ class GroupResourcePrivilege(PrivilegeBase):
         """
         # prevent import loops
         from hs_access_control.models.provenance import GroupResourceProvenance
+        # START(ID=451,NAME=PriveledgeShareUpdateClsGroupResourcePrivilege,TYPE=UPDATE,OBJECTS=[GroupResourcePrivilege])
         cls.update(**kwargs)
+        # END(ID=451)
+        # START(ID=452,NAME=PriveledgeShareUpdateClsGroupResourceProvenance,TYPE=UPDATE,OBJECTS=[GroupResourceProvenance])
         GroupResourceProvenance.update(**kwargs)
+        # END(ID=452)
 
     @classmethod
     def unshare(cls, **kwargs):
@@ -632,8 +660,12 @@ class GroupResourcePrivilege(PrivilegeBase):
         """
         # prevent import loops
         from hs_access_control.models.provenance import GroupResourceProvenance
+        # START(ID=453,NAME=PriveledgeUnShareUpdateClsGroupResourcePrivilege,TYPE=UPDATE,OBJECTS=[GroupResourcePrivilege])
         cls.update(privilege=PrivilegeCodes.NONE, **kwargs)
+        # END(ID=453)
+        # START(ID=454,NAME=PriveledgeUnShareUpdateClsGroupResourceProvenance,TYPE=UPDATE,OBJECTS=[GroupResourceProvenance])
         GroupResourceProvenance.update(privilege=PrivilegeCodes.NONE, **kwargs)
+        # END(ID=454)
 
     @classmethod
     def undo_share(cls, **kwargs):
@@ -670,7 +702,9 @@ class GroupResourcePrivilege(PrivilegeBase):
         GroupResourceProvenance.undo_share(**kwargs)
         del kwargs['grantor']
         r = GroupResourceProvenance.get_current_record(**kwargs)
+        # START(ID=455,NAME=PriveledgeUndoShareUpdateClsGroupResourcePrivilege,TYPE=UPDATE,OBJECTS=[GroupResourcePrivilege])
         cls.update(group=r.group, resource=r.resource, privilege=r.privilege, grantor=r.grantor, exhibit=r.exhibit)
+        # END(ID=455)
 
     @classmethod
     def get_undo_groups(cls, **kwargs):
@@ -770,8 +804,12 @@ class UserCommunityPrivilege(PrivilegeBase):
                 kwargs['privilege'] >= PrivilegeCodes.OWNER and \
                 kwargs['privilege'] <= PrivilegeCodes.NONE
             assert len(kwargs) == 4
+        # START(ID=456,NAME=PriveledgeShareUpdateClsUserCommunityPrivilege,TYPE=UPDATE,OBJECTS=[UserCommunityPrivilege])
         cls.update(**kwargs)
+        # END(ID=456)
+        # START(ID=457,NAME=PriveledgeShareUpdateClsUserCommunityProvenance,TYPE=UPDATE,OBJECTS=[UserCommunityProvenance])
         UserCommunityProvenance.update(**kwargs)
+        # END(ID=457)
 
     @classmethod
     def unshare(cls, **kwargs):
@@ -803,8 +841,12 @@ class UserCommunityPrivilege(PrivilegeBase):
             assert 'grantor' in kwargs
             assert isinstance(kwargs['grantor'], User)
             assert len(kwargs) == 3
+        # START(ID=458,NAME=PriveledgeUnShareUpdateClsUserCommunityPrivilege,TYPE=UPDATE,OBJECTS=[UserCommunityPrivilege])
         cls.update(privilege=PrivilegeCodes.NONE, **kwargs)
+        # END(ID=458)
+        # START(ID=459,NAME=PriveledgeUnShareUpdateClsUserCommunityProvenance,TYPE=UPDATE,OBJECTS=[UserCommunityProvenance])
         UserCommunityProvenance.update(privilege=PrivilegeCodes.NONE, **kwargs)
+        # END(ID=459)
 
     @classmethod
     def undo_share(cls, **kwargs):
@@ -847,7 +889,9 @@ class UserCommunityPrivilege(PrivilegeBase):
         UserCommunityProvenance.undo_share(grantor=grantor, **kwargs)
         # read that record and post to privilege table.
         r = UserCommunityProvenance.get_current_record(**kwargs)
+        # START(ID=460,NAME=PriveledgeUndoShareUpdateClsUserCommunityPrivilege,TYPE=UPDATE,OBJECTS=[UserCommunityPrivilege])
         cls.update(community=r.community, user=r.user, privilege=r.privilege, grantor=r.grantor)
+        # END(ID=460)
 
     @classmethod
     def get_undo_users(cls, **kwargs):
@@ -957,8 +1001,12 @@ class GroupCommunityPrivilege(PrivilegeBase):
                 kwargs['privilege'] >= PrivilegeCodes.OWNER and \
                 kwargs['privilege'] <= PrivilegeCodes.NONE
             assert len(kwargs) == 4
+        # START(ID=461,NAME=PriveledgeShareUpdateClsGroupCommunityPrivilege,TYPE=UPDATE,OBJECTS=[GroupCommunityPrivilege])
         cls.update(**kwargs)
+        # END(ID=461)
+        # START(ID=462,NAME=PriveledgeShareUpdateClsGroupCommunityProvenance,TYPE=UPDATE,OBJECTS=[GroupCommunityProvenance])
         GroupCommunityProvenance.update(**kwargs)
+        # END(ID=462)
 
     @classmethod
     def unshare(cls, **kwargs):
@@ -989,8 +1037,12 @@ class GroupCommunityPrivilege(PrivilegeBase):
             assert 'grantor' in kwargs
             assert isinstance(kwargs['grantor'], User)
             assert len(kwargs) == 3
+        # START(ID=463,NAME=PriveledgeUnShareUpdateClsGroupCommunityPrivilege,TYPE=UPDATE,OBJECTS=[GroupCommunityPrivilege])
         cls.update(privilege=PrivilegeCodes.NONE, **kwargs)
+        # END(ID=463)
+        # START(ID=464,NAME=PriveledgeUnShareUpdateClsGroupCommunityProvenanceTYPE=UPDATE,OBJECTS=[GroupCommunityProvenance])
         GroupCommunityProvenance.update(privilege=PrivilegeCodes.NONE, **kwargs)
+        # END(ID=464)
 
     @classmethod
     def undo_share(cls, **kwargs):
@@ -1033,8 +1085,10 @@ class GroupCommunityPrivilege(PrivilegeBase):
         GroupCommunityProvenance.undo_share(grantor=grantor, **kwargs)
         # read that record and post to privilege table.
         r = GroupCommunityProvenance.get_current_record(**kwargs)
+        # START(ID=465,NAME=PriveledgeUndoShareUpdateClsGroupCommunityPrivilege,TYPE=UPDATE,OBJECTS=[GroupCommunityPrivilege])
         cls.update(community=r.community, group=r.group, privilege=r.privilege,
                    grantor=r.grantor, exhibit=r.exhibit)
+        # END(ID=465)
 
     @classmethod
     def get_undo_groups(cls, **kwargs):
@@ -1144,8 +1198,12 @@ class CommunityResourcePrivilege(PrivilegeBase):
                 kwargs['privilege'] >= PrivilegeCodes.OWNER and \
                 kwargs['privilege'] <= PrivilegeCodes.NONE
             assert len(kwargs) == 4
+        # START(ID=466,NAME=PriveledgeShareUpdateClsCommunityResourcePrivilege,TYPE=UPDATE,OBJECTS=[CommunityResourcePrivilege])
         cls.update(**kwargs)
+        # END(ID=466)
+        # START(ID=467,NAME=PriveledgeShareUpdateClsCommunityResourceProvenance,TYPE=UPDATE,OBJECTS=[CommunityResourceProvenance])
         CommunityResourceProvenance.update(**kwargs)
+        # END(ID=467)
 
     @classmethod
     def unshare(cls, **kwargs):
@@ -1176,8 +1234,12 @@ class CommunityResourcePrivilege(PrivilegeBase):
             assert 'grantor' in kwargs
             assert isinstance(kwargs['grantor'], User)
             assert len(kwargs) == 3
+        # START(ID=468,NAME=PriveledgeUnShareUpdateClsCommunityResourcePrivilege,TYPE=UPDATE,OBJECTS=[CommunityResourcePrivilege])
         cls.update(privilege=PrivilegeCodes.NONE, **kwargs)
+        # END(ID=468)
+        # START(ID=469,NAME=PriveledgeUnShareUpdateClsCommunityResourceProvenance,TYPE=UPDATE,OBJECTS=[CommunityResourceProvenance])
         CommunityResourceProvenance.update(privilege=PrivilegeCodes.NONE, **kwargs)
+        # END(ID=469)
 
     @classmethod
     def undo_share(cls, **kwargs):
@@ -1220,7 +1282,9 @@ class CommunityResourcePrivilege(PrivilegeBase):
         CommunityResourceProvenance.undo_share(grantor=grantor, **kwargs)
         # read that record and post to privilege table.
         r = CommunityResourceProvenance.get_current_record(**kwargs)
+        # START(ID=470,NAME=PriveledgeUndoShareUpdateClsCommunityResourcePrivilege,TYPE=UPDATE,OBJECTS=[CommunityResourcePrivilege])
         cls.update(community=r.community, resource=r.resource, privilege=r.privilege, grantor=r.grantor)
+        # END(ID=470)
 
     @classmethod
     def get_undo_resources(cls, **kwargs):

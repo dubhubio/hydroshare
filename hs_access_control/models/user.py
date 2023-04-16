@@ -144,18 +144,22 @@ class UserAccess(models.Model):
                     )
 
             # check if the user already has made a request to join this_group
+            # START(ID=501,NAME=UserCreateGroupMemebershipRequestCheckRequestExists,TYPE=SELECT,OBJECTS=[GroupMembershipRequest])
             if GroupMembershipRequest.objects.filter(
                 request_from=self.user, group_to_join=this_group, redeemed=False
             ).exists():
+            # END(ID=501)
                 raise PermissionDenied(
                     "You already have a pending request to join this group"
                 )
             else:
+                # START(ID=502,NAME=UserCreateGroupMemebershipRequestCreateFromRequest,TYPE=INSERT,OBJECTS=[GroupMembershipRequest])
                 membership_request = GroupMembershipRequest.objects.create(
                     request_from=self.user,
                     group_to_join=this_group,
                     explanation=explanation,
                 )
+                # END(ID=502)
                 # if group allows auto approval of membership request then approve the
                 # request immediately
                 if this_group.gaccess.auto_approve:
@@ -174,19 +178,22 @@ class UserAccess(models.Model):
                 raise PermissionDenied(
                     "You need to be a group owner to send invitation to join a group"
                 )
-
+            # START(ID=503,NAME=UserCreateGroupMemebershipRequestCheckInvitationExists,TYPE=SELECT,OBJECTS=[GroupMembershipRequest])
             if GroupMembershipRequest.objects.filter(
                 group_to_join=this_group, invitation_to=this_user, redeemed=False
             ).exists():
+            # END(ID=503)
                 raise PermissionDenied(
                     "You already have a pending invitation for this user to join this group"
                 )
             else:
+                # START(ID=504,NAME=UserCreateGroupMemebershipRequestCreateFromInvite,TYPE=INSERT,OBJECTS=[GroupMembershipRequest])
                 return GroupMembershipRequest.objects.create(
                     request_from=self.user,
                     invitation_to=this_user,
                     group_to_join=this_group,
                 )
+                # END(ID=504)
 
     def act_on_group_membership_request(self, this_request, accept_request=True):
         """
@@ -268,11 +275,13 @@ class UserAccess(models.Model):
             raise PermissionDenied("Requesting user is not active")
 
         return (
+            # START(ID=505,NAME=UserActOnGroupMembershipRequestProperty,TYPE=SELECT,OBJECTS=[GroupMembershipRequest])
             GroupMembershipRequest.objects.filter(
                 Q(request_from=self.user) | Q(invitation_to=self.user)
             )
             .filter(group_to_join__gaccess__active=True)
             .filter(redeemed=False)
+            # END(ID=505)
         )
 
     def create_group(
@@ -305,8 +314,10 @@ class UserAccess(models.Model):
 
         if not self.user.is_active:
             raise PermissionDenied("Requesting user is not active")
-
+        # START(ID=506,NAME=UserCreateGroupRawGroup,TYPE=INSERT,OBJECTS=[Group])
         raw_group = Group.objects.create(name=title)
+        # END(ID=506)
+        # START(ID=507,NAME=UserCreateGroupGroupAccess,TYPE=INSERT,OBJECTS=[GroupAccess])
         GroupAccess.objects.create(
             group=raw_group,
             description=description,
@@ -314,6 +325,7 @@ class UserAccess(models.Model):
             purpose=purpose,
             requires_explanation=requires_explanation,
         )
+        # END(ID=507)
         raw_user = self.user
 
         # Must bootstrap access control system initially
@@ -369,7 +381,7 @@ class UserAccess(models.Model):
         """
         if not self.user.is_active:
             raise PermissionDenied("Requesting user is not active")
-
+        # START(ID=508,NAME=UserPropertyViewGroupsGroupFilter,TYPE=SELECT,OBJECTS=[Group])
         return Group.objects.filter(
             Q(
                 g2ugp__user=self.user,
@@ -382,6 +394,7 @@ class UserAccess(models.Model):
                 g2ugp__privilege=PrivilegeCodes.OWNER,
             )
         ).distinct()
+        # END(ID=508)
 
     @property
     def edit_groups(self):
@@ -406,7 +419,7 @@ class UserAccess(models.Model):
         """
         if not self.user.is_active:
             raise PermissionDenied("Requesting user is not active")
-
+        # START(ID=509,NAME=UserPropertyEditGroupsGroupFilter,TYPE=SELECT,OBJECTS=[Group])
         return Group.objects.filter(
             Q(
                 g2ugp__user=self.user,
@@ -419,6 +432,7 @@ class UserAccess(models.Model):
                 g2ugp__privilege=PrivilegeCodes.OWNER,
             )
         ).distinct()
+        # END(ID=509)
 
     @property
     def owned_groups(self):
@@ -441,10 +455,11 @@ class UserAccess(models.Model):
         """
         if not self.user.is_active:
             raise PermissionDenied("Requesting user is not active")
-
+        # START(ID=510,NAME=UserPropertyOwndedGroupsGroupFilter,TYPE=SELECT,OBJECTS=[Group])
         return Group.objects.filter(
             g2ugp__user=self.user, g2ugp__privilege=PrivilegeCodes.OWNER
         )
+        # END(ID=510)
 
     @property
     def my_groups(self):
@@ -459,6 +474,7 @@ class UserAccess(models.Model):
             raise PermissionDenied("Requesting user is not active")
 
         return (
+            # START(ID=511,NAME=UserPropertyOwndedGroupsGroupFilter,TYPE=SELECT,OBJECTS=[Group,GroupAccess])
             Group.objects.filter(
                 Q(
                     g2ugp__user=self.user,
@@ -473,6 +489,7 @@ class UserAccess(models.Model):
             )
             .select_related("gaccess")
             .distinct()
+            # END(ID=511)
         )
 
     #################################
@@ -499,13 +516,14 @@ class UserAccess(models.Model):
         """
         if not self.user.is_active:
             raise PermissionDenied("Requesting user is not active")
-
+        # START(ID=512,NAME=UserPropertyAllViewGroupsFilterGroup,TYPE=SELECT,OBJECTS=[Group])
         return Group.objects.filter(
             # owners can see inactive groups they own
             Q(g2ugp__user=self.user, g2ugp__privilege=PrivilegeCodes.OWNER)
             # everyone else can see only active groups they are in
             | Q(gaccess__active=True, g2ugp__user=self.user)
         ).distinct()
+        # END(ID=512)
 
     def owns_group(self, this_group):
         """
@@ -530,10 +548,11 @@ class UserAccess(models.Model):
 
         if not self.user.is_active:
             raise PermissionDenied("Requesting user is not active")
-
+        # START(ID=513,NAME=UserOwnsGroupsUserGroupPrivilegeFilter,TYPE=SELECT,OBJECTS=[UserGroupPrivilege])
         return UserGroupPrivilege.objects.filter(
             group=this_group, privilege=PrivilegeCodes.OWNER, user=self.user
         ).exists()
+        # END(ID=513)
 
     def can_change_group(self, this_group):
         """
@@ -1050,14 +1069,18 @@ class UserAccess(models.Model):
 
         # if this_user is not an OWNER, or there is another OWNER, OK.
         if (
+            # START(ID=514,NAME=UserCheckUnshareGroupWithUserUserGroupPrivilegeFilterNot,TYPE=SELECT,OBJECTS=[UserGroupPrivilege])
             not UserGroupPrivilege.objects.filter(
                 group=this_group, privilege=PrivilegeCodes.OWNER, user=this_user
             ).exists()
+            # END(ID=514)
+            # START(ID=515,NAME=UserCheckUnshareGroupWithUserUserGroupPrivilegeFilterOr,TYPE=SELECT,OBJECTS=[UserGroupPrivilege])
             or UserGroupPrivilege.objects.filter(
                 group=this_group, privilege=PrivilegeCodes.OWNER
             )
             .exclude(user=this_user)
             .exists()
+            # END(ID=515)
         ):
             return True
         else:
@@ -1103,11 +1126,13 @@ class UserAccess(models.Model):
                 # get list of owners to exclude from main list
                 # This should be one user but can be two due to race conditions.
                 # Avoid races by excluding action in that case.
+                # START(ID=516,NAME=UserGetGroupUnshareUserUser,TYPE=SELECT,OBJECTS=[User])
                 users_to_exclude = User.objects.filter(
                     is_active=True,
                     u2ugp__group=this_group,
                     u2ugp__privilege=PrivilegeCodes.OWNER,
                 ).values("pk")
+                # END(ID=516)
                 return access_group.members.exclude(pk__in=Subquery(users_to_exclude))
             else:
                 return access_group.members
@@ -1116,17 +1141,23 @@ class UserAccess(models.Model):
         elif access_group.members.filter(id=self.user.id).exists():
             if access_group.owners.count() == 1:
                 # if self is not an owner,
+                # START(ID=517,NAME=UserGetGroupUnshareUserUserGroupPrivilege,TYPE=SELECT,OBJECTS=[UserGroupPrivilege])
                 if not UserGroupPrivilege.objects.filter(
                     user=self.user, group=this_group, privilege=PrivilegeCodes.OWNER
                 ).exists():
+                # END(ID=517)
                     # return a QuerySet containing only self
+                    # START(ID=518,NAME=UserGetGroupUnshareUserUserQuerysetSelf,TYPE=SELECT,OBJECTS=[User])
                     return User.objects.filter(uaccess=self)
+                    # END(ID=518)
                 else:
                     # I can't unshare anyone
                     return User.objects.none()
             else:
                 # I can unshare self as a non-owner.
+                # START(ID=519,NAME=UserGetGroupUnshareUserUnshareSelfNonOwner,TYPE=SELECT,OBJECTS=[User])
                 return User.objects.filter(uaccess=self)
+                # END(ID=519)
         else:
             return User.objects.none()
 
@@ -1156,6 +1187,7 @@ class UserAccess(models.Model):
         # a) There is a privilege of X for the object for user.
         # b) There is no lower privilege for the object.
         # c) Thus X is the effective privilege of the object.
+        # START(ID=520,NAME=UserGetGroupsWithExplicitAccessGroup,TYPE=SELECT,OBJECTS=[Group])
         selected = Group.objects.filter(
             g2ugp__user=self.user, g2ugp__privilege=this_privilege
         ).exclude(
@@ -1165,6 +1197,7 @@ class UserAccess(models.Model):
                 ).values("pk")
             )
         )
+        # END(ID=520)
 
         # filter out inactive groups for non owner privileges
         if this_privilege != PrivilegeCodes.OWNER:
@@ -1191,13 +1224,14 @@ class UserAccess(models.Model):
         """
         if not self.user.is_active:
             raise PermissionDenied("Requesting user is not active")
-
+        # START(ID=521,NAME=UserPropertyViewResourcesBaseResource,TYPE=SELECT,OBJECTS=[BaseResource])
         return BaseResource.objects.filter(
             # direct access
             Q(r2urp__user=self.user)
             # access via a group
             | Q(r2grp__group__gaccess__active=True, r2grp__group__g2ugp__user=self.user)
         ).distinct()
+        # END(ID=521)
 
     @property
     def owned_resources(self):
@@ -1211,9 +1245,11 @@ class UserAccess(models.Model):
 
         if not self.user.is_active:
             raise PermissionDenied("Requesting user is not active")
+        # START(ID=522,NAME=UserPropertyOwnedResourcesBaseResource,TYPE=SELECT,OBJECTS=[BaseResource])
         return BaseResource.objects.filter(
             r2urp__user=self.user, r2urp__privilege=PrivilegeCodes.OWNER
         )
+        # END(ID=522)
 
     @property
     def edit_resources(self):
@@ -1236,7 +1272,7 @@ class UserAccess(models.Model):
         # a resource is editable if
         # 1. it's shared with the user and editable.
         # 2. it's shared with a group that has edit privilege and contains the user,
-
+        # START(ID=523,NAME=UserPropertyEditResourcesBaseResource,TYPE=SELECT,OBJECTS=[BaseResource])
         return BaseResource.objects.filter(
             # user owns resource invariant of immutable flag 4/9/2021
             Q(r2urp__user=self.user, r2urp__privilege=PrivilegeCodes.OWNER)
@@ -1254,6 +1290,7 @@ class UserAccess(models.Model):
                 r2grp__privilege=PrivilegeCodes.CHANGE,
             )
         ).distinct()
+        # END(ID=523)
 
     def get_resources_with_explicit_access(
         self, this_privilege, via_user=True, via_group=False, via_community=False
@@ -1314,9 +1351,11 @@ class UserAccess(models.Model):
 
         if this_privilege == PrivilegeCodes.OWNER:
             if via_user:
+                # START(ID=524,NAME=UserGetRsourcesWithExplicitAccessBaseResource,TYPE=SELECT,OBJECTS=[BaseResource])
                 return BaseResource.objects.filter(
                     r2urp__privilege=this_privilege, r2urp__user=self.user
                 )
+                # END(ID=524)
             else:
                 # groups and communities can't own resources
                 return BaseResource.objects.none()
@@ -1349,14 +1388,20 @@ class UserAccess(models.Model):
             if incl is not None:
                 if excl:
                     # exclude owners; immutability doesn't matter for them
+                    # START(ID=525,NAME=UserGetResourcesWithExplicitAccessFilterPkValuesBaseResource,TYPE=SELECT,OBJECTS=[BaseResource])
                     excluded = BaseResource.objects.filter(excl).values("pk")
+                    # END(ID=525)
                     return (
+                        # START(ID=526,NAME=UserGetResourcesWithExplicitAccessExcludePk,TYPE=SELECT,OBJECTS=[BaseResource])
                         BaseResource.objects.filter(incl)
                         .exclude(pk__in=Subquery(excluded))
                         .distinct()
                     )
+                        # END(ID=526)
                 else:
+                    # START(ID=527,NAME=UserGetResourcesWithExplicitAccessFilterIncl,TYPE=SELECT,OBJECTS=[BaseResource])
                     return BaseResource.objects.filter(incl).distinct()
+                    # END(ID=527)
             else:
                 return BaseResource.objects.none()
 
@@ -1404,17 +1449,23 @@ class UserAccess(models.Model):
             if incl is not None:
                 if excl:
                     # exclude higher privilege
+                    # START(ID=528,NAME=UserGetResourcesWithExplicitAccessFilterIInclNoneEcl,TYPE=SELECT,OBJECTS=[BaseResource])
                     excluded = BaseResource.objects.filter(
                         r2urp__privilege=PrivilegeCodes.OWNER, r2urp__user=self.user
                     ).values("pk")
+                    # END(ID=528)
 
                     return (
+                        # START(ID=529,NAME=UserGetResourcesWithExplicitAccessFilterIInclNoneEclFilterExcluded,TYPE=SELECT,OBJECTS=[BaseResource])
                         BaseResource.objects.filter(incl)
                         .exclude(pk__in=Subquery(excluded))
                         .distinct()
+                        # END(ID=529)
                     )
                 else:
+                    # START(ID=530,NAME=UserGetResourcesWithExplicitAccessFilterIInclNoneEclFilterIncluded,TYPE=SELECT,OBJECTS=[BaseResource])
                     return BaseResource.objects.filter(incl).distinct()
+                    # END(ID=530)
             else:
                 return BaseResource.objects.none()
 
@@ -1440,10 +1491,11 @@ class UserAccess(models.Model):
 
         if not self.user.is_active:
             raise PermissionDenied("Requesting user is not active")
-
+        # START(ID=531,NAME=UserOwnsResourceUserResourcePrivilege,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
         return UserResourcePrivilege.objects.filter(
             resource=this_resource, privilege=PrivilegeCodes.OWNER, user=self.user
         ).exists()
+        # END(ID=531)
 
     def can_change_resource(self, this_resource):
         """
@@ -1857,9 +1909,11 @@ class UserAccess(models.Model):
 
         # enforce non-idempotence for unprivileged users
         try:
+            # START(ID=532,NAME=UserCheckShareResourceWithGroupGroupResourcePrivilege,TYPE=SELECT,OBJECTS=[GroupResourcePrivilege])
             current_priv = GroupResourcePrivilege.objects.get(
                 group=this_group, resource=this_resource
             ).privilege
+            # END(ID=532)
             if current_priv == this_privilege:
                 raise PermissionDenied(
                     "Non-owners cannot reshare at existing privilege"
@@ -2010,14 +2064,18 @@ class UserAccess(models.Model):
 
         # if this_user is not an OWNER, or there is another OWNER, OK.
         if (
+            # START(ID=533,NAME=UserCheckUnshareResourceWithUserUserResourcePrivilegeNot,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
             not UserResourcePrivilege.objects.filter(
                 resource=this_resource, privilege=PrivilegeCodes.OWNER, user=this_user
             ).exists()
+            # END(ID=533)
+            # START(ID=534,NAME=UserCheckUnshareResourceWithUserUserResourcePrivilegeOr,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
             or UserResourcePrivilege.objects.filter(
                 resource=this_resource, privilege=PrivilegeCodes.OWNER
             )
             .exclude(user=this_user)
             .exists()
+            # END(ID=534)
         ):
             return True
         else:
@@ -2169,11 +2227,13 @@ class UserAccess(models.Model):
                 # get list of owners to exclude from main list
                 # This should be one user but can be two due to race conditions.
                 # Avoid races by excluding whole action in that case.
+                # START(ID=535,NAME=UserGetResourceUnshareUsersUser,TYPE=SELECT,OBJECTS=[User])
                 users_to_exclude = User.objects.filter(
                     is_active=True,
                     u2urp__resource=this_resource,
                     u2urp__privilege=PrivilegeCodes.OWNER,
                 ).values("pk")
+                # END(ID=535)
                 return access_resource.view_users.exclude(
                     pk__in=Subquery(users_to_exclude)
                 )
@@ -2186,19 +2246,25 @@ class UserAccess(models.Model):
         elif access_resource.view_users.filter(id=self.user.id).exists():
             if access_resource.owners.count() == 1:
                 # if self is not an owner,
+                # START(ID=536,NAME=UserGetResourceUnshareUsersUserResourcePrivilege,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
                 if not UserResourcePrivilege.objects.filter(
                     user=self.user,
                     resource=this_resource,
                     privilege=PrivilegeCodes.OWNER,
                 ).exists():
+                # END(ID=536)
                     # return a QuerySet containing only self
+                    # START(ID=537,NAME=UserGetResourceUnshareUsersUserQuerysetOnlySelf,TYPE=SELECT,OBJECTS=[User])
                     return User.objects.filter(uaccess=self)
+                    # END(ID=537)
                 else:
                     # I can't unshare anyone
                     return User.objects.none()
             else:
                 # I can unshare self even as an owner.
+                # START(ID=538,NAME=UserGetResourceUnshareUsersUserUnshareSelfAsOwner,TYPE=SELECT,OBJECTS=[User])
                 return User.objects.filter(uaccess=self)
+                # END(ID=538)
         else:
             return User.objects.none()
 
@@ -2223,15 +2289,19 @@ class UserAccess(models.Model):
 
         if self.user.is_superuser or self.owns_resource(this_resource):
             # all shared groups
+            # START(ID=539,NAME=UserGetResourceUnshareGroupsGroup,TYPE=SELECT,OBJECTS=[Group])
             return Group.objects.filter(
                 g2grp__resource=this_resource, gaccess__active=True
             )
+            # END(ID=539)
         else:
+            # START(ID=540,NAME=UserGetResourceUnshareGroupsGroup,TYPE=SELECT,OBJECTS=[Group])
             return Group.objects.filter(
                 g2ugp__user=self.user,
                 g2ugp__privilege=PrivilegeCodes.OWNER,
                 gaccess__active=True,
             )
+            # END(ID=540)
 
     #######################
     # "undo" system based upon provenance
@@ -2273,11 +2343,13 @@ class UserAccess(models.Model):
         # figure out if group has a single owner
         if this_group.gaccess.owners.count() == 1:
             # get list of owners to exclude from main list
+            # START(ID=541,NAME=UserGetGroupUndoUsersUserFilter,TYPE=SELECT,OBJECTS=[User])
             users_to_exclude = User.objects.filter(
                 is_active=True,
                 u2ugp__group=this_group,
                 u2ugp__privilege=PrivilegeCodes.OWNER,
             ).values("pk")
+            # END(ID=541)
             return candidates.exclude(pk__in=Subquery(users_to_exclude))
         else:
             return candidates
@@ -2408,11 +2480,13 @@ class UserAccess(models.Model):
         # figure out if group has a single owner
         if this_resource.raccess.owners.count() == 1:
             # get list of owners to exclude from main list
+            # START(ID=542,NAME=UserGetResourceUndoUsersUserFilter,TYPE=SELECT,OBJECTS=[User])
             users_to_exclude = User.objects.filter(
                 is_active=True,
                 u2urp__resource=this_resource,
                 u2urp__privilege=PrivilegeCodes.OWNER,
             ).values("pk")
+            # END(ID=542)
             return candidates.exclude(pk__in=Subquery(users_to_exclude))
         else:
             return candidates
@@ -2770,13 +2844,14 @@ class UserAccess(models.Model):
 
         if not self.user.is_active:
             raise PermissionDenied("Requesting user is not active")
-
+        # START(ID=543,NAME=UserCreareCommunityCreateRawCommunity,TYPE=INSERT,OBJECTS=[Community])
         raw_community = Community.objects.create(
             name=title,
             description=description,
             purpose=purpose,
             auto_approve=auto_approve,
         )
+        # END(ID=543)
         raw_user = self.user
 
         # Must bootstrap access control system initially
@@ -2810,10 +2885,11 @@ class UserAccess(models.Model):
 
         if not self.user.is_active:
             raise PermissionDenied("Requesting user is not active")
-
+        # START(ID=544,NAME=UserOwnsCommunityFilterUserCommunityPrivilege,TYPE=SELECT,OBJECTS=[UserCommunityPrivilege])
         return UserCommunityPrivilege.objects.filter(
             community=this_community, privilege=PrivilegeCodes.OWNER, user=self.user
         ).exists()
+        # END(ID=544)
 
     def can_change_community(self, this_community):
         """
@@ -2975,7 +3051,9 @@ class UserAccess(models.Model):
 
         A user is a member of a community if the user is a member of one group in the community.
         """
+        # START(ID=545,NAME=UserPropertyCommunitiesFilterCommunity,TYPE=SELECT,OBJECTS=[Community])
         return Community.objects.filter(c2gcp__group__g2ugp__user=self.user)
+        # END(ID=545)
 
     ####################################
     # (can_)share_community_with_user: check for and implement share
@@ -3223,14 +3301,18 @@ class UserAccess(models.Model):
 
         # if this_user is not an OWNER, or there is another OWNER, OK.
         if (
+            # START(ID=546,NAME=UserCheckUnshareCommunityWithUserNot,TYPE=SELECT,OBJECTS=[UserCommunityPrivilege])
             not UserCommunityPrivilege.objects.filter(
                 community=this_community, privilege=PrivilegeCodes.OWNER, user=this_user
             ).exists()
+            # END(ID=546)
+            # START(ID=547,NAME=UserCheckUnshareCommunityWithUserOr,TYPE=SELECT,OBJECTS=[UserCommunityPrivilege])
             or UserCommunityPrivilege.objects.filter(
                 community=this_community, privilege=PrivilegeCodes.OWNER
             )
             .exclude(user=this_user)
             .exists()
+            # END(ID=547)
         ):
             return True
         else:
@@ -3274,11 +3356,13 @@ class UserAccess(models.Model):
                 # get list of owners to exclude from main list
                 # This should be one user but can be two due to race conditions.
                 # Avoid races by excluding action in that case.
+                # START(ID=548,NAME=UserGetCommunityUnshareUsersUserPk,TYPE=SELECT,OBJECTS=[User])
                 users_to_exclude = User.objects.filter(
                     is_active=True,
                     u2ugp__community=this_community,
                     u2ugp__privilege=PrivilegeCodes.OWNER,
                 ).values("pk")
+                # END(ID=548)
                 return access_community.members.exclude(
                     pk__in=Subquery(users_to_exclude)
                 )
@@ -3289,19 +3373,25 @@ class UserAccess(models.Model):
         elif access_community.members.filter(id=self.user.id).exists():
             if access_community.owners.count() == 1:
                 # if self is not an owner,
+                # START(ID=549,NAME=UserGetCommunityUnshareUsersUserCommunityPrivilegeSelfNotOwner,TYPE=SELECT,OBJECTS=[UserCommunityPrivilege])
                 if not UserCommunityPrivilege.objects.filter(
                     user=self.user,
                     community=this_community,
                     privilege=PrivilegeCodes.OWNER,
                 ).exists():
+                # END(ID=549)
                     # return a QuerySet containing only self
+                    # START(ID=550,NAME=UserGetCommunityUnshareUsersUserCommunityPrivilegeQuersetOnlySelf,TYPE=SELECT,OBJECTS=[User])
                     return User.objects.filter(uaccess=self)
+                    # END(ID=550)
                 else:
                     # I can't unshare anyone
                     return User.objects.none()
             else:
                 # I can unshare self as a non-owner.
+                # START(ID=551,NAME=UserGetCommunityUnshareUsersUserCommunityPrivilegeUnshareSelfAsNonOwner,TYPE=SELECT,OBJECTS=[User])
                 return User.objects.filter(uaccess=self)
+                # END(ID=551)
         else:
             return User.objects.none()
 
@@ -3598,11 +3688,13 @@ class UserAccess(models.Model):
         # figure out if group has a single owner
         if this_community.owners.count() == 1:
             # get list of owners to exclude from main list
+            # START(ID=552,NAME=UserGetCommunityUndoUsersUsersToExclude,TYPE=SELECT,OBJECTS=[User])
             users_to_exclude = User.objects.filter(
                 is_active=True,
                 u2ucp__community=this_community,
                 u2ucp__privilege=PrivilegeCodes.OWNER,
             ).values("pk")
+            # END(ID=552)
             return candidates.exclude(pk__in=Subquery(users_to_exclude))
         else:
             return candidates
@@ -4179,6 +4271,7 @@ class UserAccess(models.Model):
         # a) There is a privilege of X for the object for user.
         # b) There is no lower privilege for the object.
         # c) Thus X is the effective privilege of the object.
+        # START(ID=553,NAME=UserGetCommunitiesWithExplicitAccess,TYPE=SELECT,OBJECTS=[Community])
         selected = Community.objects.filter(
             c2ucp__user=self.user, c2ucp__privilege=this_privilege
         ).exclude(
@@ -4188,6 +4281,7 @@ class UserAccess(models.Model):
                 ).values("pk")
             )
         )
+        # END(ID=553)
 
         return selected
 
@@ -4207,7 +4301,7 @@ class UserAccess(models.Model):
 
         if not self.user.is_active:
             raise PermissionDenied("Requesting user is not active")
-
+        # START(ID=554,NAME=UserGetCommunitiesWithExplicitMembership,TYPE=SELECT,OBJECTS=[Community])
         selected = Community.objects.filter(
             c2gcp__group__g2ugp__user=self.user, c2gcp__privilege=this_privilege
         ).exclude(
@@ -4218,6 +4312,7 @@ class UserAccess(models.Model):
                 ).values("pk")
             )
         )
+        # END(ID=554)
 
         return selected
 
@@ -4226,9 +4321,11 @@ class UserAccess(models.Model):
         # get_or_create is not atomic!
         with transaction.atomic():
             # ensure that a customization record with the feature exists
+            # START(ID=555,NAME=UserCustomizeFeature,TYPE=MERGE,OBJECTS=[Feature])
             record, create = Feature.objects.get_or_create(
                 defaults={"enabled": enabled}, user=self.user, feature=feature
             )
+            # END(ID=555)
             # and set the enabled flag if the feature already exists.
             if not create:
                 record.enabled = enabled
@@ -4237,14 +4334,18 @@ class UserAccess(models.Model):
     def uncustomize(self, feature):
         """remove a custom UI option; this makes it unavailable to a user"""
         try:
+            # START(ID=556,NAME=UserUncustomizeFeatureGet,TYPE=SELECT,OBJECTS=[Feature])
             record = Feature.objects.get(user=self.user, feature=feature)
+            # END(ID=556)
             record.delete()
         except Feature.DoesNotExist:
             pass
 
     def feature_enabled(self, feature):
         try:
+            # START(ID=557,NAME=UserFeatureEnabledFeatureGet,TYPE=SELECT,OBJECTS=[Feature])
             record = Feature.objects.get(user=self.user, feature=feature)
+            # END(ID=557)
             return record.enabled
         except Feature.DoesNotExist:
             return False
