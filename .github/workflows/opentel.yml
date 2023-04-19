@@ -19,8 +19,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Run docker image
         run: |
-          apt update && apt upgrade -y
-          apt install -y sudo
+          sudo apt update && sudo apt upgrade -y
           sudo apt-get update
           sudo apt-get install -y \
               ca-certificates \
