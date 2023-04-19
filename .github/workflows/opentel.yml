@@ -7,42 +7,44 @@ on:
     branches: [ "main" ]
 
 jobs:
-  container-job:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repository code
-        uses: actions/checkout@v3
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USER }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Run docker image
-        run: |
-          sudo apt update && sudo apt upgrade -y
-          sudo apt-get update
-          sudo apt-get install -y \
-              ca-certificates \
-              curl \
-              gnupg
-          sudo install -m 0755 -d /etc/apt/keyrings
-          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-          sudo chmod a+r /etc/apt/keyrings/docker.gpg
-          echo \
-            "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-            "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
-            sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-          sudo apt-get update
-          sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-          sudo apt-get update
-          echo "c" | sudo ./local-dev-first-start-only.sh
-      - name: Run Tests
-        run: |
-          sudo docker compose -f local-dev.yml up
-          ./hsctl managepy test
-        env:
-          GITHUB_RUN_ID: ${{ github.run_id }}
-          PR_REF: ${{ github.event.pull_request.head.sha }}
+  strategy:
+    matrix:
+      os: [ubuntu-x86_64]
+  runs-on: ${{ matrix.os }}
+  steps:
+    - name: Check out repository code
+      uses: actions/checkout@v3
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USER }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    - name: Run docker image
+      run: |
+        sudo apt update && sudo apt upgrade -y
+        sudo apt-get update
+        sudo apt-get install -y \
+            ca-certificates \
+            curl \
+            gnupg
+        sudo install -m 0755 -d /etc/apt/keyrings
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+        sudo chmod a+r /etc/apt/keyrings/docker.gpg
+        echo \
+          "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+          "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+          sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+        sudo apt-get update
+        sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+        sudo apt-get update
+        echo "c" | sudo ./local-dev-first-start-only.sh
+    - name: Run Tests
+      run: |
+        sudo docker compose -f local-dev.yml up
+        ./hsctl managepy test
+      env:
+        GITHUB_RUN_ID: ${{ github.run_id }}
+        PR_REF: ${{ github.event.pull_request.head.sha }}
 
 
 # dubhub baseguard upload_schema --orgToken 2b02ce1b-9b5c-4e75-8ff9-ddb562944734 
