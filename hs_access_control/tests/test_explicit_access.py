@@ -13,8 +13,9 @@ class T11ExplicitGet(MockIRODSTestCaseMixin, TestCase):
     def setUp(self):
         super(T11ExplicitGet, self).setUp()
         global_reset()
-
+        # START(ID=640,NAME=TestExplicitAccessSetUpGetOrCreateGroup,TYPE=MERGE,OBJECTS=[Group])
         self.group, _ = Group.objects.get_or_create(name='Hydroshare Author')
+        # END(ID=640)
         self.A_user = hydroshare.create_account(
             'a_user@gmail.com',
             username='A',
@@ -331,7 +332,9 @@ class T11ExplicitGet(MockIRODSTestCaseMixin, TestCase):
 
         # now set immutable
         r1_resource.raccess.immutable = True
+        # START(ID=641,NAME=TestExplicitAccessTest03Immutibility,TYPE=UPDATE,OBJECTS=[ResourceAccess])
         r1_resource.raccess.save()
+        # END(ID=641)
 
         # immutable should squash CHANGE privilege to VIEW
         g = B_user.uaccess.get_resources_with_explicit_access(PrivilegeCodes.OWNER,

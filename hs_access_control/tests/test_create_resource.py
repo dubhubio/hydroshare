@@ -18,7 +18,9 @@ class T03CreateResource(MockIRODSTestCaseMixin, TestCase):
     def setUp(self):
         super(T03CreateResource, self).setUp()
         global_reset()
+        # START(ID=625,NAME=TestCreateResourceSetUpGetOrCreateGroup,TYPE=MERGE,OBJECTS=[Group])
         self.group, _ = Group.objects.get_or_create(name='Hydroshare Author')
+        # END(ID=625)
         self.admin = hydroshare.create_account(
             'admin@gmail.com',
             username='admin',
@@ -50,11 +52,19 @@ class T03CreateResource(MockIRODSTestCaseMixin, TestCase):
 
     def tearDown(self):
         super(T03CreateResource, self).tearDown()
+        # START(ID=626,NAME=TestCreateResourceTearDownAllUsers,TYPE=DELETE,OBJECTS=[User])
         User.objects.all().delete()
+        # END(ID=626)
+        # START(ID=627,NAME=TestCreateResourceTearDownAllGroups,TYPE=DELETE,OBJECTS=[Group])
         Group.objects.all().delete()
+        # END(ID=627)
         if self.holes:
+            # START(ID=628,NAME=TestCreateResourceTearDownDeleteHolesBaseResource,TYPE=DELETE,OBJECTS=[BaseResource])
             self.holes.delete()
+            # END(ID=628)
+        # START(ID=629,NAME=TestCreateResourceTearDownDeleteBaseResource,TYPE=DELETE,OBJECTS=[BaseResource])
         BaseResource.objects.all().delete()
+        # END(ID=629)
 
     def test_01_create(self):
         """Resource creator has appropriate access"""
@@ -188,7 +198,9 @@ class T03CreateResource(MockIRODSTestCaseMixin, TestCase):
 
         # make it immutable: what changes?
         holes.raccess.immutable = True
+        # START(ID=630,NAME=TestCreateResourceTest06CheckFlagImmutableTrueResourceAccess,TYPE=UPDATE,OBJECTS=[ResourceAccess])
         holes.raccess.save()
+        # END(ID=630)
 
         # metadata state
         self.assertTrue(holes.raccess.immutable)
@@ -241,7 +253,9 @@ class T03CreateResource(MockIRODSTestCaseMixin, TestCase):
 
         # now no longer immutable
         holes.raccess.immutable = False
+        # START(ID=631,NAME=TestCreateResourceTest06CheckFlagImmutableFalseResourceAccess,TYPE=UPDATE,OBJECTS=[ResourceAccess])
         holes.raccess.save()
+        # END(ID=631)
 
         assertUserResourceState(self, dog, [], [holes], [])
 
@@ -315,7 +329,9 @@ class T03CreateResource(MockIRODSTestCaseMixin, TestCase):
 
         # make it discoverable
         holes.raccess.discoverable = True
+        # START(ID=632,NAME=TestCreateResourceTest07CheckFlagDiscoverableTrueResourceAccess,TYPE=UPDATE,OBJECTS=[ResourceAccess])
         holes.raccess.save()
+        # END(ID=632)
 
         # is it listed as discoverable?
         self.assertTrue(
@@ -353,7 +369,9 @@ class T03CreateResource(MockIRODSTestCaseMixin, TestCase):
 
         # make it not discoverable
         holes.raccess.discoverable = False
+        # START(ID=633,NAME=TestCreateResourceTest07CheckFlagDiscoverableFalseResourceAccess,TYPE=UPDATE,OBJECTS=[ResourceAccess])
         holes.raccess.save()
+        # END(ID=633)
 
         # metadata state
         self.assertFalse(holes.raccess.immutable)
@@ -432,7 +450,9 @@ class T03CreateResource(MockIRODSTestCaseMixin, TestCase):
 
         # make it published
         holes.raccess.published = True
+        # START(ID=634,NAME=TestCreateResourceTest08CheckFlagPublishedTrueResourceAccess,TYPE=UPDATE,OBJECTS=[ResourceAccess])
         holes.raccess.save()
+        # END(ID=634)
 
         # metadata state
         self.assertFalse(holes.raccess.immutable)
@@ -479,7 +499,9 @@ class T03CreateResource(MockIRODSTestCaseMixin, TestCase):
 
         # make it not published
         holes.raccess.published = False
+        # START(ID=635,NAME=TestCreateResourceTest08CheckFlagPublishedFalseResourceAccess,TYPE=UPDATE,OBJECTS=[ResourceAccess])
         holes.raccess.save()
+        # END(ID=635)
 
         # metadata state
         self.assertFalse(holes.raccess.immutable)
@@ -550,7 +572,9 @@ class T03CreateResource(MockIRODSTestCaseMixin, TestCase):
 
         # make it public
         holes.raccess.public = True
+        # START(ID=636,NAME=TestCreateResourceTest09CheckFlagPublicTrueResourceAccess,TYPE=UPDATE,OBJECTS=[ResourceAccess])
         holes.raccess.save()
+        # END(ID=636)
 
         # is it listed as discoverable?
         self.assertTrue(
@@ -589,7 +613,9 @@ class T03CreateResource(MockIRODSTestCaseMixin, TestCase):
 
         # make it not public
         holes.raccess.public = False
+        # START(ID=637,NAME=TestCreateResourceTest09CheckFlagPublicFalseResourceAccess,TYPE=UPDATE,OBJECTS=[ResourceAccess])
         holes.raccess.save()
+        # END(ID=637)
 
         # metadata state
         self.assertFalse(holes.raccess.immutable)

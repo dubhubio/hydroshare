@@ -13,8 +13,9 @@ class T01CreateUser(MockIRODSTestCaseMixin, TestCase):
     def setUp(self):
         super(T01CreateUser, self).setUp()
         global_reset()
-
+        # START(ID=638,NAME=TestCreateUserSetUpGetOrCreateGroup,TYPE=MERGE,OBJECTS=[Group])
         self.group, _ = Group.objects.get_or_create(name='Hydroshare Author')
+        # END(ID=638)
 
         self.admin = hydroshare.create_account(
             'admin@gmail.com',

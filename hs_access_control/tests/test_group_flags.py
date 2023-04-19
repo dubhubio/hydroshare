@@ -16,7 +16,9 @@ class T10GroupFlags(MockIRODSTestCaseMixin, TestCase):
     def setUp(self):
         super(T10GroupFlags, self).setUp()
         global_reset()
+        # START(ID=644,NAME=TestGroupFlagsSetUpGroup,TYPE=MERGE,OBJECTS=[Group])
         self.group, _ = Group.objects.get_or_create(name='Hydroshare Author')
+        # END(ID=644)
         self.admin = hydroshare.create_account(
             'admin@gmail.com',
             username='admin',
@@ -96,7 +98,9 @@ class T10GroupFlags(MockIRODSTestCaseMixin, TestCase):
         dog = self.dog
 
         felines.gaccess.discoverable = False
+        # START(ID=645,NAME=TestGroupFlagsTest06MakeNotDiscoverableFalse,TYPE=UPDATE,OBJECTS=[GroupAccess])
         felines.gaccess.save()
+        # END(ID=645)
 
         self.assertTrue(dog.uaccess.owns_group(felines))
         self.assertTrue(dog.uaccess.can_change_group(felines))
@@ -111,7 +115,9 @@ class T10GroupFlags(MockIRODSTestCaseMixin, TestCase):
 
         # undo prior change
         felines.gaccess.discoverable = True
+        # START(ID=646,NAME=TestGroupFlagsTest06MakeNotDiscoverableTrue,TYPE=UPDATE,OBJECTS=[GroupAccess])
         felines.gaccess.save()
+        # END(ID=646)
 
         self.assertTrue(dog.uaccess.owns_group(felines))
         self.assertTrue(dog.uaccess.can_change_group(felines))
@@ -131,7 +137,9 @@ class T10GroupFlags(MockIRODSTestCaseMixin, TestCase):
         dog = self.dog
 
         felines.gaccess.public = False
+        # START(ID=647,NAME=TestGroupFlagsTest07MakeNotPublicFalse,TYPE=UPDATE,OBJECTS=[GroupAccess])
         felines.gaccess.save()
+        # END(ID=647)
 
         self.assertTrue(dog.uaccess.owns_group(felines))
         self.assertTrue(dog.uaccess.can_change_group(felines))
@@ -146,7 +154,9 @@ class T10GroupFlags(MockIRODSTestCaseMixin, TestCase):
         self.assertTrue(felines not in hydroshare.get_public_groups())
 
         felines.gaccess.public = True
+        # START(ID=648,NAME=TestGroupFlagsTest07MakeNotPublicTrue,TYPE=UPDATE,OBJECTS=[GroupAccess])
         felines.gaccess.save()
+        # END(ID=648)
 
         self.assertTrue(dog.uaccess.owns_group(felines))
         self.assertTrue(dog.uaccess.can_change_group(felines))
@@ -167,7 +177,9 @@ class T10GroupFlags(MockIRODSTestCaseMixin, TestCase):
 
         felines.gaccess.public = False
         felines.gaccess.discoverable = False
+        # START(ID=649,NAME=TestGroupFlagsTest07MakePrivateTrue,TYPE=UPDATE,OBJECTS=[GroupAccess])
         felines.gaccess.save()
+        # END(ID=649)
 
         self.assertTrue(dog.uaccess.owns_group(felines))
         self.assertTrue(dog.uaccess.can_change_group(felines))
@@ -198,7 +210,9 @@ class T10GroupFlags(MockIRODSTestCaseMixin, TestCase):
 
         felines.gaccess.public = True
         felines.gaccess.discoverable = True
+        # START(ID=650,NAME=TestGroupFlagsTest07MakePrivateFalse,TYPE=UPDATE,OBJECTS=[GroupAccess])
         felines.gaccess.save()
+        # END(ID=650)
 
         self.assertTrue(dog.uaccess.owns_group(felines))
         self.assertTrue(dog.uaccess.can_change_group(felines))
@@ -217,7 +231,9 @@ class T10GroupFlags(MockIRODSTestCaseMixin, TestCase):
 
         # check shareable flag
         felines.gaccess.shareable = False
+        # START(ID=651,NAME=TestGroupFlagsTest08MakeNotShareableFalse,TYPE=UPDATE,OBJECTS=[GroupAccess])
         felines.gaccess.save()
+        # END(ID=651)
 
         self.assertTrue(dog.uaccess.owns_group(felines))
         self.assertTrue(dog.uaccess.can_change_group(felines))
@@ -232,7 +248,9 @@ class T10GroupFlags(MockIRODSTestCaseMixin, TestCase):
         self.assertTrue(self.admin.uaccess.can_view_group(felines))
 
         felines.gaccess.shareable = True
+        # START(ID=652,NAME=TestGroupFlagsTest08MakeNotShareableTrue,TYPE=UPDATE,OBJECTS=[GroupAccess])
         felines.gaccess.save()
+        # END(ID=652)
 
         self.assertTrue(dog.uaccess.owns_group(felines))
         self.assertTrue(dog.uaccess.can_change_group(felines))
@@ -447,5 +465,7 @@ class T10GroupFlags(MockIRODSTestCaseMixin, TestCase):
 
     def _set_group_active_status(self, group, active):
         group.gaccess.active = active
+        # START(ID=653,NAME=TestGroupFlagsSetGroupActiveStatus,TYPE=UPDATE,OBJECTS=[GroupAccess])
         group.gaccess.save()
+        # END(ID=653)
         self.assertEqual(group.gaccess.active, active)

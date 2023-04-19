@@ -22,7 +22,9 @@ class UnitTests(MockIRODSTestCaseMixin, TestCase):
     def setUp(self):
         super(UnitTests, self).setUp()
         global_reset()
+        # START(ID=691,NAME=TestProvenanceUnitsGetOrCreateGroup,TYPE=MERGE,OBJECTS=[Group])
         self.group, _ = Group.objects.get_or_create(name='Hydroshare Author')
+        # END(ID=691)
 
         self.alva = hydroshare.create_account(
             'alva@gmail.com',

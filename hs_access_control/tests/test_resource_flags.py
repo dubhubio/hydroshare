@@ -17,7 +17,9 @@ class T08ResourceFlags(MockIRODSTestCaseMixin, TestCase):
     def setUp(self):
         super(T08ResourceFlags, self).setUp()
         global_reset()
+        # START(ID=697,NAME=TestResourceFlagsSetUpCreateOrGet,TYPE=MERGE,OBJECTS=[Group])
         self.group, _ = Group.objects.get_or_create(name='Hydroshare Author')
+        # END(ID=697)
         self.admin = hydroshare.create_account(
             'admin@gmail.com',
             username='admin',
@@ -97,7 +99,9 @@ class T08ResourceFlags(MockIRODSTestCaseMixin, TestCase):
 
         # make bones not shareable
         bones.raccess.shareable = False
+        # START(ID=698,NAME=TestResourceFlagsTest02ShareableFalse,TYPE=UPDATE,OBJECTS=[ResourceAccess])
         bones.raccess.save()
+        # END(ID=698)
 
         # are resource flags correct?
         self.assertFalse(bones.raccess.immutable)
@@ -126,7 +130,9 @@ class T08ResourceFlags(MockIRODSTestCaseMixin, TestCase):
         bones = self.bones
         bat = self.bat
         bones.raccess.shareable = False
+        # START(ID=699,NAME=TestResourceFlagsTest03NotShareable,TYPE=UPDATE,OBJECTS=[ResourceAccess])
         bones.raccess.save()
+        # END(ID=699)
 
         dog.uaccess.share_resource_with_user(bones, cat, PrivilegeCodes.VIEW)
 
@@ -173,7 +179,9 @@ class T08ResourceFlags(MockIRODSTestCaseMixin, TestCase):
 
         # can I change discoverable?
         bones.raccess.discoverable = True
+        # START(ID=700,NAME=TestResourceFlagsTest05DiscoverableTrue,TYPE=UPDATE,OBJECTS=[ResourceAccess])
         bones.raccess.save()
+        # END(ID=700)
 
         self.assertFalse(bones.raccess.immutable)
         self.assertFalse(bones.raccess.public)
@@ -193,7 +201,9 @@ class T08ResourceFlags(MockIRODSTestCaseMixin, TestCase):
 
         bones.raccess.discoverable = False
         bones.raccess.public = False
+        # START(ID=701,NAME=TestResourceFlagsTest06DiscoverableFalse,TYPE=UPDATE,OBJECTS=[ResourceAccess])
         bones.raccess.save()
+        # END(ID=701)
 
         self.assertFalse(bones.raccess.immutable)
         self.assertFalse(bones.raccess.public)
@@ -212,7 +222,9 @@ class T08ResourceFlags(MockIRODSTestCaseMixin, TestCase):
         nobody = self.nobody
 
         bones.raccess.immutable = True
+        # START(ID=702,NAME=TestResourceFlagsTest07UmmutableTrue,TYPE=UPDATE,OBJECTS=[ResourceAccess])
         bones.raccess.save()
+        # END(ID=702)
 
         self.assertTrue(bones.raccess.immutable)
         self.assertFalse(bones.raccess.public)
@@ -239,7 +251,9 @@ class T08ResourceFlags(MockIRODSTestCaseMixin, TestCase):
 
         # undo immutable
         bones.raccess.immutable = False
+        # START(ID=703,NAME=TestResourceFlagsTest07UmmutableFalse,TYPE=UPDATE,OBJECTS=[ResourceAccess])
         bones.raccess.save()
+        # END(ID=703)
 
         self.assertFalse(bones.raccess.immutable)
         self.assertFalse(bones.raccess.public)
@@ -266,7 +280,9 @@ class T08ResourceFlags(MockIRODSTestCaseMixin, TestCase):
         self.assertTrue(chewies.raccess.shareable)
 
         chewies.raccess.public = True
+        # START(ID=704,NAME=TestResourceFlagsTest08PublicTrue,TYPE=UPDATE,OBJECTS=[ResourceAccess])
         chewies.raccess.save()
+        # END(ID=704)
 
         self.assertFalse(chewies.raccess.immutable)
         self.assertTrue(chewies.raccess.public)
@@ -304,7 +320,9 @@ class T08ResourceFlags(MockIRODSTestCaseMixin, TestCase):
         self.assertTrue(chewies.raccess.shareable)
 
         chewies.raccess.discoverable = True
+        # START(ID=705,NAME=TestResourceFlagsTest08DiscoverableTrue,TYPE=UPDATE,OBJECTS=[ResourceAccess])
         chewies.raccess.save()
+        # END(ID=705)
 
         self.assertFalse(chewies.raccess.immutable)
         self.assertFalse(chewies.raccess.public)
@@ -342,7 +360,9 @@ class T08ResourceFlags(MockIRODSTestCaseMixin, TestCase):
         """Tests UserAccess can_view_resource method with public and view permissions"""
         # public resources may always be copied
         self.chewies.raccess.public = True
+        # START(ID=706,NAME=TestResourceFlagsTest10CopyPermissions,TYPE=UPDATE,OBJECTS=[ResourceAccess])
         self.chewies.raccess.save()
+        # END(ID=706)
         self.assertTrue(self.cat.uaccess.can_view_resource(self.chewies))
         self.assertTrue(self.dog.uaccess.can_view_resource(self.chewies))
 

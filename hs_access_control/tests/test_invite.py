@@ -13,7 +13,9 @@ class TestRequest(TestCase):
     def setUp(self):
         super(TestRequest, self).setUp()
         global_reset()
+        # START(ID=675,NAME=TestInviteSetUpGetOrCreateGroup,TYPE=MERGE,OBJECTS=[Group])
         self.group, _ = Group.objects.get_or_create(name='Hydroshare Author')
+        # END(ID=675)
         self.admin = hydroshare.create_account(
             'admin@gmail.com',
             username='admin',
@@ -210,7 +212,9 @@ class TestRequest(TestCase):
         self.assertFalse(self.cats in self.pets.member_groups)
 
         message, success = request.approve(responder=self.cat)
+        # START(ID=676,NAME=TestInviteCommunityInviteToGroupGroupCommunityRequestApprove,TYPE=SELECT,OBJECTS=[GroupCommunityRequest])
         request = GroupCommunityRequest.objects.get(pk=request.pk)
+        # END(ID=676)
 
         expected = "Request to connect group '{}' to community '{}' {}.".format(
             self.cats.name, self.pets.name, 'approved')
@@ -257,7 +261,9 @@ class TestRequest(TestCase):
         self.assertFalse(self.cats in self.pets.member_groups)
 
         message, success = request.decline(responder=self.cat)
+        # START(ID=677,NAME=TestInviteCommunityInviteToGroupGroupCommunityRequestDecline,TYPE=SELECT,OBJECTS=[GroupCommunityRequest])
         request = GroupCommunityRequest.objects.get(pk=request.pk)
+        # END(ID=677)
 
         expected = "Request to connect group '{}' to community '{}' {}.".format(
             self.cats.name, self.pets.name, 'declined')
@@ -304,7 +310,9 @@ class TestRequest(TestCase):
         self.assertFalse(self.cats in self.pets.member_groups)
 
         message, success = request.approve(responder=self.dog)
+        # START(ID=678,NAME=TestInviteCommunityRequestToGroupGroupCommunityRequestApprove,TYPE=SELECT,OBJECTS=[GroupCommunityRequest])
         request = GroupCommunityRequest.objects.get(pk=request.pk)
+        # END(ID=678)
 
         expected = "Request to connect group '{}' to community '{}' {}.".format(
             self.cats.name, self.pets.name, 'approved')
@@ -351,7 +359,9 @@ class TestRequest(TestCase):
         self.assertFalse(self.cats in self.pets.member_groups)
 
         message, success = request.decline(responder=self.dog)
+        # START(ID=679,NAME=TestInviteCommunityRequestToGroupGroupCommunityRequestDecline,TYPE=SELECT,OBJECTS=[GroupCommunityRequest])
         request = GroupCommunityRequest.objects.get(pk=request.pk)
+        # END(ID=679)
 
         expected = "Request to connect group '{}' to community '{}' {}.".format(
             self.cats.name, self.pets.name, 'declined')
@@ -409,7 +419,9 @@ class TestRequest(TestCase):
         self.assertEqual(message, expected)
 
         # refresh objects to pick up async database changes
+        # START(ID=680,NAME=TestInviteCommunityRequestInviteThenRequest,TYPE=SELECT,OBJECTS=[GroupCommunityRequest])
         request = GroupCommunityRequest.objects.get(pk=request.pk)
+        # END(ID=680)
 
         self.assertTrue(isinstance(request, GroupCommunityRequest))
         self.assertEqual(request.community, self.pets)
@@ -463,7 +475,9 @@ class TestRequest(TestCase):
         self.assertEqual(message, expected)
 
         # refresh objects to pick up async database changes
+        # START(ID=681,NAME=TestInviteCommunityRequestRequestThenInvite,TYPE=SELECT,OBJECTS=[GroupCommunityRequest])
         request = GroupCommunityRequest.objects.get(pk=request.pk)
+        # END(ID=681)
 
         self.assertTrue(isinstance(request, GroupCommunityRequest))
         self.assertEqual(request.community, self.pets)
@@ -484,7 +498,9 @@ class TestRequest(TestCase):
         self.assertTrue(self.dog.uaccess.can_share_community_with_group(self.pets, self.dogs,
                                                                         PrivilegeCodes.VIEW))
         self.pets.auto_approve = True
+        # START(ID=682,NAME=TestInviteCommunityTestAutoApproval,TYPE=UPDATE,OBJECTS=[Community])
         self.pets.save()
+        # END(ID=682)
 
         message, approved = GroupCommunityRequest.create_or_update(
             group=self.cats, community=self.pets, requester=self.cat)

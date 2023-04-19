@@ -15,7 +15,9 @@ class T11PreserveOwnership(MockIRODSTestCaseMixin, TestCase):
     def setUp(self):
         super(T11PreserveOwnership, self).setUp()
         global_reset()
+        # START(ID=683,NAME=TestPreserveOwnershipSetUpGetOrCreate,TYPE=MERGE,OBJECTS=[Group])
         self.group, _ = Group.objects.get_or_create(name='Hydroshare Author')
+        # END(ID=683)
         self.admin = hydroshare.create_account(
             'admin@gmail.com',
             username='admin',

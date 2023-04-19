@@ -15,7 +15,9 @@ class T06ProtectGroup(MockIRODSTestCaseMixin, TestCase):
     def setUp(self):
         super(T06ProtectGroup, self).setUp()
         global_reset()
+        # START(ID=684,NAME=TestProtectGroupSetUpGetOrCreate,TYPE=MERGE,OBJECTS=[Group])
         self.group, _ = Group.objects.get_or_create(name='Hydroshare Author')
+        # END(ID=684)
         self.admin = hydroshare.create_account(
             'admin@gmail.com',
             username='admin',

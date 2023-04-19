@@ -15,7 +15,9 @@ class UserFeatures(MockIRODSTestCaseMixin, TestCase):
         super(UserFeatures, self).setUp()
 
         global_reset()
+        # START(ID=751,NAME=TestUserFeaturesSetUpGetCreateGroup,TYPE=MERGE,OBJECTS=[Group])
         self.group, _ = Group.objects.get_or_create(name='Hydroshare Author')
+        # END(ID=751)
         self.admin = hydroshare.create_account(
             'admin@gmail.com',
             username='admin',

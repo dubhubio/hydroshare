@@ -15,7 +15,9 @@ class T01PublicGroups(MockIRODSTestCaseMixin, TestCase):
     def setUp(self):
         super(T01PublicGroups, self).setUp()
         global_reset()
+        # START(ID=692,NAME=TestPublicGroupsGetOrCreateGroup,TYPE=MERGE,OBJECTS=[Group])
         self.group, _ = Group.objects.get_or_create(name='Hydroshare Author')
+        # END(ID=692)
         self.admin = hydroshare.create_account(
             'admin@gmail.com',
             username='admin',
@@ -88,7 +90,9 @@ class T01PublicGroups(MockIRODSTestCaseMixin, TestCase):
 
         # override policies for discoverable data
         self.posts.raccess.discoverable = True
+        # START(ID=693,NAME=TestPublicGroupsTest01GroupsPostsDiscoverableTrue,TYPE=UPDATE,OBJECTS=[ResourceAccess])
         self.posts.raccess.save()
+        # END(ID=693)
 
         # group should appear in list
         groups = GroupAccess.groups_with_public_resources()
@@ -99,7 +103,9 @@ class T01PublicGroups(MockIRODSTestCaseMixin, TestCase):
         self.assertTrue(is_equal_to_as_set([self.posts], resources))
 
         self.bones.raccess.discoverable = True
+        # START(ID=694,NAME=TestPublicGroupsTest01GroupsBonesDiscoverableTrue,TYPE=UPDATE,OBJECTS=[ResourceAccess])
         self.bones.raccess.save()
+        # END(ID=694)
 
         # Now group dogs should appear in list
         groups = GroupAccess.groups_with_public_resources()
@@ -121,7 +127,9 @@ class T01PublicGroups(MockIRODSTestCaseMixin, TestCase):
 
         # override policies for discoverable data
         self.posts.raccess.discoverable = True
+        # START(ID=695,NAME=TestPublicGroupsTest02CommunitiesPostsDiscoverableTrue,TYPE=UPDATE,OBJECTS=[ResourceAccess])
         self.posts.raccess.save()
+        # END(ID=695)
 
         # group should appear in list
         groups = self.pets.groups_with_public_resources()
@@ -132,7 +140,9 @@ class T01PublicGroups(MockIRODSTestCaseMixin, TestCase):
         self.assertTrue(is_equal_to_as_set([self.posts], resources))
 
         self.bones.raccess.discoverable = True
+        # START(ID=696,NAME=TestPublicGroupsTest02CommunitiesBonesDiscoverableTrue,TYPE=UPDATE,OBJECTS=[ResourceAccess])
         self.bones.raccess.save()
+        # END(ID=696)
 
         # Now group dogs should appear in list
         groups = self.pets.groups_with_public_resources()

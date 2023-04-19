@@ -16,7 +16,9 @@ class T05ShareResource(MockIRODSTestCaseMixin, TestCase):
     def setUp(self):
         super(T05ShareResource, self).setUp()
         global_reset()
+        # START(ID=707,NAME=TestShareResourceSetUpGetOrCreate,TYPE=MERGE,OBJECTS=[Group])
         self.group, _ = Group.objects.get_or_create(name='Hydroshare Author')
+        # END(ID=707)
         self.admin = hydroshare.create_account(
             'admin@gmail.com',
             username='admin',
@@ -75,8 +77,11 @@ class T05ShareResource(MockIRODSTestCaseMixin, TestCase):
         self.assertTrue(cat.uaccess.can_change_resource(holes))
         self.assertTrue(cat.uaccess.can_view_resource(holes))
         self.assertEqual(
+            # START(ID=708,NAME=TestShareResourceTest01UserCatUserResourcePrivilege,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
             1, UserResourcePrivilege.objects.filter(
-                user=cat, resource=holes).count())
+                user=cat, resource=holes).count()
+            # END(ID=708)
+            )
 
         self.assertTrue(is_equal_to_as_set([cat], holes.raccess.owners))
         self.assertTrue(is_equal_to_as_set([cat], holes.raccess.view_users))
@@ -107,8 +112,11 @@ class T05ShareResource(MockIRODSTestCaseMixin, TestCase):
         self.assertFalse(dog.uaccess.can_change_resource(holes))
         self.assertFalse(dog.uaccess.can_view_resource(holes))
         self.assertEqual(
+            # START(ID=709,NAME=TestShareResourceTest01UserDogUserResourcePrivilege,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
             0, UserResourcePrivilege.objects.filter(
-                user=dog, resource=holes).count())
+                user=dog, resource=holes).count()
+            # END(ID=709)
+            )
 
         # composite django state for dog
         self.assertFalse(dog.uaccess.can_change_resource(holes))
@@ -158,8 +166,11 @@ class T05ShareResource(MockIRODSTestCaseMixin, TestCase):
         self.assertTrue(cat.uaccess.can_change_resource(holes))
         self.assertTrue(cat.uaccess.can_view_resource(holes))
         self.assertEqual(
+            # START(ID=710,NAME=TestShareResourceTest02UserCatUserResourcePrivilege,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
             1, UserResourcePrivilege.objects.filter(
-                user=cat, resource=holes).count())
+                user=cat, resource=holes).count()
+            # END(ID=710)
+                )
 
         # composite django state for cat
         self.assertTrue(cat.uaccess.can_change_resource_flags(holes))
@@ -179,8 +190,11 @@ class T05ShareResource(MockIRODSTestCaseMixin, TestCase):
         self.assertFalse(dog.uaccess.can_change_resource(holes))
         self.assertFalse(dog.uaccess.can_view_resource(holes))
         self.assertEqual(
+            # START(ID=711,NAME=TestShareResourceTest02UserDogUserResourcePrivilege,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
             0, UserResourcePrivilege.objects.filter(
-                user=dog, resource=holes).count())
+                user=dog, resource=holes).count()
+            # END(ID=711)
+                )
 
         # composite django state for dog
         self.assertFalse(dog.uaccess.can_change_resource_flags(holes))
@@ -234,8 +248,11 @@ class T05ShareResource(MockIRODSTestCaseMixin, TestCase):
         self.assertTrue(cat.uaccess.can_change_resource(holes))
         self.assertTrue(cat.uaccess.can_view_resource(holes))
         self.assertEqual(
+            # START(ID=712,NAME=TestShareResourceTest02UserCatSecondUserResourcePrivilege,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
             1, UserResourcePrivilege.objects.filter(
-                user=cat, resource=holes).count())
+                user=cat, resource=holes).count()
+            # END(ID=712)    
+            )
 
         # composite django state for cat
         self.assertTrue(cat.uaccess.can_change_resource_flags(holes))
@@ -255,11 +272,17 @@ class T05ShareResource(MockIRODSTestCaseMixin, TestCase):
         self.assertTrue(dog.uaccess.can_change_resource(holes))
         self.assertTrue(dog.uaccess.can_view_resource(holes))
         self.assertEqual(
+            # START(ID=713,NAME=TestShareResourceTest02UserDogSecondUserResourcePrivilege,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
             1, UserResourcePrivilege.objects.filter(
-                user=dog, resource=holes).count())
+                user=dog, resource=holes).count()
+            # END(ID=713)    
+            )
         self.assertEqual(
+            # START(ID=714,NAME=TestShareResourceTest02UserCatDogSecondUserResourcePrivilege,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
             cat, UserResourcePrivilege.objects.get(
-                user=dog, resource=holes).grantor)
+                user=dog, resource=holes).grantor
+            # END(ID=714) 
+            )
 
         # composite django state for dog
         self.assertTrue(dog.uaccess.can_change_resource_flags(holes))
@@ -317,11 +340,17 @@ class T05ShareResource(MockIRODSTestCaseMixin, TestCase):
         self.assertTrue(dog.uaccess.can_change_resource(holes))
         self.assertTrue(dog.uaccess.can_view_resource(holes))
         self.assertEqual(
+            # START(ID=715,NAME=TestShareResourceTest02SimplePrivilegeDogCount,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
             1, UserResourcePrivilege.objects.filter(
-                user=dog, resource=holes).count())
+                user=dog, resource=holes).count()
+            # END(ID=715)     
+            )
         self.assertEqual(
+            # START(ID=716,NAME=TestShareResourceTest02SimplePrivilegeDogGrantor,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
             cat, UserResourcePrivilege.objects.get(
-                user=dog, resource=holes).grantor)
+                user=dog, resource=holes).grantor
+            # END(ID=716)    
+                )
 
         # composite django state for dog
         self.assertTrue(dog.uaccess.can_change_resource_flags(holes))
@@ -385,8 +414,11 @@ class T05ShareResource(MockIRODSTestCaseMixin, TestCase):
         self.assertFalse(dog.uaccess.can_change_resource(holes))
         self.assertFalse(dog.uaccess.can_view_resource(holes))
         self.assertEqual(
+            # START(ID=717,NAME=TestShareResourceTest03SimplePrivilegeDogCount,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
             0, UserResourcePrivilege.objects.filter(
-                user=dog, resource=holes).count())
+                user=dog, resource=holes).count()
+            # END(ID=717)  
+                )
 
         # composite django state for dog
         self.assertFalse(dog.uaccess.can_change_resource_flags(holes))
@@ -2333,14 +2365,18 @@ class T05ShareResource(MockIRODSTestCaseMixin, TestCase):
             holes, meowers, PrivilegeCodes.VIEW)
 
         # format sharing record for user
+        # START(ID=718,NAME=TestShareResourceTest15UserResourcePrivilegeGet,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
         foo = str(UserResourcePrivilege.objects.get(user=cat, resource=holes))
+        # END(ID=718)  
         self.assertTrue(foo.find(holes.short_id) >= 0)
 
         # format sharing record for group
+        # START(ID=719,NAME=TestShareResourceTest15GroupResourcePrivilegeGet,TYPE=SELECT,OBJECTS=[GroupResourcePrivilege])
         foo = str(
             GroupResourcePrivilege.objects.get(
                 group=meowers,
                 resource=holes))
+        # END(ID=719)
         self.assertTrue(foo.find(holes.short_id) >= 0)
 
     def test_privilege_to_string(self):

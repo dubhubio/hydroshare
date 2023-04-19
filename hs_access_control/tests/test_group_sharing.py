@@ -16,7 +16,9 @@ class T09GroupSharing(MockIRODSTestCaseMixin, TestCase):
     def setUp(self):
         super(T09GroupSharing, self).setUp()
         global_reset()
+        # START(ID=672,NAME=TestGroupSharingSetUpGetORCreateGroup,TYPE=MERGE,OBJECTS=[Group])
         self.group, _ = Group.objects.get_or_create(name='Hydroshare Author')
+        # END(ID=672)
         self.admin = hydroshare.create_account(
             'admin@gmail.com',
             username='admin',
@@ -176,10 +178,14 @@ class T09GroupSharing(MockIRODSTestCaseMixin, TestCase):
             scratching, felines, PrivilegeCodes.CHANGE)
 
         text = str(
+            # START(ID=673,NAME=TestGroupSharingGroupSharePrintingGroupResourcePrivilege,TYPE=SELECT,OBJECTS=[GroupResourcePrivilege])
             GroupResourcePrivilege.objects.get(
                 resource=scratching,
-                group=felines))
+                group=felines)
+            # END(ID=673)
+                )
         self.assertTrue(text.find(felines.name) >= 0)
-
+        # START(ID=674,NAME=TestGroupSharingGroupSharePrintingUserGroupPrivilege,TYPE=SELECT,OBJECTS=[UserGroupPrivilege])
         text = str(UserGroupPrivilege.objects.get(user=dog, group=felines))
+        # END(ID=674)
         self.assertTrue(text.find(felines.name) >= 0)

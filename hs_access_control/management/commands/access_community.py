@@ -191,12 +191,10 @@ class Command(BaseCommand):
                     # START(ID=407,NAME=AccessCommunityCommunityUpdatePurpose,TYPE=UPDATE,OBJECTS=[Community])
                     community.save()
                     # END(ID=407)
-                # START(ID=437,NAME=AccessCommunityUpdateUserCommunityPrivilege,TYPE=UPDATE,OBJECTS=[UserCommunityPrivilege])
                 UserCommunityPrivilege.update(user=owner,
                                               community=community,
                                               privilege=PrivilegeCodes.OWNER,
                                               grantor=owner)
-                # END(ID=437)
             else:  # if it does not exist, create it
                 if options['description'] is not None:
                     description = options['description']

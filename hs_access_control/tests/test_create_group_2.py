@@ -13,7 +13,9 @@ class T15CreateGroup(MockIRODSTestCaseMixin, TestCase):
     def setUp(self):
         super(T15CreateGroup, self).setUp()
         global_reset()
+        # START(ID=617,NAME=TestCreateGroup2SetUpGetGroup,TYPE=MERGE,OBJECTS=[Group])
         self.group, _ = Group.objects.get_or_create(name='Hydroshare Author')
+        # END(ID=617)
         self.admin = hydroshare.create_account(
             'admin@gmail.com',
             username='admin',
@@ -77,7 +79,9 @@ class T15CreateGroup(MockIRODSTestCaseMixin, TestCase):
 
         # now set it to non-public
         meowers.gaccess.public = False
+        # START(ID=618,NAME=Test03ChangeGroupNotPublic,TYPE=UPDATE,OBJECTS=[Group])
         meowers.gaccess.save()
+        # END(ID=618)
 
         # check flags
         self.assertFalse(meowers.gaccess.public)
@@ -104,7 +108,9 @@ class T15CreateGroup(MockIRODSTestCaseMixin, TestCase):
 
         # now set it to non-discoverable
         meowers.gaccess.discoverable = False
+        # START(ID=619,NAME=Test03ChangeGroupNotDiscoverable,TYPE=UPDATE,OBJECTS=[Group])
         meowers.gaccess.save()
+        # END(ID=619)
 
         # check flags
         self.assertTrue(meowers.gaccess.public)

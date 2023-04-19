@@ -12,7 +12,9 @@ class GroupMembershipRequest(MockIRODSTestCaseMixin, TestCase):
 
     def setUp(self):
         super(GroupMembershipRequest, self).setUp()
+        # START(ID=654,NAME=TestGroupMembershipRequestGetOrCreateGroup,TYPE=MERGE,OBJECTS=[Group])
         self.group, _ = Group.objects.get_or_create(name='Hydroshare Author')
+        # END(ID=654)
         self.admin = hydroshare.create_account(
             'admin@gmail.com',
             username='admin',
@@ -449,7 +451,9 @@ class GroupMembershipRequest(MockIRODSTestCaseMixin, TestCase):
     def test_user_sending_invitation_without_explanation(self):
         # require explanation on the group
         self.modeling_group.gaccess.requires_explanation = True
+        # START(ID=655,NAME=TestGroupMembershipRequestInvitationWithoutExplanation,TYPE=UPDATE,OBJECTS=[GroupAccess])
         self.modeling_group.gaccess.save()
+        # END(ID=655)
 
         # lisa should should not be one of the members
         self.assertNotIn(
@@ -518,7 +522,9 @@ class GroupMembershipRequest(MockIRODSTestCaseMixin, TestCase):
 
         # set the modeling group for auto membership approval
         self.modeling_group.gaccess.auto_approve = True
+        # START(ID=656,NAME=TestGroupMembershipRequestUserSendAutoApprovalTrue,TYPE=UPDATE,OBJECTS=[GroupAccess])
         self.modeling_group.gaccess.save()
+        # END(ID=656)
 
         # let lisa send a membership request to join modeling group - which is an auto
         # membership approval group
@@ -693,7 +699,9 @@ class GroupMembershipRequest(MockIRODSTestCaseMixin, TestCase):
         # inactive user can't make request to join a group - PermissionDenied
         # exception
         self.lisa_group_member.is_active = False
+        # START(ID=657,NAME=TestGroupMembershipRequestInactiveUserIsActiveFalse,TYPE=UPDATE,OBJECTS=[User])
         self.lisa_group_member.save()
+        # END(ID=657)
         # lisa should not be one of the members
         self.assertNotIn(
             self.lisa_group_member,
@@ -705,12 +713,16 @@ class GroupMembershipRequest(MockIRODSTestCaseMixin, TestCase):
         # inactive user can't accept/decline request to join a group -
         # PermissionDenied exception
         self.lisa_group_member.is_active = True
+        # START(ID=658,NAME=TestGroupMembershipRequestInactiveUserIsActiveTrue,TYPE=UPDATE,OBJECTS=[User])
         self.lisa_group_member.save()
+        # END(ID=658)
         # let the group owner (mike) send a membership invitation to user lisa
         membership_request = self.mike_group_owner.uaccess.create_group_membership_request(
             self.modeling_group, self.lisa_group_member)
         self.lisa_group_member.is_active = False
+        # START(ID=659,NAME=TestGroupMembershipRequestInactiveUserIsActiveFalseAfterMembershipRequest,TYPE=UPDATE,OBJECTS=[User])
         self.lisa_group_member.save()
+        # END(ID=659)
         with self.assertRaises(PermissionDenied):
             self.lisa_group_member.uaccess.act_on_group_membership_request(
                 membership_request, accept_request=True)
@@ -722,9 +734,13 @@ class GroupMembershipRequest(MockIRODSTestCaseMixin, TestCase):
         # inactive group owner can't invite user to join a group -
         # PermissionDenied exception
         self.mike_group_owner.is_active = False
+        # START(ID=660,NAME=TestGroupMembershipRequestInactiveUserIsActiveFalsePermissionDenied,TYPE=UPDATE,OBJECTS=[User])
         self.mike_group_owner.save()
+        # END(ID=660)
         self.lisa_group_member.is_active = True
+        # START(ID=661,NAME=TestGroupMembershipRequestInactiveUserIsActiveTruePermissionDenied,TYPE=UPDATE,OBJECTS=[User])
         self.lisa_group_member.save()
+        # END(ID=661)
         with self.assertRaises(PermissionDenied):
             self.mike_group_owner.uaccess.create_group_membership_request(
                 self.modeling_group, self.lisa_group_member)
@@ -751,7 +767,9 @@ class GroupMembershipRequest(MockIRODSTestCaseMixin, TestCase):
         self.assertIn(kelly_membership_request,
                       self.modeling_group.gaccess.group_membership_requests)
         self.kelly_group_member.is_active = False
+        # START(ID=662,NAME=TestGroupMembershipRequestInactiveUserIsActiveFalseKelly,TYPE=UPDATE,OBJECTS=[User])
         self.kelly_group_member.save()
+        # END(ID=662)
 
         # john acts on the existing request
         with self.assertRaises(PermissionDenied):
@@ -760,7 +778,9 @@ class GroupMembershipRequest(MockIRODSTestCaseMixin, TestCase):
 
         # reactivate kelly
         self.kelly_group_member.is_active = True
+        # START(ID=663,NAME=TestGroupMembershipRequestInactiveUserIsActiveTrueKelly,TYPE=UPDATE,OBJECTS=[User])
         self.kelly_group_member.save()
+        # END(ID=663)
 
         # Kelly has no active membership requests
         self.assertEqual(

@@ -24,18 +24,42 @@ from hs_core.models import BaseResource
 
 
 def global_reset():
+    # START(ID=752,NAME=UtilitiesGlobalResetUserResourcePrivilege,TYPE=DELETE,OBJECTS=[UserResourcePrivilege])
     UserResourcePrivilege.objects.all().delete()
+    # END(ID=752)
+    # START(ID=753,NAME=UtilitiesGlobalResetUserGroupPrivilege,TYPE=DELETE,OBJECTS=[UserGroupPrivilege])
     UserGroupPrivilege.objects.all().delete()
+    # END(ID=753)
+    # START(ID=754,NAME=UtilitiesGlobalResetUserGroupResourcePrivilege,TYPE=DELETE,OBJECTS=[GroupResourcePrivilege])
     GroupResourcePrivilege.objects.all().delete()
+    # END(ID=754)
+    # START(ID=755,NAME=UtilitiesGlobalResetUserResourceProvenance,TYPE=DELETE,OBJECTS=[UserResourceProvenance])
     UserResourceProvenance.objects.all().delete()
+    # END(ID=755)
+    # START(ID=756,NAME=UtilitiesGlobalResetUserGroupProvenance,TYPE=DELETE,OBJECTS=[UserGroupProvenance])
     UserGroupProvenance.objects.all().delete()
+    # END(ID=756)
+    # START(ID=757,NAME=UtilitiesGlobalResetGroupResourceProvenance,TYPE=DELETE,OBJECTS=[GroupResourceProvenance])
     GroupResourceProvenance.objects.all().delete()
+    # END(ID=757)
+    # START(ID=758,NAME=UtilitiesGlobalResetUserAccess,TYPE=DELETE,OBJECTS=[UserAccess])
     UserAccess.objects.all().delete()
+    # END(ID=758)
+    # START(ID=759,NAME=UtilitiesGlobalResetGroupAccess,TYPE=DELETE,OBJECTS=[GroupAccess])
     GroupAccess.objects.all().delete()
+    # END(ID=759)
+    # START(ID=760,NAME=UtilitiesGlobalResetResourceAccess,TYPE=DELETE,OBJECTS=[ResourceAccess])
     ResourceAccess.objects.all().delete()
+    # END(ID=760)
+    # START(ID=761,NAME=UtilitiesGlobalResetUser,TYPE=DELETE,OBJECTS=[User])
     User.objects.all().delete()
+    # END(ID=761)
+    # START(ID=762,NAME=UtilitiesGlobalResetGroup,TYPE=DELETE,OBJECTS=[Group])
     Group.objects.all().delete()
+    # END(ID=762)
+    # START(ID=763,NAME=UtilitiesGlobalResetBaseResource,TYPE=DELETE,OBJECTS=[BaseResource])
     BaseResource.objects.all().delete()
+    # END(ID=763)
 
 
 def is_equal_to_as_set(l1, l2):
@@ -781,14 +805,22 @@ def assertUserResourceUnshareCoherence(self):
     :param self: an instance of testCase
     :return: None
     """
+    # START(ID=764,NAME=UtilitiesAssertUserResourceUnshareCoherenceGetAllBaseResource,TYPE=SELECT,OBJECTS=[BaseResource])
     for r in BaseResource.objects.all():  # all resources
+    # END(ID=764)
+        # START(ID=765,NAME=UtilitiesAssertUserResourceUnshareCoherenceGetAllInstigationUser,TYPE=SELECT,OBJECTS=[User])
         for u in User.objects.all():  # all instigating users
+        # END(ID=765)
+            # START(ID=766,NAME=UtilitiesAssertUserResourceUnshareCoherenceGetAllTargetUser,TYPE=SELECT,OBJECTS=[User])
             for v in User.objects.all():  # all target users
+            # END(ID=766)
                 if u.uaccess.can_unshare_resource_with_user(r, v):
                     self.assertTrue(
                         v in u.uaccess.get_resource_unshare_users(r))
+                    # START(ID=767,NAME=UtilitiesAssertUserResourceUnshareCoherenceUserResourcePrivilegeRecord,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
                     record = UserResourcePrivilege.objects.get(
                         user=v, resource=r)
+                    # END(ID=767)
                     if u != v and not u.is_superuser and record.grantor != v:
                         # can only undo unshare in this case(!)
                         u.uaccess.unshare_resource_with_user(r, v)
@@ -811,13 +843,21 @@ def assertUserGroupUnshareCoherence(self):
     :param self: an instance of testCase
     :return: None
     """
+    # START(ID=768,NAME=UtilitiesAssertUserGroupUnshareCoherenceGetAllGroup,TYPE=SELECT,OBJECTS=[Group])
     for g in Group.objects.all().exclude(
             pk=self.group.pk):  # all groups except Hydroshare Author
+    # END(ID=768)
+        # START(ID=769,NAME=UtilitiesAssertUserGroupUnshareCoherenceGetAllInstigatingUser,TYPE=SELECT,OBJECTS=[User])
         for u in User.objects.all():  # all instigating users
+        # END(ID=769)
+            # START(ID=770,NAME=UtilitiesAssertUserGroupUnshareCoherenceGetAllTargetUser,TYPE=SELECT,OBJECTS=[User])
             for v in User.objects.all():  # all target users
+            # END(ID=770)
                 if u.uaccess.can_unshare_group_with_user(g, v):
                     self.assertTrue(v in u.uaccess.get_group_unshare_users(g))
+                    # START(ID=771,NAME=UtilitiesAssertUserGroupUnshareCoherenceUserGroupPrivilegeRecord,TYPE=SELECT,OBJECTS=[UserGroupPrivilege])
                     record = UserGroupPrivilege.objects.get(user=v, group=g)
+                    # END(ID=771)
                     if u != v and not u.is_superuser and record.grantor != v:
                         # can only undo unshare in this case(!)
                         u.uaccess.unshare_group_with_user(g, v)
@@ -839,15 +879,23 @@ def assertGroupResourceUnshareCoherence(self):
     :param self: an instance of testCase
     :return: None
     """
+    # START(ID=772,NAME=UtilitiesAssertGroupResourceUnshareCoherenceGetAllBaseResource,TYPE=SELECT,OBJECTS=[BaseResource])
     for r in BaseResource.objects.all():  # all resources
+    # END(ID=772)
+        # START(ID=773,NAME=UtilitiesAssertGroupResourceUnshareCoherenceGetAllInstigatingUser,TYPE=SELECT,OBJECTS=[User])
         for u in User.objects.all():  # all instigating users
+        # END(ID=773)
+            # START(ID=774,NAME=UtilitiesAssertGroupResourceUnshareCoherenceGetAllGroup,TYPE=SELECT,OBJECTS=[Group])
             for g in Group.objects.all().exclude(
                     pk=self.group.pk):  # all groups except "author"
+            # END(ID=774)
                 if u.uaccess.can_unshare_resource_with_group(r, g):
                     self.assertTrue(
                         g in u.uaccess.get_resource_unshare_groups(r))
+                    # START(ID=775,NAME=UtilitiesAssertGroupResourceUnshareCoherenceGetAllGroupResourcePrivilege,TYPE=SELECT,OBJECTS=[GroupResourcePrivilege])
                     record = GroupResourcePrivilege.objects.get(
                         group=g, resource=r)
+                    # END(ID=775)
                     # can only undo unshare in this case(!)
                     if not u.is_superuser:
                         u.uaccess.unshare_resource_with_group(r, g)
@@ -861,22 +909,34 @@ def assertGroupResourceUnshareCoherence(self):
 
 
 def check_provenance_synchronization(self):
+    # START(ID=776,NAME=UtilitiesCheckProvenanceSynchronizationGetAllUsersForBaseResource,TYPE=SELECT,OBJECTS=[User])
     for u in User.objects.all():
+    # END(ID=776)
+        # START(ID=777,NAME=UtilitiesCheckProvenanceSynchronizationGetAllBaseResource,TYPE=SELECT,OBJECTS=[BaseResource])
         for r in BaseResource.objects.all():
+        # END(ID=777)
             prov = UserResourceProvenance.get_privilege(resource=r, user=u)
             priv = UserResourcePrivilege.get_privilege(resource=r, user=u)
             self.assertEqual(prov, priv,
                              str.format("prov={}, priv={}, resource={}, user={}",
                                         prov, priv, r, u))
+    # START(ID=778,NAME=UtilitiesCheckProvenanceSynchronizationGetAllUsersForGroup,TYPE=SELECT,OBJECTS=[User])
     for u in User.objects.all():
+    # END(ID=778)
+        # START(ID=779,NAME=UtilitiesCheckProvenanceSynchronizationGetAllGroup,TYPE=SELECT,OBJECTS=[Group])
         for g in Group.objects.all():
+        # END(ID=779)
             prov = UserGroupProvenance.get_privilege(group=g, user=u)
             priv = UserGroupPrivilege.get_privilege(group=g, user=u)
             self.assertEqual(prov, priv,
                              str.format("prov={}, priv={}, group={}, user={}",
                                         prov, priv, g, u))
+    # START(ID=780,NAME=UtilitiesCheckProvenanceSynchronizationGetAllGroupForBaseResource,TYPE=SELECT,OBJECTS=[Group])
     for g in Group.objects.all():
+    # END(ID=780)
+        # START(ID=781,NAME=UtilitiesCheckProvenanceSynchronizationGetAllBaseResourceFromGroupLoop,TYPE=SELECT,OBJECTS=[BaseResource])
         for r in BaseResource.objects.all():
+        # END(ID=781)
             prov = GroupResourceProvenance.get_privilege(resource=r, group=g)
             priv = GroupResourcePrivilege.get_privilege(resource=r, group=g)
             self.assertEqual(prov, priv,
@@ -887,7 +947,9 @@ def check_provenance_synchronization(self):
 def printGroupResourceProvenance():
     print("===================================")
     print("GroupResourcePrivilege")
+    # START(ID=782,NAME=UtilitiesPrintGroupResourcePrivilegePrivOrderBy,TYPE=SELECT,OBJECTS=[GroupResourcePrivilege])
     priv = GroupResourcePrivilege.objects.all().order_by('group__id', 'resource__id')
+    # END(ID=782)
     o = None
     for p in priv:
         if o is not None and (p.group != o.group or p.resource != o.resource):
@@ -896,8 +958,10 @@ def printGroupResourceProvenance():
         o = p
     print("===================================")
     print("GroupResourceProvenance")
+    # START(ID=783,NAME=UtilitiesPrintGroupResourceProvenanceProvOrderBy,TYPE=SELECT,OBJECTS=[GroupResourceProvenance])
     prov = GroupResourceProvenance.objects.all().order_by(
         'group__id', 'resource__id', 'start')
+    # END(ID=783)
     o = None
     for p in prov:
         if o is not None and (p.group != o.group or p.resource != o.resource):
@@ -914,7 +978,9 @@ def printGroupResourceProvenance():
 def printUserResourceProvenance():
     print("===================================")
     print("UserResourcePrivilege")
+    # START(ID=784,NAME=UtilitiesPrintUserResourcePrivilegePrivOrderBy,TYPE=SELECT,OBJECTS=[UserResourcePrivilege])
     priv = UserResourcePrivilege.objects.all().order_by('user__id', 'resource__id')
+    # END(ID=784)
     o = None
     for p in priv:
         if o is not None and (p.user != o.user or p.resource != o.resource):
@@ -923,8 +989,10 @@ def printUserResourceProvenance():
         o = p
     print("===================================")
     print("UserResourceProvenance")
+    # START(ID=785,NAME=UtilitiesPrintUserResourceProvenanceProvOrderBy,TYPE=SELECT,OBJECTS=[UserResourceProvenance])
     prov = UserResourceProvenance.objects.all().order_by(
         'user__id', 'resource__id', 'start')
+    # END(ID=785)
     o = None
     for p in prov:
         if o is not None and (p.user != o.user or p.resource != o.resource):
@@ -941,7 +1009,9 @@ def printUserResourceProvenance():
 def printUserGroupProvenance():
     print("===================================")
     print("UserGroupPrivilege")
+    # START(ID=786,NAME=UtilitiesPrintUserGroupPrivilegePrivOrderBy,TYPE=SELECT,OBJECTS=[UserGroupPrivilege])
     priv = UserGroupPrivilege.objects.all().order_by('user__id', 'group__id')
+    # END(ID=786)
     o = None
     for p in priv:
         if o is not None and (p.user != o.user or p.group != o.group):
@@ -950,8 +1020,10 @@ def printUserGroupProvenance():
         o = p
     print("===================================")
     print("UserGroupProvenance")
+    # START(ID=787,NAME=UtilitiesPrintUserGroupProvenanceProvOrderBy,TYPE=SELECT,OBJECTS=[UserGroupProvenance])
     prov = UserGroupProvenance.objects.all().order_by(
         'user__id', 'group__id', 'start')
+    # END(ID=787)
     o = None
     for p in prov:
         if o is not None and (p.user != o.user or p.group != o.group):

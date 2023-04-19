@@ -224,7 +224,9 @@ class UserAccess(models.Model):
 
         if not user_to_join_group.is_active:
             this_request.redeemed = True
+            # START(ID=558,NAME=UserActoOnGRoupMembershipRequestThisRequestTrue,TYPE=UPDATE,OBJECTS=[GroupMembershipRequest])
             this_request.save()
+            # END(ID=558)
             raise PermissionDenied("User to be granted group membership is not active")
 
         if not this_request.group_to_join.gaccess.active:
@@ -262,7 +264,9 @@ class UserAccess(models.Model):
                 this_privilege=PrivilegeCodes.VIEW,
             )
         this_request.redeemed = True
+        # START(ID=559,NAME=UserActOnGRoupMembershipRequestThisRequestRedeemedTrue,TYPE=UPDATE,OBJECTS=[GroupMembershipRequest])
         this_request.save()
+        # END(ID=559)
 
     @property
     def group_membership_requests(self):
@@ -361,8 +365,9 @@ class UserAccess(models.Model):
             # GroupCommunityPrivilege.objects.filter(group=this_group).delete()
             # GroupResourcePrivilege.objects.filter(group=this_group).delete()
             # access_group.delete()
-
+            # START(ID=561,NAME=UserDeleteGroup,TYPE=DELETE,OBJECTS=[Group])
             this_group.delete()
+            # END(ID=561)
         else:
             raise PermissionDenied("User must own group")
 
@@ -4329,7 +4334,9 @@ class UserAccess(models.Model):
             # and set the enabled flag if the feature already exists.
             if not create:
                 record.enabled = enabled
+                # START(ID=560,NAME=UserCustomizeFeatureUpdate,TYPE=UPDATE,OBJECTS=[Feature])
                 record.save()
+                # END(ID=560)
 
     def uncustomize(self, feature):
         """remove a custom UI option; this makes it unavailable to a user"""
@@ -4337,7 +4344,9 @@ class UserAccess(models.Model):
             # START(ID=556,NAME=UserUncustomizeFeatureGet,TYPE=SELECT,OBJECTS=[Feature])
             record = Feature.objects.get(user=self.user, feature=feature)
             # END(ID=556)
+            # START(ID=562,NAME=UserUncustomizeDeleteFeature,TYPE=DELETE,OBJECTS=[Feature])
             record.delete()
+            # END(ID=562)
         except Feature.DoesNotExist:
             pass
 

@@ -234,20 +234,16 @@ class ProvenanceBase(models.Model):
         previous = cls.__get_prev_record(**kwargs)
         if previous is not None:
             # create a rollback record that reinstates the previous privilege.
-            # START(ID=471,NAME=ProvenanceUndoShareUpdateClsProvenanceBasePreviousNotNone,TYPE=UPDATE,OBJECTS=[ProvenanceBase])
             cls.update(privilege=previous.privilege,
                        grantor=previous.grantor,
                        undone=True,
                        **kwargs)
-            # END(ID=471)
         else:
             # put in a record revoking all privilege -- cannot be undone
-            # START(ID=472,NAME=ProvenanceUndoShareUpdateClsProvenanceBasePreviousNone,TYPE=UPDATE,OBJECTS=[ProvenanceBase])
             cls.update(privilege=PrivilegeCodes.NONE,
                        grantor=None,
                        undone=True,
                        **kwargs)
-            # END(ID=472)
 
     @classmethod
     def share(cls, **kwargs):
@@ -274,9 +270,7 @@ class ProvenanceBase(models.Model):
         Note that this does not modify the *Privilege class accordingly.
         That must be done separately.
         """
-        # START(ID=473,NAME=ProvenanceShareUpdateClsProvenanceBase,TYPE=UPDATE,OBJECTS=[ProvenanceBase])
         cls.update(**kwargs)
-        # END(ID=473)
 
     @classmethod
     def unshare(cls, **kwargs):
@@ -312,9 +306,8 @@ class ProvenanceBase(models.Model):
         That must be done separately.
 
         """
-        # START(ID=474,NAME=ProvenanceUnShareUpdateClsProvenanceBase,TYPE=UPDATE,OBJECTS=[ProvenanceBase])
         cls.update(privilege=PrivilegeCodes.NONE, **kwargs)
-        # END(ID=474)
+
 
 
 class UserGroupProvenance(ProvenanceBase):
@@ -421,13 +414,11 @@ class UserGroupProvenance(ProvenanceBase):
             assert isinstance(user, User)
             assert grantor is None or isinstance(grantor, User)
             assert privilege >= PrivilegeCodes.OWNER and privilege <= PrivilegeCodes.NONE
-        # START(ID=475,NAME=ProvenanceUpdateClsUserGroupProvenance,TYPE=UPDATE,OBJECTS=[UserGroupProvenance])
         super(UserGroupProvenance, cls).update(group=group,
                                                user=user,
                                                privilege=privilege,
                                                grantor=grantor,
                                                undone=undone)
-        # END(ID=475)
 
 
 class UserResourceProvenance(ProvenanceBase):
@@ -529,14 +520,12 @@ class UserResourceProvenance(ProvenanceBase):
             assert isinstance(user, User)
             assert grantor is None or isinstance(grantor, User)
             assert privilege >= PrivilegeCodes.OWNER and privilege <= PrivilegeCodes.NONE
-        # START(ID=476,NAME=ProvenanceUpdateUpdateClsUserResourceProvenance,TYPE=UPDATE,OBJECTS=[UserResourceProvenance])
         super(UserResourceProvenance, cls).update(resource=resource,
                                                   user=user,
                                                   privilege=privilege,
                                                   grantor=grantor,
                                                   undone=undone,
                                                   exhibit=exhibit)
-        # END(ID=476)
 
 class GroupResourceProvenance(ProvenanceBase):
     """
@@ -640,15 +629,12 @@ class GroupResourceProvenance(ProvenanceBase):
             assert isinstance(resource, BaseResource)
             assert isinstance(group, Group)
             assert grantor is None or isinstance(grantor, User)
-            assert privilege >= PrivilegeCodes.OWNER and privilege <= PrivilegeCodes.NONE
-        # START(ID=477,NAME=ProvenanceUpdateUpdateClsGroupResourceProvenance,TYPE=UPDATE,OBJECTS=[GroupResourceProvenance])
         super(GroupResourceProvenance, cls).update(resource=resource,
                                                    group=group,
                                                    privilege=privilege,
                                                    grantor=grantor,
                                                    undone=undone,
                                                    exhibit=exhibit)
-        # END(ID=477)
 
 
 class UserCommunityProvenance(ProvenanceBase):
@@ -756,13 +742,11 @@ class UserCommunityProvenance(ProvenanceBase):
             assert isinstance(community, Community)
             assert grantor is None or isinstance(grantor, User)
             assert privilege >= PrivilegeCodes.OWNER and privilege <= PrivilegeCodes.NONE
-        # START(ID=478,NAME=ProvenanceUpdateUpdateClsUserCommunityProvenance,TYPE=UPDATE,OBJECTS=[UserCommunityProvenance])
         super(UserCommunityProvenance, cls).update(user=user,
                                                    community=community,
                                                    privilege=privilege,
                                                    grantor=grantor,
                                                    undone=undone)
-        # END(ID=478)
 
 
 class GroupCommunityProvenance(ProvenanceBase):
@@ -870,13 +854,11 @@ class GroupCommunityProvenance(ProvenanceBase):
             assert isinstance(community, Community)
             assert grantor is None or isinstance(grantor, User)
             assert privilege >= PrivilegeCodes.OWNER and privilege <= PrivilegeCodes.NONE
-        # START(ID=479,NAME=ProvenanceUpdateUpdateClsGroupCommunityProvenance,TYPE=UPDATE,OBJECTS=[GroupCommunityProvenance])
         super(GroupCommunityProvenance, cls).update(group=group,
                                                     community=community,
                                                     privilege=privilege,
                                                     grantor=grantor,
                                                     undone=undone)
-        # END(ID=479)
 
 
 class CommunityResourceProvenance(ProvenanceBase):
@@ -989,11 +971,10 @@ class CommunityResourceProvenance(ProvenanceBase):
             assert isinstance(resource, BaseResource)
             assert grantor is None or isinstance(grantor, User)
             assert privilege >= PrivilegeCodes.OWNER and privilege <= PrivilegeCodes.NONE
-        # START(ID=480,NAME=ProvenanceUpdateUpdateClsCommunityResourceProvenance,TYPE=UPDATE,OBJECTS=[CommunityResourceProvenance])
         super(CommunityResourceProvenance, cls).update(community=community,
                                                        resource=resource,
                                                        privilege=privilege,
                                                        grantor=grantor,
                                                        undone=undone,
                                                        exhibit=exhibit)
-        # END(ID=480)
+

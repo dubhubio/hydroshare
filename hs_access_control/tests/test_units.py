@@ -15,8 +15,9 @@ class UnitTests(MockIRODSTestCaseMixin, TestCase):
     def setUp(self):
         super(UnitTests, self).setUp()
         global_reset()
+        # START(ID=722,NAME=TestUnitsSetUpGroupGetOrCreate,TYPE=MERGE,OBJECTS=[Group])
         self.group, _ = Group.objects.get_or_create(name='Hydroshare Author')
-
+        # END(ID=722)
         self.alva = hydroshare.create_account(
             'alva@gmail.com',
             username='alva',
@@ -117,7 +118,9 @@ class UnitTests(MockIRODSTestCaseMixin, TestCase):
         bikers = self.bikers
         self.assertTrue(george.uaccess.can_view_group(bikers))
         bikers.gaccess.public = False
+        # START(ID=723,NAME=TestUnitsTestUserCanViewGroup,TYPE=UPDATE,OBJECTS=[GroupAccess])
         bikers.save()
+        # END(ID=723)
         self.assertFalse(alva.uaccess.can_view_group(bikers))
 
     def test_user_can_view_group_metadata(self):
@@ -127,7 +130,9 @@ class UnitTests(MockIRODSTestCaseMixin, TestCase):
         self.assertTrue(george.uaccess.can_view_group_metadata(bikers))
         bikers.gaccess.public = False
         bikers.gaccess.discoverable = False
+        # START(ID=724,NAME=TestUnitsTestUserCanViewGroupMetadata,TYPE=UPDATE,OBJECTS=[GroupAccess])
         bikers.save()
+        # END(ID=724)
         self.assertFalse(alva.uaccess.can_view_group_metadata(bikers))
 
     def test_user_can_change_group_flags(self):

@@ -15,7 +15,9 @@ class T04CreateGroup(MockIRODSTestCaseMixin, TestCase):
     def setUp(self):
         super(T04CreateGroup, self).setUp()
         global_reset()
+        # START(ID=620,NAME=TestCreateGroupSetUpGetGroup,TYPE=MERGE,OBJECTS=[Group])
         self.group, _ = Group.objects.get_or_create(name='Hydroshare Author')
+        # END(ID=620)
         self.admin = hydroshare.create_account(
             'admin@gmail.com',
             username='admin',
@@ -63,8 +65,9 @@ class T04CreateGroup(MockIRODSTestCaseMixin, TestCase):
         self.assertEqual(
             arfers.gaccess.purpose,
             "Our purpose to collaborate on hydrology")
-
+        # START(ID=624,NAME=TestCreateGroupTest02CreateDeleteGroupArfers,TYPE=DELETE,OBJECTS=[Group])
         arfers.delete()
+        # END(ID=624)
         arfers = dog.uaccess.create_group(
             title='arfers', description="This is arfers group")
         self.assertEqual(arfers.name, 'arfers')
@@ -186,7 +189,9 @@ class T15CreateGroup(MockIRODSTestCaseMixin, TestCase):
     def setUp(self):
         super(T15CreateGroup, self).setUp()
         global_reset()
+        # START(ID=621,NAME=TestCreateGroupT15SetUpGetGroup,TYPE=MERGE,OBJECTS=[Group])
         self.group, _ = Group.objects.get_or_create(name='Hydroshare Author')
+        # END(ID=621)
         self.admin = hydroshare.create_account(
             'admin@gmail.com',
             username='admin',
@@ -250,7 +255,9 @@ class T15CreateGroup(MockIRODSTestCaseMixin, TestCase):
 
         # now set it to non-public
         meowers.gaccess.public = False
+        # START(ID=622,NAME=TestCreateGroupTest03ChangeGroupNotPublicFalse,TYPE=UPDATE,OBJECTS=[GroupAccess])
         meowers.gaccess.save()
+        # END(ID=622)
 
         # check flags
         self.assertFalse(meowers.gaccess.public)
@@ -277,7 +284,9 @@ class T15CreateGroup(MockIRODSTestCaseMixin, TestCase):
 
         # now set it to non-discoverable
         meowers.gaccess.discoverable = False
+        # START(ID=623,NAME=TestCreateGroupTest03ChangeGroupNotDiscoverableFalse,TYPE=UPDATE,OBJECTS=[GroupAccess])
         meowers.gaccess.save()
+        # END(ID=623)
 
         # check flags
         self.assertTrue(meowers.gaccess.public)

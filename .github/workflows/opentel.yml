@@ -9,12 +9,6 @@ on:
 jobs:
   container-job:
     runs-on: ubuntu-latest
-    container: canopyiq/python-dind-builder:latest
-    services:
-      open-tel:
-        image: baseshiftefraim/otelcol:latest
-        ports:
-          - 4317:4317
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
@@ -23,13 +17,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Install Dependencies
-        run: |
-          python -m venv .venv
-          /usr/bin/env sh
-          python -m pip install --upgrade pip wheel setuptools
-          pip install dubhub
-          pip install dubhub-instrument-psycopg2
       - name: Run docker image
         run: |
           apt update && apt upgrade -y
@@ -39,26 +26,21 @@ jobs:
               ca-certificates \
               curl \
               gnupg
-          sudo mkdir -m 0755 -p /etc/apt/keyrings
-          curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+          sudo install -m 0755 -d /etc/apt/keyrings
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+          sudo chmod a+r /etc/apt/keyrings/docker.gpg
           echo \
-          "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
-          "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
-          sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+            "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+            "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+            sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
           sudo apt-get update
           sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
           sudo apt-get update
-          sudo apt-get install -y docker-compose-plugin
           echo "c" | sudo ./local-dev-first-start-only.sh
       - name: Run Tests
         run: |
-          echo "c" | sudo ./local-dev-first-start-only.sh
-          sudo docker compose -f local-dev.yml up -d
-          sleep 200
-          ./hsctl managepy test hs_core.tests.api.rest.test_resmap --keepdb
-          sudo docker exec -u hydro-service -ti hydroshare python manage.py test
-          docker logs hydroshare
-          sudo docker exec -u hydro-service hydroshare python manage.py test
+          sudo docker compose -f local-dev.yml up
+          ./hsctl managepy test
         env:
           GITHUB_RUN_ID: ${{ github.run_id }}
           PR_REF: ${{ github.event.pull_request.head.sha }}

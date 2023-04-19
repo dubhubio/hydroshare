@@ -20,7 +20,9 @@ class BasicFunction(MockIRODSTestCaseMixin, TestCase):
     def setUp(self):
         super(BasicFunction, self).setUp()
         global_reset()
+        # START(ID=572,NAME=TestBasicFunctionGroupGetCreate,TYPE=MERGE,OBJECTS=[Group])
         self.group, _ = Group.objects.get_or_create(name='Hydroshare Author')
+        # END(ID=572)
 
         self.alva = create_account(
             'alva@gmail.com',
@@ -108,7 +110,9 @@ class BasicFunction(MockIRODSTestCaseMixin, TestCase):
         assertUserResourceState(self, john, [], [], [bikes])
 
         bikes.raccess.immutable = True
+        # START(ID=573,NAME=TestBasicFunctionBaseResourceUpdateImmutableTrue,TYPE=UPDATE,OBJECTS=[BaseResource])
         bikes.raccess.save()
+        # END(ID=573)
 
         assertResourceUserState(
             self, bikes, [george], [], [
@@ -153,7 +157,9 @@ class BasicFunction(MockIRODSTestCaseMixin, TestCase):
         assertGroupResourceState(self, bikers, [], [bikes])
 
         bikes.raccess.immutable = False
+        # START(ID=574,NAME=TestBasicFunctionBaseResourceUpdateImmutableFalse,TYPE=UPDATE,OBJECTS=[BaseResource])
         bikes.raccess.save()
+        # END(ID=574)
 
         # without immutable, CHANGE returns
         assertResourceGroupState(self, bikes, [bikers], [])
@@ -345,14 +351,18 @@ class BasicFunction(MockIRODSTestCaseMixin, TestCase):
         # inactive users can't be granted access
         # set john to an inactive user
         john.is_active = False
+        # START(ID=575,NAME=TestBasicFunctionTestShareInactiveUserUpdateUserIsActiveFalse,TYPE=UPDATE,OBJECTS=[User])
         john.save()
+        # END(ID=575)
 
         with self.assertRaises(PermissionDenied):
             george.uaccess.share_resource_with_user(
                 bikes, john, PrivilegeCodes.CHANGE)
 
         john.is_active = True
+        # START(ID=576,NAME=TestBasicFunctionTestShareInactiveUserUpdateUserIsActiveTrue,TYPE=UPDATE,OBJECTS=[User])
         john.save()
+        # END(ID=576)
 
         # inactive grantor can't grant access
         # let's first grant John access privilege
@@ -364,7 +374,9 @@ class BasicFunction(MockIRODSTestCaseMixin, TestCase):
             PrivilegeCodes.CHANGE)
 
         john.is_active = False
+        # START(ID=577,NAME=TestBasicFunctionTestShareInactiveUserUpdateUserIsActiveSecondFalse,TYPE=UPDATE,OBJECTS=[User])
         john.save()
+        # END(ID=577)
 
         with self.assertRaises(PermissionDenied):
             john.uaccess.share_resource_with_user(

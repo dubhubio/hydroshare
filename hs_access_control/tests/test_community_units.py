@@ -23,7 +23,9 @@ class UnitTests(MockIRODSTestCaseMixin, TestCase):
     def setUp(self):
         super(UnitTests, self).setUp()
         global_reset()
+        # START(ID=611,NAME=TestCommunityUnitsSetUpGetGroup,TYPE=MERGE,OBJECTS=[Group])
         self.group, _ = Group.objects.get_or_create(name='Hydroshare Author')
+        # END(ID=611)
 
         self.alva = hydroshare.create_account(
             'alva@gmail.com',
@@ -77,11 +79,21 @@ class UnitTests(MockIRODSTestCaseMixin, TestCase):
 
     def tearDown(self):
         super(UnitTests, self).tearDown()
+        # START(ID=616,NAME=TestCommunityTearDownUser,TYPE=DELETE,OBJECTS=[User])
         User.objects.all().delete()
+        # END(ID=616)
+        # START(ID=612,NAME=TestCommunityTearDownGroup,TYPE=DELETE,OBJECTS=[Group])
         Group.objects.all().delete()
+        # END(ID=612)
+        # START(ID=613,NAME=TestCommunityTearDownBaseResourceBikes,TYPE=DELETE,OBJECTS=[BaseResource])
         self.bikes.delete()
+        # END(ID=613)
+        # START(ID=614,NAME=TestCommunityTearDownBaseResource,TYPE=DELETE,OBJECTS=[BaseResource])
         BaseResource.objects.all().delete()
+        # END(ID=614)
+        # START(ID=615,NAME=TestCommunityTearDownCommunity,TYPE=DELETE,OBJECTS=[Community])
         Community.objects.all().delete()
+        # END(ID=615)
 
     def test_usercommunityprivilege_get_current_record(self):
         george = self.george

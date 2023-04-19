@@ -22,7 +22,9 @@ class UnitTests(MockIRODSTestCaseMixin, TestCase):
     def setUp(self):
         super(UnitTests, self).setUp()
         global_reset()
+        # START(ID=685,NAME=TestProvenanceFunctionSetUpGetOrCreate,TYPE=MERGE,OBJECTS=[Group])
         self.group, _ = Group.objects.get_or_create(name='Hydroshare Author')
+        # END(ID=685)
 
         self.alva = hydroshare.create_account(
             'alva@gmail.com',
@@ -84,11 +86,21 @@ class UnitTests(MockIRODSTestCaseMixin, TestCase):
 
     def tearDown(self):
         super(UnitTests, self).tearDown()
+        # START(ID=686,NAME=TestProvenanceFunctionTearDownAllUser,TYPE=DELETE,OBJECTS=[User])
         User.objects.all().delete()
+        # END(ID=686)
+        # START(ID=687,NAME=TestProvenanceFunctionTearDownAllGroup,TYPE=DELETE,OBJECTS=[Group])
         Group.objects.all().delete()
+        # END(ID=687)
+        # START(ID=688,NAME=TestProvenanceFunctionTearDownBaseResourceHarps,TYPE=DELETE,OBJECTS=[BaseResource])
         self.harps.delete()
+        # END(ID=688)
+        # START(ID=689,NAME=TestProvenanceFunctionTearDownBaseResourceBikes,TYPE=DELETE,OBJECTS=[BaseResource])
         self.bikes.delete()
+        # END(ID=689)
+        # START(ID=690,NAME=TestProvenanceFunctionTearDownAllBaseResource,TYPE=DELETE,OBJECTS=[BaseResource])
         BaseResource.objects.all().delete()
+        # END(ID=690)
 
     def test_user_resource_provenance_crosstalk(self):
         george = self.george

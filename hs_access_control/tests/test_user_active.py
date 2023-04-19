@@ -16,7 +16,9 @@ class T12UserActive(MockIRODSTestCaseMixin, TestCase):
         super(T12UserActive, self).setUp()
 
         global_reset()
+        # START(ID=725,NAME=TestUserActiveSetUpGetOrCreate,TYPE=MERGE,OBJECTS=[Group])
         self.group, _ = Group.objects.get_or_create(name='Hydroshare Author')
+        # END(ID=725)
         self.admin = hydroshare.create_account(
             'admin@gmail.com',
             username='admin',
@@ -63,7 +65,9 @@ class T12UserActive(MockIRODSTestCaseMixin, TestCase):
 
         # turn off active
         cat.is_active = False
+        # START(ID=726,NAME=TestUserActiveTest00Exceptions,TYPE=UPDATE,OBJECTS=[User])
         cat.save()
+        # END(ID=726)
 
         # all user routines should raise exceptions
         with self.assertRaises(PermissionDenied):
@@ -179,7 +183,9 @@ class T12UserActive(MockIRODSTestCaseMixin, TestCase):
                     cat, dog]))
 
         dog.is_active = False
+        # START(ID=727,NAME=TestUserActiveTest01Reporting,TYPE=UPDATE,OBJECTS=[User])
         dog.save()
+        # END(ID=727)
 
         self.assertTrue(
             is_equal_to_as_set(

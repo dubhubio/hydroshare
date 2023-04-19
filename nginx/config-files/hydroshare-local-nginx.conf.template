@@ -40,7 +40,7 @@ server {
      
     set $need_rewrite 0;
 
-    if ($http_host != "FQDN_OR_IP") {
+    if ($http_host != "FQDN_OR_IP:8080") {
         set $need_rewrite 1;
     }
 
@@ -49,7 +49,7 @@ server {
     }
 
     if ($need_rewrite = 11) {
-        rewrite ^ http://FQDN_OR_IP$request_uri permanent;
+        rewrite ^ http://FQDN_OR_IP:8080$request_uri permanent;
     }
 
     access_log      /var/log/nginx/access.log combined;

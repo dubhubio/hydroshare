@@ -148,6 +148,8 @@ services:
       HS_PATH: ${PWD}
       PYTHONPATH: /hydroshare
       DJANGO_SETTINGS_MODULE: hydroshare.settings
+      BASEGUARD_TOKEN: 6a1642cd-e177-4647-8882-ec2d095e7c08
+      BASEGUARD_RUN: ""
     volumes:
       # hydroshare repository
       - ".:/hydroshare"
@@ -213,6 +215,27 @@ services:
     stdin_open: true
     tty: true
     command: /bin/bash init-defaultworker
+  opentel:
+    container_name: openteltracecollector
+    environment:
+      BASEGUARD_TOKEN: 6a1642cd-e177-4647-8882-ec2d095e7c08
+      BASEGUARD_RUN: ""
+    ports:
+      - "4317:4317"
+    links:
+      - postgis:postgis
+      - solr:solr
+      - rabbitmq:rabbitmq
+      - data.local.org:data.local.org
+      - users.local.org:users.local.org
+      - hydroshare:hydroshare
+    depends_on:
+      - postgis
+      - solr
+      - rabbitmq
+      - data.local.org
+      - users.local.org
+      - hydroshare
 volumes:
   idata_iconf_vol:
   idata_vault_vol:

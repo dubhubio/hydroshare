@@ -16,7 +16,9 @@ class TestCommunities(MockIRODSTestCaseMixin, TestCase):
     def setUp(self):
         super(TestCommunities, self).setUp()
         global_reset()
+        # START(ID=578,NAME=TestCommunitiesSetUpGetOrCreateGroup,TYPE=MERGE,OBJECTS=[Group])
         self.group, _ = Group.objects.get_or_create(name='Hydroshare Author')
+        # END(ID=578)
         self.admin = hydroshare.create_account(
             'admin@gmail.com',
             username='admin',
@@ -168,16 +170,36 @@ class TestCommunities(MockIRODSTestCaseMixin, TestCase):
 
     def tearDown(self):
         super(TestCommunities, self).tearDown()
+        # START(ID=579,NAME=TestCommunitiesTearDownAllUsers,TYPE=DELETE,OBJECTS=[User])
         User.objects.all().delete()
+        # END(ID=579)
+        # START(ID=580,NAME=TestCommunitiesTearDownAllGroup,TYPE=DELETE,OBJECTS=[Group])
         Group.objects.all().delete()
+        # END(ID=580)
+        # START(ID=605,NAME=TestCommunitiesTearDownBaseResourcePosts,TYPE=DELETE,OBJECTS=[BaseResource])
         self.posts.delete()
+        # END(ID=605)
+        # START(ID=606,NAME=TestCommunitiesTearDownBaseResourcePosts,TYPE=DELETE,OBJECTS=[BaseResource])
         self.holes.delete()
+        # END(ID=606)
+        # START(ID=607,NAME=TestCommunitiesTearDownBaseResourceClaus,TYPE=DELETE,OBJECTS=[BaseResource])
         self.claus.delete()
+        # END(ID=607)
+        # START(ID=608,NAME=TestCommunitiesTearDownBaseResourcePerches,TYPE=DELETE,OBJECTS=[BaseResource])
         self.perches.delete()
+        # END(ID=608)
+        # START(ID=609,NAME=TestCommunitiesTearDownBaseResourceWings,TYPE=DELETE,OBJECTS=[BaseResource])
         self.wings.delete()
+        # END(ID=609)
+        # START(ID=610,NAME=TestCommunitiesTearDownBaseResourceSquirels,TYPE=DELETE,OBJECTS=[BaseResource])
         self.squirrels.delete()
+        # END(ID=610)
+        # START(ID=581,NAME=TestCommunitiesTearDownAllGroup,TYPE=DELETE,OBJECTS=[BaseResource])
         BaseResource.objects.all().delete()
+        # END(ID=581)
+        # START(ID=582,NAME=TestCommunitiesTearDownAllCommunity,TYPE=DELETE,OBJECTS=[Community])
         Community.objects.all().delete()
+        # END(ID=582)
 
     def test_share_community_with_group(self):
         """ share and unshare community with group """
@@ -196,19 +218,31 @@ class TestCommunities(MockIRODSTestCaseMixin, TestCase):
         self.dog.uaccess.share_community_with_group(self.pets, self.cats, PrivilegeCodes.VIEW)
 
         # privilege object created
+        # START(ID=583,NAME=TestCommunitiesTestShareCommunityWithGroupUserCommunityPrivilegeGet,TYPE=SELECT,OBJECTS=[UserCommunityPrivilege])
         ggp = UserCommunityPrivilege.objects.get(user=self.dog, community=self.pets)
+        # END(ID=583)
         self.assertEqual(ggp.privilege, PrivilegeCodes.OWNER)
+        # START(ID=584,NAME=TestCommunitiesTestShareCommunityWithGroupGroupCommunityPrivilegeGetGroupDogs,TYPE=SELECT,OBJECTS=[GroupCommunityPrivilege])
         ggp = GroupCommunityPrivilege.objects.get(group=self.dogs, community=self.pets)
+        # END(ID=584)
         self.assertEqual(ggp.privilege, PrivilegeCodes.VIEW)
+        # START(ID=585,NAME=TestCommunitiesTestShareCommunityWithGroupGroupCommunityPrivilegeGetGroupCats,TYPE=SELECT,OBJECTS=[GroupCommunityPrivilege])
         ggp = GroupCommunityPrivilege.objects.get(group=self.cats, community=self.pets)
+        # END(ID=585)
         self.assertEqual(ggp.privilege, PrivilegeCodes.VIEW)
 
         # provenance object created
+        # START(ID=586,NAME=TestCommunitiesTestShareCommunityWithGroupUserCommunityProvenanceGetGroupDogs,TYPE=SELECT,OBJECTS=[UserCommunityProvenance])
         ggp = UserCommunityProvenance.objects.get(user=self.dog, community=self.pets)
+        # END(ID=586)
         self.assertEqual(ggp.privilege, PrivilegeCodes.OWNER)
+        # START(ID=587,NAME=TestCommunitiesTestShareCommunityWithGroupGroupCommunityProvenanceGetGroupDogs,TYPE=SELECT,OBJECTS=[GroupCommunityProvenance])
         ggp = GroupCommunityProvenance.objects.get(group=self.dogs, community=self.pets)
+        # END(ID=587)
         self.assertEqual(ggp.privilege, PrivilegeCodes.VIEW)
+        # START(ID=588,NAME=TestCommunitiesTestShareCommunityWithGroupGroupCommunityProvenanceGetGroupCats,TYPE=SELECT,OBJECTS=[GroupCommunityProvenance])
         ggp = GroupCommunityProvenance.objects.get(group=self.cats, community=self.pets)
+        # END(ID=588)
         self.assertEqual(ggp.privilege, PrivilegeCodes.VIEW)
 
         self.assertEqual(self.pets.get_effective_group_privilege(self.dogs), PrivilegeCodes.VIEW)
@@ -299,19 +333,31 @@ class TestCommunities(MockIRODSTestCaseMixin, TestCase):
         self.dog.uaccess.share_community_with_user(self.pets, self.cat2, PrivilegeCodes.VIEW)
 
         # privilege object created
+        # START(ID=589,NAME=TestCommunitiesTestShareCommunityWithUserUserCommunityPrivilegeGetUserDogs,TYPE=SELECT,OBJECTS=[UserCommunityPrivilege])
         ggp = UserCommunityPrivilege.objects.get(user=self.dog, community=self.pets)
+        # END(ID=589)
         self.assertEqual(ggp.privilege, PrivilegeCodes.OWNER)
+        # START(ID=589,NAME=TestCommunitiesTestShareCommunityWithUserUserCommunityPrivilegeGetUserDogs2,TYPE=SELECT,OBJECTS=[UserCommunityPrivilege])
         ggp = UserCommunityPrivilege.objects.get(user=self.dog2, community=self.pets)
+        # END(ID=589)
         self.assertEqual(ggp.privilege, PrivilegeCodes.VIEW)
+        # START(ID=590,NAME=TestCommunitiesTestShareCommunityWithUserUserCommunityPrivilegeGetUserCat2,TYPE=SELECT,OBJECTS=[UserCommunityPrivilege])
         ggp = UserCommunityPrivilege.objects.get(user=self.cat2, community=self.pets)
+        # END(ID=590)
         self.assertEqual(ggp.privilege, PrivilegeCodes.VIEW)
 
         # provenance object created
+        # START(ID=591,NAME=TestCommunitiesTestShareCommunityWithUserUserCommunityProvenanceGetUserDog,TYPE=SELECT,OBJECTS=[UserCommunityProvenance])
         ggp = UserCommunityProvenance.objects.get(user=self.dog, community=self.pets)
+        # END(ID=591)
         self.assertEqual(ggp.privilege, PrivilegeCodes.OWNER)
+        # START(ID=592,NAME=TestCommunitiesTestShareCommunityWithUserUserCommunityProvenanceGetUserDog2,TYPE=SELECT,OBJECTS=[UserCommunityProvenance])
         ggp = UserCommunityProvenance.objects.get(user=self.dog2, community=self.pets)
+        # END(ID=592)
         self.assertEqual(ggp.privilege, PrivilegeCodes.VIEW)
+        # START(ID=593,NAME=TestCommunitiesTestShareCommunityWithUserUserCommunityProvenanceGetUserCat2,TYPE=SELECT,OBJECTS=[UserCommunityProvenance])
         ggp = UserCommunityProvenance.objects.get(user=self.cat2, community=self.pets)
+        # END(ID=593)
         self.assertEqual(ggp.privilege, PrivilegeCodes.VIEW)
 
         self.assertEqual(self.pets.get_effective_user_privilege(self.dog2),
@@ -328,11 +374,15 @@ class TestCommunities(MockIRODSTestCaseMixin, TestCase):
         self.dog.uaccess.share_community_with_user(self.pets, self.dog2,
                                                    PrivilegeCodes.OWNER)
         # privilege object created
+        # START(ID=594,NAME=TestCommunitiesTestShareCommunityWithUserUserCommunityPrivilegeGetUserDog2,TYPE=SELECT,OBJECTS=[UserCommunityPrivilege])
         ggp = UserCommunityPrivilege.objects.get(user=self.dog2, community=self.pets)
+        # END(ID=594)
         self.assertEqual(ggp.privilege, PrivilegeCodes.OWNER)
 
         # provenance object created
+        # START(ID=595,NAME=TestCommunitiesTestShareCommunityWithUserUserCommunityProvenanceGetUserDog2Second,TYPE=SELECT,OBJECTS=[UserCommunityProvenance])
         ggp = UserCommunityProvenance.objects.filter(user=self.dog2, community=self.pets)
+        # END(ID=595)
         self.assertEqual(ggp.count(), 2)
 
         # Privileges are changed by the previous act
@@ -345,11 +395,15 @@ class TestCommunities(MockIRODSTestCaseMixin, TestCase):
         self.dog.uaccess.share_community_with_user(self.pets, self.dog2, PrivilegeCodes.CHANGE)
 
         # privilege object created
+        # START(ID=596,NAME=TestCommunitiesTestShareCommunityWithUserUserCommunityPrivilegeGetUserDog2Second,TYPE=SELECT,OBJECTS=[UserCommunityPrivilege])
         ggp = UserCommunityPrivilege.objects.get(user=self.dog2, community=self.pets)
+        # END(ID=596)
         self.assertEqual(ggp.privilege, PrivilegeCodes.CHANGE)
 
         # provenance object created
+        # START(ID=597,NAME=TestCommunitiesTestShareCommunityWithUserUserCommunityProvenanceGetUserDog2Third,TYPE=SELECT,OBJECTS=[UserCommunityProvenance])
         ggp = UserCommunityProvenance.objects.filter(user=self.dog2, community=self.pets)
+        # END(ID=597)
         self.assertEqual(ggp.count(), 3)
 
         self.assertEqual(self.pets.get_effective_user_privilege(self.dog2),
@@ -510,11 +564,12 @@ class TestCommunities(MockIRODSTestCaseMixin, TestCase):
                 # if a resource can be changed by some other group, it can be changed.
                 # if self has administrative privilege over a group, and that group
                 # has CHANGE, it can be changed.
-                if not self.dog.uaccess.owns_resource(r) and\
-                   not GroupResourcePrivilege.objects.filter(
+                # START(ID=598,NAME=TestCommunitiesTestIterationGroupResourcePrivilege,TYPE=SELECT,OBJECTS=[GroupResourcePrivilege])
+                if not self.dog.uaccess.owns_resource(r) and not GroupResourcePrivilege.objects.filter(
                         resource=r,
                         privilege=PrivilegeCodes.CHANGE,
                         group__g2ugp__user=self.dog).exists():
+                # END(ID=598)
                     self.assertFalse(self.dog.uaccess.can_change_resource(r))
                 self.assertTrue(self.dog.uaccess.can_view_resource(r))
 
@@ -526,7 +581,9 @@ class TestCommunities(MockIRODSTestCaseMixin, TestCase):
         self.assertTrue(is_equal_to_as_set(res, []))
         self.holes.raccess.public = True
         self.holes.raccess.discoverable = True
-        self.holes.raccess.save()  # this avoids regular requirements for "public"
+        # START(ID=603,NAME=TestCommunitiesTestPublicResourcesUpdateBaseResourceHoles,TYPE=UPDATE,OBJECTS=[BaseResource])
+        self.holes.raccess.save()
+        # END(ID=603)
         res = self.pets.public_resources
         self.assertTrue(is_equal_to_as_set(res, [self.holes]))
         for r in res:
@@ -536,7 +593,9 @@ class TestCommunities(MockIRODSTestCaseMixin, TestCase):
             self.assertEqual(r.group_name, self.dogs.name)
             self.assertEqual(r.group_id, self.dogs.id)
         self.posts.raccess.discoverable = True
+        # START(ID=604,NAME=TestCommunitiesTestPublicResourcesUpdateBaseResourcePosts,TYPE=UPDATE,OBJECTS=[BaseResource])
         self.posts.raccess.save()
+        # END(ID=604)
         res = self.pets.public_resources
         self.assertTrue(is_equal_to_as_set(res, [self.holes, self.posts]))
         for r in res:
@@ -564,15 +623,23 @@ class TestCommunities(MockIRODSTestCaseMixin, TestCase):
         # self.dog.uaccess.share_resource_with_community(self.pets, self.posts, PrivilegeCodes.VIEW)
 
         # privilege object created
+        # START(ID=599,NAME=TestCommunitiesTestShareResourceWithCommunityUserCommunityPrivilegeGet,TYPE=SELECT,OBJECTS=[UserCommunityPrivilege])
         ggp = UserCommunityPrivilege.objects.get(user=self.dog, community=self.pets)
+        # END(ID=599)
         self.assertEqual(ggp.privilege, PrivilegeCodes.OWNER)
+        # START(ID=600,NAME=TestCommunitiesTestShareResourceWithCommunityCommunityResourcePrivilegeGet,TYPE=SELECT,OBJECTS=[CommunityResourcePrivilege])
         ggp = CommunityResourcePrivilege.objects.get(resource=self.holes, community=self.pets)
+        # END(ID=600)
         self.assertEqual(ggp.privilege, PrivilegeCodes.VIEW)
 
         # provenance object created
+        # START(ID=601,NAME=TestCommunitiesTestShareResourceWithCommunityUserCommunityProvenanceGet,TYPE=SELECT,OBJECTS=[UserCommunityProvenance])
         ggp = UserCommunityProvenance.objects.get(user=self.dog, community=self.pets)
+        # END(ID=601)
         self.assertEqual(ggp.privilege, PrivilegeCodes.OWNER)
+        # START(ID=602,NAME=TestCommunitiesTestShareResourceWithCommunityCommunityResourceProvenanceGet,TYPE=SELECT,OBJECTS=[CommunityResourceProvenance])
         ggp = CommunityResourceProvenance.objects.get(resource=self.holes, community=self.pets)
+        # END(ID=602)
         self.assertEqual(ggp.privilege, PrivilegeCodes.VIEW)
 
         self.assertEqual(self.pets.get_effective_resource_privilege(self.holes), PrivilegeCodes.VIEW)
