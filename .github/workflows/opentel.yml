@@ -7,7 +7,8 @@ on:
     branches: [ "main" ]
 
 jobs:
-  strategy:
+  container-job:
+    strategy:
       matrix:
         os: [ubuntu-x86_64]
     runs-on: ${{ matrix.os }}
